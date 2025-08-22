@@ -1,0 +1,30 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+app:
+  version: 0.0.1
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILE:local}
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: ${SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS:604800000}
