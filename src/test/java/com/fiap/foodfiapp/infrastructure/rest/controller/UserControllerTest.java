@@ -35,10 +35,12 @@ class UserControllerTest {
     private UserRepositoryGateway userRepositoryGateway;
 
     private UserRequestDTO userRequestDTO;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         userRequestDTO = new UserRequestDTO("Test", "test@email.com", "1234");
+        objectMapper = new ObjectMapper();
     }
 
     @Test
