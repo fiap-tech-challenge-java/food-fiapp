@@ -97,6 +97,7 @@ Para rodar todos os testes e gerar um relatório de cobertura:
 ./mvnw clean verify
 ```
 
-Além disso, o projeto inclui testes de arquitetura com o ArchUnit para garantir que as regras da Arquitetura Limpa sejam respeitadas.
+Além disso, o projeto inclui testes de arquitetura com o ArchUnit 
+para garantir que as regras da Arquitetura Limpa sejam respeitadas.
 
 ```
