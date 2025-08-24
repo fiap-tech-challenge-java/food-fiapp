@@ -1,11 +1,12 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.application.usecases.user.CreateUserUseCase;
-import com.fiap.foodfiapp.domain.entity.User;
 import com.fiap.foodfiapp.domain.exception.BusinessException;
 import com.fiap.foodfiapp.infrastructure.rest.dto.UserRequestDTO;
 import com.fiap.foodfiapp.infrastructure.rest.dto.UserResponseDTO;
 import com.fiap.foodfiapp.application.gateways.UserRepositoryGateway;
+import com.fiap.foodfiapp.infrastructure.rest.mapper.UserRequestMapper;
+import com.fiap.foodfiapp.infrastructure.rest.mapper.UserResponseMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +28,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO userRequestDTO) {
         try {
-            User user = new User(null, userRequestDTO.getName(), userRequestDTO.getEmail(), userRequestDTO.getPassword());
-            User createdUser = createUserUseCase.execute(user);
-            UserResponseDTO responseDTO = new UserResponseDTO(createdUser.id(), createdUser.name(), createdUser.email());
+            var user = UserRequestMapper.toEntity(userRequestDTO);
+            var createdUser = createUserUseCase.execute(user);
+            var responseDTO = UserResponseMapper.toDTO(createdUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (BusinessException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -38,11 +39,10 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> findAll() {
-        List<User> users = userRepositoryGateway.findAll();
-        List<UserResponseDTO> response = users.stream()
-                .map(u -> new UserResponseDTO(u.id(), u.name(), u.email()))
+        var users = userRepositoryGateway.findAll();
+        var response = users.stream()
+                .map(UserResponseMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
 }
-
