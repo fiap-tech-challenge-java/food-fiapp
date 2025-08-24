@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
+
 import com.fiap.foodfiapp.application.usecases.user.CreateUserUseCase;
 import com.fiap.foodfiapp.domain.entity.User;
 import com.fiap.foodfiapp.domain.exception.BusinessException;

@@ -49,16 +49,25 @@ public class CleanArchitectureTest {
                             "lombok.."
                     );
 
-    // Regra 4: Valida que a camada de infraestrutura só depende de si mesma ou das camadas internas
-    // Reforça a "Regra de Dependência" da Arquitetura Limpa
+    // Regra 4: Valida que a camada de domínio não depende de camadas externas
+    // Esta regra garante que as dependências apontem para dentro, reforçando a Regra de Dependência.
     @ArchTest
-    public static final ArchRule dependencias_apontam_para_dentro =
+    public static final ArchRule domain_depende_apenas_de_si_mesma_e_java =
             ArchRuleDefinition.classes()
-                    .that().resideInAPackage("..infrastructure..")
+                    .that().resideInAPackage("..domain..")
                     .should().onlyDependOnClassesThat()
-                    .resideInAnyPackage("..infrastructure..", "..application..", "..domain..", "java..");
+                    .resideInAnyPackage("..domain..", "java..");
 
-    // Regra 5: Garante que a camada de REST/controller não exponha entidades de domínio diretamente
+    // Regra 5: Valida que a camada de aplicação só depende de si mesma ou de camadas internas
+    @ArchTest
+    public static final ArchRule application_depende_apenas_de_si_mesma_domain_e_java =
+            ArchRuleDefinition.classes()
+                    .that().resideInAPackage("..application..")
+                    .should().onlyDependOnClassesThat()
+                    .resideInAnyPackage("..application..", "..domain..", "java..");
+
+
+    // Regra 6: Garante que a camada de REST/controller não exponha entidades de domínio diretamente
     // Promove a utilização de DTOs (UserRequestDTO, UserResponseDTO) para comunicação externa
     @ArchTest
     public static final ArchRule controller_nao_expoe_domain =
