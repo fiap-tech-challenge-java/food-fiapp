@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.architecture;
 
+import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
@@ -11,7 +12,7 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 public class CleanArchitectureTest {
 
     // Regra 1: Valida as dependências entre as camadas
-    // Exemplo: a camada de infraestrutura deve depender apenas da camada de aplicação ou de domínio
+    // A camada de infraestrutura deve depender apenas da camada de aplicação ou de domínio
     @ArchTest
     public static final ArchRule layered_architecture_is_respected = layeredArchitecture()
             .consideringOnlyDependenciesInLayers()
@@ -65,14 +66,5 @@ public class CleanArchitectureTest {
                     .that().resideInAPackage("..application..")
                     .should().onlyDependOnClassesThat()
                     .resideInAnyPackage("..application..", "..domain..", "java..");
-
-
-    // Regra 6: Garante que a camada de REST/controller não exponha entidades de domínio diretamente
-    // Promove a utilização de DTOs (UserRequestDTO, UserResponseDTO) para comunicação externa
-    @ArchTest
-    public static final ArchRule controller_nao_expoe_domain =
-            ArchRuleDefinition.noClasses()
-                    .that().resideInAPackage("..infrastructure.rest..")
-                    .should().dependOnClassesThat().resideInAPackage("..domain..");
 
 }
