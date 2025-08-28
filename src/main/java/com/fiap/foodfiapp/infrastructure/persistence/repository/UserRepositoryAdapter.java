@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.persistence.repository;
 
-import com.fiap.foodfiapp.domain.entity.User;
-import com.fiap.foodfiapp.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.entity.User;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserSpringDataRepository;
 import java.util.List;
