@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp;
 
-import com.fiap.foodfiapp.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
 import com.fiap.foodfiapp.infrastructure.persistence.repository.UserRepositoryGatewayImpl;
 import com.fiap.foodfiapp.infrastructure.rest.controller.UserController;
 import org.junit.jupiter.api.Test;

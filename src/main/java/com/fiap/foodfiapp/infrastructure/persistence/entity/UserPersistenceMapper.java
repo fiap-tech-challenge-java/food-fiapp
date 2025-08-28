@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
-import com.fiap.foodfiapp.domain.entity.User;
+import com.fiap.foodfiapp.core.domain.entity.User;
 
 public class UserPersistenceMapper {
     public static UserEntity toEntity(User user) {
