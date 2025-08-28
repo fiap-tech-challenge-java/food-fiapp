@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.config;
 
-import com.fiap.foodfiapp.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
+import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

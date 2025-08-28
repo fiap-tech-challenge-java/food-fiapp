@@ -1,10 +1,10 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 
-import com.fiap.foodfiapp.application.usecases.user.CreateUserUseCase;
-import com.fiap.foodfiapp.domain.entity.User;
-import com.fiap.foodfiapp.domain.exception.BusinessException;
-import com.fiap.foodfiapp.application.gateways.UserRepositoryGateway;
+import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.domain.entity.User;
+import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

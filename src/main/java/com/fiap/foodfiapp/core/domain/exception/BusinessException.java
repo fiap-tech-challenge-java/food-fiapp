@@ -1,4 +1,4 @@
-package com.fiap.foodfiapp.domain.exception;
+package com.fiap.foodfiapp.core.domain.exception;
 
 /**
  * BusinessException is a generic exception for business rule violations in the domain layer.

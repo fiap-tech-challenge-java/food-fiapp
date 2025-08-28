@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
 import com.fiap.foodfiapp.infrastructure.rest.dto.UserRequestDTO;
-import com.fiap.foodfiapp.domain.entity.User;
+import com.fiap.foodfiapp.core.domain.entity.User;
 
 public class UserRequestMapper {
     private UserRequestMapper() {}

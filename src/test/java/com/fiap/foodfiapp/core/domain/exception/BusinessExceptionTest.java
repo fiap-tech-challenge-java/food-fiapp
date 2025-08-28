@@ -1,4 +1,4 @@
-package com.fiap.foodfiapp.domain.exception;
+package com.fiap.foodfiapp.core.domain.exception;
 
 import org.junit.jupiter.api.Test;
 
