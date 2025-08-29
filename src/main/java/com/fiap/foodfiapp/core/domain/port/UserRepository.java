@@ -1,6 +1,6 @@
-package com.fiap.foodfiapp.domain.port;
+package com.fiap.foodfiapp.core.domain.port;
 
-import com.fiap.foodfiapp.domain.entity.User;
+import com.fiap.foodfiapp.core.domain.entity.User;
 import java.util.Optional;
 import java.util.List;
 

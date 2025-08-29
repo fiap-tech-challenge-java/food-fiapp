@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.persistence.repository;
 
-import com.fiap.foodfiapp.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.domain.entity.User;
+import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserPersistenceMapper;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserSpringDataRepository;

@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main  # ou a sua branch principal, por exemplo, 'develop'
+      - develop
 
 jobs:
   build_and_test:
