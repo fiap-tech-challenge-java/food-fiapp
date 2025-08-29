@@ -1,10 +1,10 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
-import com.fiap.foodfiapp.application.usecases.user.CreateUserUseCase;
-import com.fiap.foodfiapp.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.infrastructure.rest.dto.UserRequestDTO;
 import com.fiap.foodfiapp.infrastructure.rest.dto.UserResponseDTO;
-import com.fiap.foodfiapp.application.gateways.UserRepositoryGateway;
+import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserRequestMapper;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserResponseMapper;
 import org.springframework.http.HttpStatus;

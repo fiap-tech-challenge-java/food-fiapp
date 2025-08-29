@@ -1,9 +1,6 @@
-package com.fiap.foodfiapp.application.gateways;
+package com.fiap.foodfiapp.core.application.gateways;
 
-import com.fiap.foodfiapp.domain.entity.User;
-import com.fiap.foodfiapp.domain.port.UserRepository;
-import java.util.Optional;
-import java.util.List;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
 
 /**
  * This is a gateway interface for UserRepository, to be implemented by infrastructure layer (e.g., database, external services).
