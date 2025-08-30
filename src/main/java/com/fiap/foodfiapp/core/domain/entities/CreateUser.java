@@ -1,18 +1,20 @@
-package com.fiap.foodfiapp.infrastructure.rest.dto;
+package com.fiap.foodfiapp.core.domain.entities;
 
-public class UserRequestDTO {
+public class CreateUser {
     private String name;
     private String email;
     private String cpf;
     private String login;
     private String password;
 
-    public UserRequestDTO() {
+    public CreateUser() {
     }
 
-    public UserRequestDTO(String name, String email, String password) {
+    public CreateUser(String name, String email, String cpf, String login, String password) {
         this.name = name;
         this.email = email;
+        this.cpf = cpf;
+        this.login = login;
         this.password = password;
     }
 
@@ -56,4 +58,3 @@ public class UserRequestDTO {
         this.password = password;
     }
 }
-

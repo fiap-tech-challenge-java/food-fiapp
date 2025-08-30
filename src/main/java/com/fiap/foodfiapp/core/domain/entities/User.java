@@ -1,12 +1,10 @@
-package com.fiap.foodfiapp.infrastructure.rest.dto;
-
-import com.fiap.foodfiapp.core.domain.entities.Address;
+package com.fiap.foodfiapp.core.domain.entities;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public class UserResponseDTO {
+public class User {
     private UUID id;
     private String name;
     private String email;
@@ -16,12 +14,20 @@ public class UserResponseDTO {
     private OffsetDateTime updatedAt;
     private OffsetDateTime createdAt;
     private boolean active;
+    private String password;
 
-    public UserResponseDTO() {}
+    public User() {
+    }
 
-    public UserResponseDTO(UUID id, String name, String email, String cpf, String login,
-                           List<Address> addresses, OffsetDateTime updatedAt,
-                           OffsetDateTime createdAt, boolean active) {
+    public User(UUID id, String name, String email, String password) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(UUID id, String name, String email, String cpf, String login, List<Address> addresses,
+                OffsetDateTime updatedAt, OffsetDateTime createdAt, boolean active, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -31,12 +37,7 @@ public class UserResponseDTO {
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
         this.active = active;
-    }
-
-    public UserResponseDTO(UUID id, String name, String email) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
+        this.password = password;
     }
 
     public UUID getId() {
@@ -109,5 +110,13 @@ public class UserResponseDTO {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

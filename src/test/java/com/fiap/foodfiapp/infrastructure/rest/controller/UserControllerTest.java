@@ -1,20 +1,21 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 
-import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
-import com.fiap.foodfiapp.core.domain.entity.User;
-import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
+import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.domain.entities.User;
+import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -28,14 +29,15 @@ class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private CreateUserUseCase createUserUseCase;
-    @MockBean
+
+    @Mock
     private UserRepositoryGateway userRepositoryGateway;
 
     @Test
     void shouldReturnCreatedWhenUserIsCreated() throws Exception {
-        User createdUser = new User(1L, "Test", "test@email.com", "1234");
+        User createdUser = new User(UUID.randomUUID(), "Test", "test@email.com", "1234");
         when(createUserUseCase.execute(any(User.class))).thenReturn(createdUser);
 
         mockMvc.perform(post("/users")
@@ -66,8 +68,8 @@ class UserControllerTest {
     @Test
     void shouldReturnAllUsers() throws Exception {
         when(userRepositoryGateway.findAll()).thenReturn(Arrays.asList(
-                new User(1L, "Test1", "test1@email.com", "1234"),
-                new User(2L, "Test2", "test2@email.com", "5678")
+                new User(UUID.randomUUID(), "Test1", "test1@email.com", "1234"),
+                new User(UUID.randomUUID(), "Test2", "test2@email.com", "5678")
         ));
 
         mockMvc.perform(get("/users"))
