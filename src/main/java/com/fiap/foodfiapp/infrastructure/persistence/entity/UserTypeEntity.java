@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserTypeEntity {
 
-    //TODO CRIAR MIGRATION PARA OS TRÊS TIPOS??
+    //TODO CRIAR MIGRATION PARA OS TRÊS TIPOS??  // 1 Costumer, 2 Owner e 3 Admin
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

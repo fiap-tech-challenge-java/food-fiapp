@@ -1,26 +1,20 @@
 package com.fiap.foodfiapp.core.application.usecases.user;
 
 import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.core.domain.entities.User;
-import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.application.usecases.user.impl.CreateUserUseCaseImpl;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
-class CreateUserUseCaseTest {
+class CreateUserUseCaseImplTest {
     private UserRepositoryGateway userRepositoryGateway;
-    private CreateUserUseCase createUserUseCase;
+    private CreateUserUseCaseImpl createUserUseCaseImpl;
 
     @BeforeEach
     void setUp() {
         userRepositoryGateway = Mockito.mock(UserRepositoryGateway.class);
-        createUserUseCase = new CreateUserUseCase(userRepositoryGateway);
+        createUserUseCaseImpl = new CreateUserUseCaseImpl(userRepositoryGateway);
     }
 
     /////////// COMENTADO POIS A CLASSE USER MUDOU, DEVEMOS APENAS ACRESCER OS CAMPOS NO CONSTRUTOR

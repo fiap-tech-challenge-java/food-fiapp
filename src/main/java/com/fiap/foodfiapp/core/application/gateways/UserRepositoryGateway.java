@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.core.application.gateways;
 
+import com.fiap.foodfiapp.core.domain.entities.CreateUser;
 import com.fiap.foodfiapp.core.domain.entities.User;
 
 import java.util.List;
@@ -16,5 +17,6 @@ public interface UserRepositoryGateway {
     Optional<User> findByEmail(String email);
     List<User> findAll();
     void deleteById(UUID id);
+    User createUser(CreateUser createUser);
 }
 

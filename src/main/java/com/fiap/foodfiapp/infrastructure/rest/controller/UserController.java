@@ -1,8 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
-import com.fiap.foodfiapp.core.domain.entities.CreateUser;
+import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
 import com.fiap.foodfiapp.core.domain.entities.User;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.infrastructure.rest.dto.UserRequestDTO;
@@ -18,18 +17,18 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final CreateUserUseCase createUserUseCase;
-    private final UserRepositoryGateway userRepositoryGateway;
+    private final FindUserUseCase findUserUseCase;
     private static final UserMapper USER_MAPPER = UserMapper.INSTANCE;
 
-    public UserController(CreateUserUseCase createUserUseCase, UserRepositoryGateway userRepositoryGateway) {
+    public UserController(CreateUserUseCase createUserUseCase, FindUserUseCase findUserUseCase) {
         this.createUserUseCase = createUserUseCase;
-        this.userRepositoryGateway = userRepositoryGateway;
+        this.findUserUseCase = findUserUseCase;
     }
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO userRequestDTO) {
         try {
-            CreateUser createdUser = createUserUseCase.execute(USER_MAPPER.mapToCreateUser(userRequestDTO));
+            User createdUser = createUserUseCase.execute(USER_MAPPER.mapToCreateUser(userRequestDTO));
             UserResponseDTO responseDTO = USER_MAPPER.mapToUserResponseDTO(createdUser);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
@@ -40,9 +39,8 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> findAll() {
-        List<User> users = userRepositoryGateway.findAll();
-        List<UserResponseDTO> response = UserMapper.INSTANCE.mapToUserResponseListDTO(users);
+        List<User> userResponse = findUserUseCase.findAll();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(USER_MAPPER.mapToUserResponseListDTO(userResponse));
     }
 }

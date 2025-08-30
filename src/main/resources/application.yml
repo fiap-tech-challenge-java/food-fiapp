@@ -11,10 +11,15 @@ spring:
     active: ${SPRING_PROFILE:local}
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/foodfiapp
+    username: postgres
+    password: pgAdmin
     driver-class-name: org.postgresql.Driver
+#  datasource:
+#    url: ${DB_URL}
+#    username: ${DB_USERNAME}
+#    password: ${DB_PASSWORD}
+
 
   jpa:
     hibernate:
@@ -26,5 +31,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
-  secret: ${JWT_SECRET}
-  expiration-ms: ${JWT_EXPIRATION_MS:604800000}
+  secret: yX56ambwC9AM8QkQzYOpHr0wYviQizzneZBtbeO+IfY=
+  expiration-ms: 604800000
+
+#jwt:
+#  secret: ${JWT_SECRET}
+#  expiration-ms: ${JWT_EXPIRATION_MS:604800000}
