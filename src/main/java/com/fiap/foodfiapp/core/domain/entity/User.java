@@ -1,7 +1,19 @@
 package com.fiap.foodfiapp.core.domain.entity;
 
-public record User(Long id, String name, String email, String password) {
-    public String getEmail() {
-        return email;
-    }
-}
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+
+public record User(
+        UUID id,
+        String name,
+        String email,
+        String cpf,
+        String login,
+        List<Address> address,
+        OffsetDateTime updatedAt,
+        OffsetDateTime createdAt,
+        UserType role,
+        boolean active,
+        String password
+) {}

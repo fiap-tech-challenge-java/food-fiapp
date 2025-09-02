@@ -47,6 +47,7 @@ public class UserRepositoryAdapter implements UserRepository {
         return new UserEntity(user.id(), user.name(), user.email(), user.password());
     }
 
+
     private User toDomain(UserEntity entity) {
         return new User(entity.getId(), entity.getName(), entity.getEmail(), entity.getPassword());
     }

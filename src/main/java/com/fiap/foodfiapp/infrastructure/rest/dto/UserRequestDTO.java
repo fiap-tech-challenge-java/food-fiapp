@@ -1,16 +1,28 @@
 package com.fiap.foodfiapp.infrastructure.rest.dto;
 
+import java.util.List;
+
 public class UserRequestDTO {
     private String name;
     private String email;
+    private String cpf;
+    private String login;
     private String password;
+    private List<AddressRequestDTO> addresses;
+    private String role;
+    private boolean active;
 
     public UserRequestDTO() {}
 
-    public UserRequestDTO(String name, String email, String password) {
+    public UserRequestDTO(String name, String email, String cpf, String login, String password, List<AddressRequestDTO> addresses, String role, boolean active) {
         this.name = name;
         this.email = email;
+        this.cpf = cpf;
+        this.login = login;
         this.password = password;
+        this.addresses = addresses;
+        this.role = role;
+        this.active = active;
     }
 
     public String getName() {
