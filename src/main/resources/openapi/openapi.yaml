@@ -277,21 +277,6 @@ paths:
         - addresses
       security:
         - bearerAuth: [ ]
-      parameters:
-        - name: userId
-          schema:
-            format: uuid
-            type: string
-          in: path
-          required: true
-          description: O ID único do usuário proprietário do endereço.
-        - name: addressId
-          schema:
-            format: uuid
-            type: string
-          in: path
-          required: true
-          description: O ID único do endereço.
       operationId: updateAddressForUser
       summary: Atualiza um endereço específico de um usuário.
       description: Permite a atualização dos detalhes de um endereço específico associado a um usuário.
