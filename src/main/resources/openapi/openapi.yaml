@@ -252,7 +252,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AddressResponse'
-          description: Cria com sucesso endereço ao usuário. Retorna os detalhes do endereço recém-criado.
+          description: Cria com sucesso um endereço para o usuário. Retorna os detalhes do endereço recém-criado.
 
   /users/{userId}/addresses/{addressId}:
     parameters:
