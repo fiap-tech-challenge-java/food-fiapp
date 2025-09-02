@@ -301,21 +301,6 @@ paths:
         - addresses
       security:
         - bearerAuth: [ ]
-      parameters:
-        - name: userId
-          schema:
-            format: uuid
-            type: string
-          in: path
-          required: true
-          description: O ID único do usuário proprietário do endereço.
-        - name: addressId
-          schema:
-            format: uuid
-            type: string
-          in: path
-          required: true
-          description: O ID único do endereço.
       operationId: deleteAddressForUser
       summary: Deleta logicamente um endereço de um usuário.
       description: Marca um endereço específico como inativo para um determinado usuário, não o removendo fisicamente do banco de dados.
