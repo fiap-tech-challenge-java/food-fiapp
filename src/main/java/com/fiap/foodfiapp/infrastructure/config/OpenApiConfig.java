@@ -16,7 +16,7 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
-                .info(new Info().title("Food Fiapp").version("1.0.0")
+                .info(new Info().title("Food FiApp").version("1.0.0")
                         .description("API to manage users (restaurant owner and customer)"))
 
                 .components(new Components().addSecuritySchemes(securitySchemeName, new SecurityScheme()
