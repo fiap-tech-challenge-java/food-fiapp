@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
+import com.fiap.foodfiapp.core.domain.entity.UserType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,7 +40,7 @@ public class UserEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_type_id", nullable = false)
-    private UserType userType;
+    private UserTypeEntity userType;
 
     @Column(name = "active", nullable = false)
     private boolean active;

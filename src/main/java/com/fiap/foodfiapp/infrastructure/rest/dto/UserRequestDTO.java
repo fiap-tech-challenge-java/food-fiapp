@@ -12,7 +12,8 @@ public class UserRequestDTO {
     private String role;
     private boolean active;
 
-    public UserRequestDTO() {}
+    public UserRequestDTO() {
+    }
 
     public UserRequestDTO(String name, String email, String cpf, String login, String password, List<AddressRequestDTO> addresses, String role, boolean active) {
         this.name = name;
@@ -47,6 +48,30 @@ public class UserRequestDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public List<AddressRequestDTO> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressRequestDTO> addresses) {
+        this.addresses = addresses;
     }
 }
 

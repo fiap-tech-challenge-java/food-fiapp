@@ -4,8 +4,10 @@ import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserSpringDataRepository;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class UserRepositoryAdapter implements UserRepository {
@@ -23,7 +25,7 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(UUID id) {
         return springDataRepository.findById(id).map(this::toDomain);
     }
 
@@ -38,17 +40,36 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(UUID id) {
         springDataRepository.deleteById(id);
     }
 
-    // Métodos de mapeamento
     private UserEntity toEntity(User user) {
-        return new UserEntity(user.id(), user.name(), user.email(), user.password());
+        return UserEntity.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .cpf(user.getCpf())
+                .email(user.getEmail())
+                .login(user.getLogin())
+                .password(user.getPassword())
+                .userType(null)
+                .active(user.isActive())
+                .build();
     }
 
-
     private User toDomain(UserEntity entity) {
-        return new User(entity.getId(), entity.getName(), entity.getEmail(), entity.getPassword());
+        return new User(
+                entity.getId(),
+                entity.getName(),
+                entity.getEmail(),
+                entity.getLogin(),
+                entity.getCpf(),
+                null,
+                null,
+                entity.isActive(),
+                null,
+                null,
+                entity.getPassword()
+        );
     }
 }

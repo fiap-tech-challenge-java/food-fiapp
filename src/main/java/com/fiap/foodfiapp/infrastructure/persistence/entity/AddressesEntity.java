@@ -16,8 +16,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AddressesEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     @Column(name = "public_place", nullable = false)
     private String publicPlace;

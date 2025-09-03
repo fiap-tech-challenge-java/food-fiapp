@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -44,5 +45,36 @@ public class UserController {
                 .map(UserResponseMapper::toDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> findById(@PathVariable UUID id) {
+        return userRepositoryGateway.findById(id)
+                .map(UserResponseMapper::toDTO)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID id, @RequestBody UserRequestDTO userRequestDTO) {
+        try {
+            var existingUser = userRepositoryGateway.findById(id).orElse(null);
+            if (existingUser == null) {
+                return ResponseEntity.notFound().build();
+            }
+            var updatedUser = UserRequestMapper.toEntity(userRequestDTO);
+            updatedUser.setId(id);
+            var savedUser = userRepositoryGateway.save(updatedUser);
+            var responseDTO = UserResponseMapper.toDTO(savedUser);
+            return ResponseEntity.ok(responseDTO);
+        } catch (BusinessException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+        userRepositoryGateway.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
