@@ -11,7 +11,7 @@ public class User {
     private String email;
     private String cpf;
     private String login;
-    private List<Address> address;
+    private List<Address> addresses;
     private OffsetDateTime updatedAt;
     private OffsetDateTime createdAt;
     private UserType userType;
@@ -28,7 +28,7 @@ public class User {
         this.email = email;
         this.cpf = cpf;
         this.login = login;
-        this.address = address;
+        this.addresses = address;
         this.active = active;
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
@@ -77,12 +77,12 @@ public class User {
         this.login = login;
     }
 
-    public List<Address> getAddress() {
-        return address;
+    public List<Address> getAddresses() {
+        return addresses;
     }
 
-    public void setAddress(List<Address> address) {
-        this.address = address;
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
     }
 
     public OffsetDateTime getUpdatedAt() {

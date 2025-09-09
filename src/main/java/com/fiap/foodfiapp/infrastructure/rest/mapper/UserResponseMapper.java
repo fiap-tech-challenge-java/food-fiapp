@@ -14,8 +14,8 @@ public class UserResponseMapper {
 
     public static UserResponseDTO toDTO(User user) {
         List<AddressResponseDTO> addresses = null;
-        if (user.getAddress() != null) {
-            addresses = user.getAddress().stream()
+        if (user.getAddresses() != null) {
+            addresses = user.getAddresses().stream()
                     .map(UserResponseMapper::toAddressDTO)
                     .collect(Collectors.toList());
         }

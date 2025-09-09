@@ -3,6 +3,7 @@ package com.fiap.foodfiapp.infrastructure.rest.dto;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,7 +29,7 @@ class UserRequestDTOTest {
 
     @Test
     void shouldCreateWithAllArgsConstructor() {
-        UserRequestDTO dto = new UserRequestDTO("Other", "other@email.com", "09876543210", "other_login", "pass", Collections.emptyList(), "client", true);
+        UserRequestDTO dto = new UserRequestDTO("Other", "other@email.com", "09876543210", "other_login", "pass", Collections.emptyList(), UUID.randomUUID(), true);
 
         assertEquals("Other", dto.getName());
         assertEquals("other@email.com", dto.getEmail());

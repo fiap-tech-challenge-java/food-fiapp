@@ -25,8 +25,8 @@ public class UserPersistenceMapper {
                 .password(user.getPassword())
                 .userType(toPersistenceUserType(user.getUserType()))
                 .active(user.isActive())
-                .addressesList(user.getAddress() != null ?
-                        user.getAddress().stream()
+                .addressesList(user.getAddresses() != null ?
+                        user.getAddresses().stream()
                                 .map(UserPersistenceMapper::toAddressesEntity)
                                 .collect(Collectors.toList()) : null)
                 .build();
@@ -55,8 +55,8 @@ public class UserPersistenceMapper {
         );
     }
 
-    private static AddressesEntity toAddressesEntity(Address address) {
-        return new AddressesEntity(
+    private static AddressEntity toAddressesEntity(Address address) {
+        return new AddressEntity(
                 address.getId(),
                 null,
                 address.getPublicPlace(),
@@ -69,7 +69,7 @@ public class UserPersistenceMapper {
         );
     }
 
-    private static Address toAddressDomain(AddressesEntity addressesEntity) {
+    private static Address toAddressDomain(AddressEntity addressesEntity) {
         return new Address(
                 addressesEntity.getId(),
                 addressesEntity.getPublicPlace(),
@@ -83,10 +83,10 @@ public class UserPersistenceMapper {
     }
 
     private static UserTypeEntity toPersistenceUserType(UserType domainUserType) {
-        return new UserTypeEntity(domainUserType.getId(), domainUserType.getName());
+        return new UserTypeEntity(domainUserType.getUuid(), domainUserType.getName());
     }
 
     private static UserType toDomainUserType(UserTypeEntity persistenceUserType) {
-        return new UserType(persistenceUserType.getId(), persistenceUserType.getName());
+        return new UserType(persistenceUserType.getUuid(), persistenceUserType.getName());
     }
 }

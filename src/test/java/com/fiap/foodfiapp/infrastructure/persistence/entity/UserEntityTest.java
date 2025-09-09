@@ -15,7 +15,7 @@ class UserEntityTest {
         UserEntity entity = new UserEntity();
         UUID userId = UUID.randomUUID();
         UserTypeEntity userType = new UserTypeEntity();
-        List<AddressesEntity> addresses = new ArrayList<>();
+        List<AddressEntity> addresses = new ArrayList<>();
 
         entity.setId(userId);
         entity.setName("Test User");
@@ -42,7 +42,7 @@ class UserEntityTest {
     void shouldCreateWithAllArgsConstructor() {
         UUID userId = UUID.randomUUID();
         UserTypeEntity userType = new UserTypeEntity();
-        List<AddressesEntity> addresses = Collections.emptyList();
+        List<AddressEntity> addresses = Collections.emptyList();
 
         UserEntity entity = new UserEntity(
                 userId,
@@ -71,7 +71,7 @@ class UserEntityTest {
     void shouldCreateWithBuilder() {
         UUID userId = UUID.randomUUID();
         UserTypeEntity userType = new UserTypeEntity();
-        List<AddressesEntity> addresses = Collections.emptyList();
+        List<AddressEntity> addresses = Collections.emptyList();
 
         UserEntity entity = UserEntity.builder()
                 .id(userId)

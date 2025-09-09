@@ -1,6 +1,7 @@
 package com.fiap.foodfiapp.core.application.usecases.user;
 
 import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
+import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +18,13 @@ import static org.mockito.Mockito.*;
 
 class CreateUserUseCaseTest {
     private UserRepositoryGateway userRepositoryGateway;
+    private UserTypeRepositoryGateway userTypeRepositoryGateway;
     private CreateUserUseCase createUserUseCase;
 
     @BeforeEach
     void setUp() {
         userRepositoryGateway = Mockito.mock(UserRepositoryGateway.class);
-        createUserUseCase = new CreateUserUseCase(userRepositoryGateway);
+        createUserUseCase = new CreateUserUseCase(userRepositoryGateway, userTypeRepositoryGateway);
     }
 
     @Test

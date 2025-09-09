@@ -1,6 +1,5 @@
 package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
-import com.fiap.foodfiapp.core.domain.entity.UserType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +45,6 @@ public class UserEntity {
     private boolean active;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AddressesEntity> addressesList = new ArrayList<>();
+    private List<AddressEntity> addressesList = new ArrayList<>();
 }
 
