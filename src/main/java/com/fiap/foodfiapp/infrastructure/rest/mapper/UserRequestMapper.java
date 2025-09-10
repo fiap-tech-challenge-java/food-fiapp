@@ -15,7 +15,7 @@ public class UserRequestMapper {
         UserType userType = new UserType();
         userType.setUuid(dto.getUserTypeUuid());
         return new User(
-                UUID.randomUUID(),
+                null,
                 dto.getName(),
                 dto.getEmail(),
                 dto.getLogin(),

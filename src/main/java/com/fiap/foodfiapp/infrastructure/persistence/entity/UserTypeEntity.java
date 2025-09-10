@@ -16,10 +16,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserTypeEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID uuid;
 
     @Column(nullable = false, unique = true)
     private String name;
-
 }
