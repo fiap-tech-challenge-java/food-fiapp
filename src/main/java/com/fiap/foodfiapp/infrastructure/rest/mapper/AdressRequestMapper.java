@@ -22,6 +22,9 @@ public class AdressRequestMapper {
     }
 
     public static List<Address> toEntity(List<AddressRequestDTO> dto) {
+        if (dto == null) {
+            return null;
+        }
         return dto.stream().map(AdressRequestMapper::toEntity).toList();
     }
 }

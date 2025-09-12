@@ -20,6 +20,11 @@ public class UserResponseMapper {
                     .collect(Collectors.toList());
         }
 
+        // Verificação de null safety para UserType
+        var userType = user.getUserType();
+        var userTypeId = userType != null ? userType.getUuid() : null;
+        var userTypeName = userType != null ? userType.getName() : null;
+
         return new UserResponseDTO(
                 user.getId(),
                 user.getName(),
@@ -27,7 +32,8 @@ public class UserResponseMapper {
                 user.getCpf(),
                 user.getLogin(),
                 addresses,
-                user.getUserType().getName(),
+                userTypeId,
+                userTypeName,
                 user.isActive()
         );
     }
@@ -45,4 +51,3 @@ public class UserResponseMapper {
         );
     }
 }
-

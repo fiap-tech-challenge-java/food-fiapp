@@ -10,19 +10,22 @@ public class UserResponseDTO {
     private String cpf;
     private String login;
     private List<AddressResponseDTO> addresses;
-    private String role;
+    private UUID userTypeId;
+    private String userTypeName;
     private boolean active;
 
     public UserResponseDTO() {}
 
-    public UserResponseDTO(UUID id, String name, String email, String cpf, String login, List<AddressResponseDTO> addresses, String role, boolean active) {
+    public UserResponseDTO(UUID id, String name, String email, String cpf, String login,
+                          List<AddressResponseDTO> addresses, UUID userTypeId, String userTypeName, boolean active) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.cpf = cpf;
         this.login = login;
         this.addresses = addresses;
-        this.role = role;
+        this.userTypeId = userTypeId;
+        this.userTypeName = userTypeName;
         this.active = active;
     }
 
@@ -50,12 +53,51 @@ public class UserResponseDTO {
         this.email = email;
     }
 
-    public String getRole() {
-        return role;
+    public String getCpf() {
+        return cpf;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public List<AddressResponseDTO> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressResponseDTO> addresses) {
+        this.addresses = addresses;
+    }
+
+    public UUID getUserTypeId() {
+        return userTypeId;
+    }
+
+    public void setUserTypeId(UUID userTypeId) {
+        this.userTypeId = userTypeId;
+    }
+
+    public String getUserTypeName() {
+        return userTypeName;
+    }
+
+    public void setUserTypeName(String userTypeName) {
+        this.userTypeName = userTypeName;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
-

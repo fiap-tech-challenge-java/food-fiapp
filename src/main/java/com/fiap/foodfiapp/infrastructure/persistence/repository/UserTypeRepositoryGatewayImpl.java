@@ -35,6 +35,12 @@ public class UserTypeRepositoryGatewayImpl implements UserTypeRepositoryGateway 
     }
 
     @Override
+    public Optional<UserType> findByName(String name) {
+        return userTypeSpringDataRepository.findByName(name)
+                .map(UserTypePersistenceMapper::toDomain);
+    }
+
+    @Override
     public List<UserType> findAll() {
         return userTypeSpringDataRepository.findAll().stream()
                 .map(UserTypePersistenceMapper::toDomain)

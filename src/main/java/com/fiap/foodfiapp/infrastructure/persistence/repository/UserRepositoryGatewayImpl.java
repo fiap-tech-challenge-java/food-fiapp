@@ -50,5 +50,9 @@ public class UserRepositoryGatewayImpl implements UserRepositoryGateway {
     public void deleteById(UUID id) {
         userSpringDataRepository.deleteById(id);
     }
-}
 
+    @Override
+    public boolean existsByUserTypeUuid(UUID userTypeUuid) {
+        return userSpringDataRepository.existsByUserType_Uuid(userTypeUuid);
+    }
+}

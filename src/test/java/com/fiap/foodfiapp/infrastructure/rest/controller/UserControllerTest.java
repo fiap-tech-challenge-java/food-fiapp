@@ -3,6 +3,7 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
@@ -44,6 +45,9 @@ class UserControllerTest {
     private CreateUserUseCase createUserUseCase;
 
     @Mock
+    private UpdateUserUseCase updateUserUseCase;
+
+    @Mock
     private UserRepositoryGateway userRepositoryGateway;
 
     private UserController userController;
@@ -57,7 +61,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        userController = new UserController(createUserUseCase, userRepositoryGateway);
+        userController = new UserController(createUserUseCase, updateUserUseCase, userRepositoryGateway);
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
 
         objectMapper = new ObjectMapper();
@@ -76,7 +80,10 @@ class UserControllerTest {
              var userResponseMapperMockedStatic = mockStatic(UserResponseMapper.class)) {
             userRequestMapperMockedStatic.when(() -> UserRequestMapper.toEntity(any(UserRequestDTO.class))).thenReturn(user);
             userResponseMapperMockedStatic.when(() -> UserResponseMapper.toDTO(any(User.class))).thenReturn(new com.fiap.foodfiapp.infrastructure.rest.dto.UserResponseDTO(
-                    user.getId(), user.getName(), user.getEmail(), user.getCpf(), user.getLogin(), Collections.emptyList(), user.getUserType() != null ? user.getUserType().getName() : null, user.isActive()
+                    user.getId(), user.getName(), user.getEmail(), user.getCpf(), user.getLogin(), Collections.emptyList(),
+                    user.getUserType() != null ? user.getUserType().getUuid() : null,
+                    user.getUserType() != null ? user.getUserType().getName() : null,
+                    user.isActive()
             ));
         }
     }
@@ -145,8 +152,7 @@ class UserControllerTest {
 
     @Test
     void shouldReturnOkWhenUserIsUpdated() throws Exception {
-        when(userRepositoryGateway.findById(eq(userId))).thenReturn(Optional.of(user));
-        when(userRepositoryGateway.save(any(User.class))).thenReturn(user);
+        when(updateUserUseCase.execute(eq(userId), any(User.class))).thenReturn(user);
 
         mockMvc.perform(put("/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -155,21 +161,20 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id").value(userId.toString()))
                 .andExpect(jsonPath("$.name").value(user.getName()));
 
-        verify(userRepositoryGateway).findById(eq(userId));
-        verify(userRepositoryGateway).save(any(User.class));
+        verify(updateUserUseCase).execute(eq(userId), any(User.class));
     }
 
     @Test
     void shouldReturnNotFoundWhenUpdatingNonExistentUser() throws Exception {
-        when(userRepositoryGateway.findById(eq(userId))).thenReturn(Optional.empty());
+        when(updateUserUseCase.execute(eq(userId), any(User.class)))
+                .thenThrow(new BusinessException("User not found"));
 
         mockMvc.perform(put("/users/{id}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userRequestDTO)))
                 .andExpect(status().isNotFound());
 
-        verify(userRepositoryGateway).findById(eq(userId));
-        verify(userRepositoryGateway, never()).save(any(User.class));
+        verify(updateUserUseCase).execute(eq(userId), any(User.class));
     }
 
     @Test
