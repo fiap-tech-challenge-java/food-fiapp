@@ -12,7 +12,7 @@ tags:
   - name: users
     description: Operações relacionadas a usuários
   - name: addresses
-    description: Operações relacionadas a endereços de usuários
+    description: Operações relacionadas a endereços
   - name: restaurants
     description: Operações relacionadas a restaurantes
   - name: menu-items
@@ -74,7 +74,7 @@ paths:
       tags:
         - users
       summary: Cria um novo usuário
-      description: Cadastra um novo usuário no sistema, podendo ser um dono de restaurante ou um cliente. Um endereço inicial é obrigatório no momento da criação.
+      description: Cadastra um novo usuário no sistema, podendo ser um dono de restaurante ou um cliente. Um ou mais endereços podem ser incluídos no momento da criação.
       requestBody:
         content:
           application/json:
@@ -86,7 +86,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateUserResponse'
+                $ref: '#/components/schemas/UserResponse'
           description: Usuário criado com sucesso. Retorna os detalhes do usuário recém-criado, incluindo seu ID.
         '400':
           content:
@@ -94,6 +94,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Dados inválidos fornecidos na requisição.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflito - usuário já existe com os dados fornecidos.
 
   /users/{id}:
     get:
@@ -157,6 +163,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Usuário não encontrado para o ID fornecido.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflito durante a atualização.
 
     delete:
       operationId: deleteUser
@@ -189,7 +201,7 @@ paths:
       tags:
         - users
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -218,7 +230,7 @@ paths:
       tags:
         - addresses
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: listAddressesByUserId
       summary: Lista todos os endereços de um usuário.
       description: Retorna uma lista de todos os endereços associados a um usuário específico.
@@ -236,7 +248,7 @@ paths:
       tags:
         - addresses
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: createAddressForUser
       summary: Cria um novo endereço para um usuário.
       description: Adiciona um novo endereço à lista de endereços de um usuário existente.
@@ -276,7 +288,7 @@ paths:
       tags:
         - addresses
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: updateAddressForUser
       summary: Atualiza um endereço específico de um usuário.
       description: Permite a atualização dos detalhes de um endereço específico associado a um usuário.
@@ -300,7 +312,7 @@ paths:
       tags:
         - addresses
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       operationId: deleteAddressForUser
       summary: Deleta logicamente um endereço de um usuário.
       description: Marca um endereço específico como inativo para um determinado usuário, não o removendo fisicamente do banco de dados.
@@ -680,12 +692,16 @@ components:
             email: O formato do e-mail é inválido.
             password: A senha deve ter no mínimo 8 caracteres.
 
-
-    AddressUserRequest:
-      title: Solicitação de Endereço do Usuário
+    AddressRequest:
+      title: Solicitação de Endereço
       type: object
       description: Representa os dados de um endereço para requisições.
       properties:
+        id:
+          type: string
+          format: uuid
+          description: ID do endereço (opcional para criação, obrigatório para atualização).
+          example: b1a7d7a3-2f18-4c91-a10d-9e4a5c0f3b99
         publicPlace:
           type: string
           description: Nome da rua, avenida, praça, etc.
@@ -750,8 +766,49 @@ components:
 
     CreateAddressRequest:
       title: Solicitação de Criação de Endereço
-      description: Estrutura da requisição para criar um novo endereço para um usuário.
       type: object
+      description: Estrutura da requisição para criar um novo endereço.
+      required:
+        - publicPlace
+        - number
+        - neighborhood
+        - city
+        - state
+        - postalCode
+      properties:
+        publicPlace:
+          type: string
+          description: Nome da rua, avenida, praça, etc.
+          example: Rua das Acácias
+        number:
+          type: string
+          description: Número do imóvel.
+          example: '456'
+        complement:
+          type: string
+          description: Complemento do endereço (apartamento, bloco, etc.).
+          example: Bloco C, Apto 101
+        neighborhood:
+          type: string
+          description: Nome do bairro.
+          example: Bela Vista
+        city:
+          type: string
+          description: Nome da cidade.
+          example: Belo Horizonte
+        state:
+          type: string
+          description: Sigla do estado (UF).
+          example: MG
+        postalCode:
+          type: string
+          description: Código de Endereçamento Postal (CEP).
+          example: 30160-010
+
+    UpdateAddressRequest:
+      title: Solicitação de Atualização de Endereço
+      type: object
+      description: Estrutura da requisição para atualizar um endereço existente.
       properties:
         publicPlace:
           type: string
@@ -764,7 +821,7 @@ components:
         complement:
           type: string
           description: Complemento do endereço (apartamento, bloco, etc.).
-          example: Apto 45
+          example: Apto 202
         neighborhood:
           type: string
           description: Nome do bairro.
@@ -782,42 +839,174 @@ components:
           description: Código de Endereçamento Postal (CEP).
           example: 01234-567
 
-    UpdateAddressRequest:
-      title: Solicitação de Atualização de Endereço
-      description: Estrutura da requisição para atualizar um endereço existente de um usuário.
-      type: object
-      properties:
-        publicPlace:
-          type: string
-          description: Novo nome da rua, avenida, praça, etc.
-          example: Avenida Central
-        number:
-          type: string
-          description: Novo número do imóvel.
-          example: '999'
-        complement:
-          type: string
-          description: Novo complemento do endereço (apartamento, bloco, etc.).
-          example: Casa
-        neighborhood:
-          type: string
-          description: Novo nome do bairro.
-          example: Centro
-        city:
-          type: string
-          description: Nova cidade.
-          example: Rio de Janeiro
-        state:
-          type: string
-          description: Nova sigla do estado (UF).
-          example: RJ
-        postalCode:
-          type: string
-          description: Novo Código de Endereçamento Postal (CEP).
-          example: 98765-432
-
     AddressResponse:
       title: Resposta de Endereço
+      description: Estrutura da resposta contendo os detalhes de um endereço.
+      type: object
+      properties:
+        id:
+          format: uuid
+          type: string
+          description: O ID único do endereço.
+          example: b1a7d7a3-2f18-4c91-a10d-9e4a5c0f3b99
+        publicPlace:
+          type: string
+          description: Nome da rua, avenida, praça, etc.
+          example: Rua das Flores
+        number:
+          type: string
+          description: Número do imóvel.
+          example: '123'
+        complement:
+          type: string
+          description: Complemento do endereço (apartamento, bloco, etc.).
+          example: Apto 202
+        neighborhood:
+          type: string
+          description: Nome do bairro.
+          example: Jardim Primavera
+        city:
+          type: string
+          description: Nome da cidade.
+          example: São Paulo
+        state:
+          type: string
+          description: Sigla do estado (UF).
+          example: SP
+        postalCode:
+          type: string
+          description: Código de Endereçamento Postal (CEP).
+          example: 01234-567
+
+    UserRequestDTO:
+      title: User Request DTO
+      description: Estrutura da requisição para criar um novo usuário no sistema.
+      required:
+        - name
+        - email
+        - cpf
+        - login
+        - password
+        - userTypeUuid
+        - active
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome completo do usuário.
+          example: João Silva
+        email:
+          type: string
+          description: Endereço de e-mail único do usuário.
+          example: joao.silva@example.com
+        cpf:
+          type: string
+          description: Cadastro de Pessoa Física (CPF) do usuário. Deve ser único.
+          example: '286.084.030-30'
+        login:
+          type: string
+          description: Nome de usuário para login. Deve ser único.
+          example: joaosilva123
+        password:
+          type: string
+          description: Senha do usuário.
+          example: MyStrongPassword123!
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressRequestDTO'
+          description: Lista de endereços do usuário.
+        userTypeUuid:
+          type: string
+          format: uuid
+          description: UUID do tipo de usuário (OWNER, CUSTOMER, etc.).
+          example: 123e4567-e89b-12d3-a456-426614174000
+        active:
+          type: boolean
+          description: Status de ativação do usuário.
+          example: true
+
+    UserResponseDTO:
+      title: User Response DTO
+      description: Estrutura da resposta contendo os detalhes completos de um usuário.
+      type: object
+      properties:
+        id:
+          format: uuid
+          type: string
+          description: O ID único do usuário.
+          example: fdsgasfdg234-sfdgh-39468956-adfg
+        name:
+          type: string
+          description: Nome completo do usuário.
+          example: João Silva
+        email:
+          type: string
+          description: Endereço de e-mail do usuário.
+          example: joao.silva@example.com
+        cpf:
+          type: string
+          description: CPF do usuário.
+          example: '286.084.030-30'
+        login:
+          type: string
+          description: Login do usuário.
+          example: joaosilva123
+        role:
+          type: string
+          description: Papel/tipo do usuário no sistema.
+          example: CUSTOMER
+        active:
+          description: Indica se o usuário está ativo no sistema (true para ativo, false para inativo).
+          type: boolean
+          example: true
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressResponseDTO'
+          description: Lista dos endereços associados ao usuário.
+
+    AddressRequestDTO:
+      title: Address Request DTO
+      type: object
+      description: Representa os dados de um endereço para requisições.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID do endereço (opcional para criação, obrigatório para atualização).
+          example: b1a7d7a3-2f18-4c91-a10d-9e4a5c0f3b99
+        publicPlace:
+          type: string
+          description: Nome da rua, avenida, praça, etc.
+          example: Rua das Acácias
+        number:
+          type: string
+          description: Número do imóvel.
+          example: '456'
+        complement:
+          type: string
+          description: Complemento do endereço (apartamento, bloco, etc.).
+          example: Bloco C, Apto 101
+        neighborhood:
+          type: string
+          description: Nome do bairro.
+          example: Bela Vista
+        city:
+          type: string
+          description: Nome da cidade.
+          example: Belo Horizonte
+        state:
+          type: string
+          description: Sigla do estado (UF).
+          example: MG
+        postalCode:
+          type: string
+          description: Código de Endereçamento Postal (CEP).
+          example: 30160-010
+
+    AddressResponseDTO:
+      title: Address Response DTO
       description: Estrutura da resposta contendo os detalhes de um endereço.
       type: object
       properties:
@@ -859,12 +1048,12 @@ components:
       title: Solicitação de Criação de Usuário
       description: Estrutura da requisição para criar um novo usuário no sistema.
       required:
-        - address
         - name
         - email
         - cpf
         - login
         - password
+        - userTypeUuid
       type: object
       properties:
         name:
@@ -897,21 +1086,70 @@ components:
           example: MyStrongPassword123!
           minLength: 8
           maxLength: 64
-        role:
-          $ref: '#/components/schemas/UserRole'
-        address:
-          $ref: '#/components/schemas/AddressUserRequest'
-          description: O endereço principal do usuário no momento do cadastro.
+        userTypeUuid:
+          type: string
+          format: uuid
+          description: UUID do tipo de usuário (OWNER, CUSTOMER, etc.).
+          example: 123e4567-e89b-12d3-a456-426614174000
+        active:
+          type: boolean
+          description: Status de ativação do usuário.
+          example: true
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressRequest'
+          description: Lista de endereços do usuário.
 
-    CreateUserResponse:
-      title: Resposta de Criação de Usuário
-      description: Estrutura da resposta após a criação bem-sucedida de um usuário.
+    UpdateUserRequest:
+      title: Solicitação de Atualização de Usuário
+      description: Estrutura da requisição para atualizar informações de um usuário existente.
+      type: object
+      properties:
+        name:
+          type: string
+          description: Novo nome completo do usuário.
+          example: Larissa Fiap Santos
+        email:
+          type: string
+          description: Novo email do usuário.
+          example: larissa@email.com
+        cpf:
+          type: string
+          description: Novo CPF do usuário.
+          example: '123.456.789-00'
+        login:
+          type: string
+          description: Novo login do usuário.
+          example: LarissaLuana
+        password:
+          type: string
+          description: Nova senha do usuário.
+          example: NovaSenh@123
+        userTypeUuid:
+          type: string
+          format: uuid
+          description: Novo UUID do tipo de usuário.
+          example: 123e4567-e89b-12d3-a456-426614174000
+        active:
+          type: boolean
+          description: Novo status de ativação do usuário.
+          example: true
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressRequest'
+          description: Nova lista de endereços do usuário.
+
+    UserResponse:
+      title: Resposta de Usuário
+      description: Estrutura da resposta contendo os detalhes completos de um usuário.
       type: object
       properties:
         id:
           format: uuid
           type: string
-          description: O ID único gerado para o novo usuário.
+          description: O ID único do usuário.
           example: fdsgasfdg234-sfdgh-39468956-adfg
         name:
           type: string
@@ -930,24 +1168,18 @@ components:
           description: Login do usuário.
           example: joaosilva123
         role:
-          $ref: '#/components/schemas/UserRole'
+          type: string
+          description: Papel/tipo do usuário no sistema.
+          example: CUSTOMER
         active:
+          description: Indica se o usuário está ativo no sistema (true para ativo, false para inativo).
           type: boolean
-          description: Status de ativação do usuário (true se ativo, false se inativo).
           example: true
-        createdAt:
-          type: string
-          description: Criação do usuário
-          example: '15/06/2025 19:40'
-        updatedAt:
-          type: string
-          description: Última atualização do usuário
-          example: '16/06/2025 19:40'
-        address:
+        addresses:
           type: array
           items:
             $ref: '#/components/schemas/AddressResponse'
-          description: Uma lista dos endereços associados ao usuário.
+          description: Lista dos endereços associados ao usuário.
 
     LoginResponse:
       title: Resposta de Login
@@ -989,69 +1221,6 @@ components:
           description: ID único do usuário
           example: 123e4567-e89b-12d3-a456-426614174000
 
-    UserResponse:
-      title: Resposta de Detalhes do Usuário
-      description: Estrutura da resposta contendo os detalhes completos de um usuário.
-      type: object
-      properties:
-        id:
-          format: uuid
-          type: string
-          description: O ID único do usuário.
-          example: fdsgasfdg234-sfdgh-39468956-adfg
-        name:
-          type: string
-          description: Nome completo do usuário.
-          example: João Silva
-        email:
-          type: string
-          description: Endereço de e-mail do usuário.
-          example: joao.silva@example.com
-        cpf:
-          type: string
-          description: CPF do usuário.
-          example: '286.084.030-30'
-        login:
-          type: string
-          description: Login do usuário.
-          example: joaosilva123
-        role:
-          $ref: '#/components/schemas/UserRole'
-        active:
-          description: Indica se o usuário está ativo no sistema (true para ativo, false para inativo).
-          type: boolean
-          example: true
-        createdAt:
-          type: string
-          description: Criação do usuário
-          example: '15/06/2025 19:40'
-        updatedAt:
-          type: string
-          description: Última atualização do usuário
-          example: '16/06/2025 19:40'
-        address:
-          type: array
-          items:
-            $ref: '#/components/schemas/AddressResponse'
-          description: Uma lista dos endereços associados ao usuário.
-
-    UpdateUserRequest:
-      title: Solicitação de Atualização de Usuário
-      description: Estrutura da requisição para atualizar informações de um usuário existente.
-      type: object
-      properties:
-        name:
-          type: string
-          description: Novo nome completo do usuário.
-          example: Larissa Fiap Santos
-        login:
-          type: string
-          description: Novo login do usuário.
-          example: LarissaLuana
-        email:
-          type: string
-          description: Novo email do usuário.
-          example: larissa@email.com
 
     LoginRequest:
       title: Solicitação de Login
