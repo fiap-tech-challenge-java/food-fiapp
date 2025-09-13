@@ -24,6 +24,7 @@ class CreateUserUseCaseTest {
     @BeforeEach
     void setUp() {
         userRepositoryGateway = Mockito.mock(UserRepositoryGateway.class);
+        userTypeRepositoryGateway = Mockito.mock(UserTypeRepositoryGateway.class);
         createUserUseCase = new CreateUserUseCase(userRepositoryGateway, userTypeRepositoryGateway);
     }
 
