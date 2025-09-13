@@ -5,8 +5,8 @@ import com.fiap.foodfiapp.model.AddressRequest;
 
 import java.util.List;
 
-public class AdressRequestMapper {
-    private AdressRequestMapper() {
+public class AddressRequestMapper {
+    private AddressRequestMapper() {
     }
 
     public static Address toEntity(AddressRequest dto) {
@@ -23,6 +23,6 @@ public class AdressRequestMapper {
     }
 
     public static List<Address> toEntity(List<AddressRequest> dto) {
-        return dto.stream().map(AdressRequestMapper::toEntity).toList();
+        return dto.stream().map(AddressRequestMapper::toEntity).toList();
     }
 }

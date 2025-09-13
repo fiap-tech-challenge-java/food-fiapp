@@ -19,7 +19,7 @@ public class CreateUserRequestMapper {
                 dto.getEmail(),
                 dto.getLogin(),
                 dto.getCpf(),
-                AdressRequestMapper.toEntity(dto.getAddresses()),
+                AddressRequestMapper.toEntity(dto.getAddresses()),
                 userType,
                 true,
                 OffsetDateTime.now(),
