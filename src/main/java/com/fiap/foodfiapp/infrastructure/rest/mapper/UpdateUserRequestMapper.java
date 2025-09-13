@@ -3,7 +3,6 @@ package com.fiap.foodfiapp.infrastructure.rest.mapper;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.model.UpdateUserRequest;
-import com.fiap.foodfiapp.model.UserRequest;
 
 import java.time.OffsetDateTime;
 

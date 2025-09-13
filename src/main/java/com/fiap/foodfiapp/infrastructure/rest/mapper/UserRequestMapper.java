@@ -5,7 +5,6 @@ import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.model.UserRequest;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 public class UserRequestMapper {
     private UserRequestMapper() {

@@ -6,7 +6,8 @@ import com.fiap.foodfiapp.model.AddressRequest;
 import java.util.List;
 
 public class AdressRequestMapper {
-    private AdressRequestMapper(){}
+    private AdressRequestMapper() {
+    }
 
     public static Address toEntity(AddressRequest dto) {
         return new Address(

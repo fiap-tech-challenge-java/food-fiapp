@@ -6,7 +6,6 @@ import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.CreateUserRequestMapper;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UpdateUserRequestMapper;
-import com.fiap.foodfiapp.infrastructure.rest.mapper.UserRequestMapper;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserResponseMapper;
 import com.fiap.foodfiapp.model.*;
 import org.springframework.http.HttpStatus;
