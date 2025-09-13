@@ -81,6 +81,6 @@ public class UserController implements UsersApi {
 
     @Override
     public ResponseEntity<Void> changePassword(ChangePasswordRequest changePasswordRequest) {
-        return null;
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 }

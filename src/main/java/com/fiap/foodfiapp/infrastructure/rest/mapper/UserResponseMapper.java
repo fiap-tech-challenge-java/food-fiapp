@@ -27,7 +27,7 @@ public class UserResponseMapper {
         userResponse.setCpf(user.getCpf());
         userResponse.setLogin(user.getLogin());
         userResponse.setAddresses(addresses);
-        userResponse.setUserType(user.getUserType().getName());
+        userResponse.setUserType(user.getUserType() != null ? user.getUserType().getName() : null);
         userResponse.setActive(user.isActive());
 
         return userResponse;
