@@ -58,7 +58,7 @@ paths:
       summary: Lista todos os usuários
       description: Retorna uma lista de todos os usuários cadastrados no sistema. A lista pode ser vazia se não houver usuários.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       responses:
         '200':
           content:
@@ -109,7 +109,7 @@ paths:
       summary: Busca um usuário pelo ID
       description: Retorna os detalhes de um usuário específico, utilizando seu ID único.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - name: id
           schema:
@@ -135,7 +135,7 @@ paths:
       summary: Atualiza um usuário existente
       description: Permite a atualização de informações de um usuário existente, como nome e login.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       requestBody:
         content:
           application/json:
@@ -175,7 +175,7 @@ paths:
       tags:
         - users
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       summary: Deleta um usuário existente
       description: Remove um usuário do sistema com base no seu ID. Esta é uma exclusão lógica.
       parameters:
@@ -201,7 +201,7 @@ paths:
       tags:
         - users
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       requestBody:
         content:
           application/json:
@@ -230,7 +230,7 @@ paths:
       tags:
         - addresses
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: listAddressesByUserId
       summary: Lista todos os endereços de um usuário.
       description: Retorna uma lista de todos os endereços associados a um usuário específico.
@@ -248,7 +248,7 @@ paths:
       tags:
         - addresses
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: createAddressForUser
       summary: Cria um novo endereço para um usuário.
       description: Adiciona um novo endereço à lista de endereços de um usuário existente.
@@ -288,7 +288,7 @@ paths:
       tags:
         - addresses
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: updateAddressForUser
       summary: Atualiza um endereço específico de um usuário.
       description: Permite a atualização dos detalhes de um endereço específico associado a um usuário.
@@ -312,7 +312,7 @@ paths:
       tags:
         - addresses
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       operationId: deleteAddressForUser
       summary: Deleta logicamente um endereço de um usuário.
       description: Marca um endereço específico como inativo para um determinado usuário, não o removendo fisicamente do banco de dados.
@@ -329,7 +329,7 @@ paths:
       summary: Lista todos os restaurantes
       description: Retorna uma lista de todos os restaurantes cadastrados.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Lista de restaurantes retornada com sucesso.
@@ -345,7 +345,7 @@ paths:
       summary: Cria um novo restaurante
       description: Cadastra um novo restaurante. Apenas usuários do tipo "Owner" ou "Admin" podem realizar esta operação.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       requestBody:
         required: true
         content:
@@ -379,7 +379,7 @@ paths:
       summary: Busca um restaurante pelo ID
       description: Retorna os detalhes de um restaurante específico.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -406,7 +406,7 @@ paths:
       summary: Atualiza um restaurante existente
       description: Atualiza os dados de um restaurante. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operação.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -445,7 +445,7 @@ paths:
       summary: Deleta um restaurante
       description: Deleta um restaurante. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operação.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -476,7 +476,7 @@ paths:
       summary: Lista os itens do cardápio de um restaurante
       description: Retorna todos os itens do cardápio de um restaurante específico.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - name: restaurantId
           in: path
@@ -499,7 +499,7 @@ paths:
       summary: Adiciona um novo item ao cardápio
       description: Adiciona um novo item ao cardápio de um restaurante. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operação.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - name: restaurantId
           in: path
@@ -540,7 +540,7 @@ paths:
       summary: Busca um item do cardápio pelo ID
       description: Retorna os detalhes de um item específico do cardápio.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - name: restaurantId
           in: path
@@ -573,7 +573,7 @@ paths:
       summary: Atualiza um item do cardápio
       description: Atualiza os dados de um item do cardápio. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operação.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - name: restaurantId
           in: path
@@ -618,7 +618,7 @@ paths:
       summary: Deleta um item do cardápio
       description: Deleta um item do cardápio. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operação.
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       parameters:
         - name: restaurantId
           in: path
@@ -878,8 +878,8 @@ components:
           description: Código de Endereçamento Postal (CEP).
           example: 01234-567
 
-    UserRequestDTO:
-      title: User Request DTO
+    UserRequest:
+      title: User Request
       description: Estrutura da requisição para criar um novo usuário no sistema.
       required:
         - name
@@ -914,7 +914,7 @@ components:
         addresses:
           type: array
           items:
-            $ref: '#/components/schemas/AddressRequestDTO'
+            $ref: '#/components/schemas/AddressRequest'
           description: Lista de endereços do usuário.
         userTypeUuid:
           type: string
@@ -925,124 +925,6 @@ components:
           type: boolean
           description: Status de ativação do usuário.
           example: true
-
-    UserResponseDTO:
-      title: User Response DTO
-      description: Estrutura da resposta contendo os detalhes completos de um usuário.
-      type: object
-      properties:
-        id:
-          format: uuid
-          type: string
-          description: O ID único do usuário.
-          example: fdsgasfdg234-sfdgh-39468956-adfg
-        name:
-          type: string
-          description: Nome completo do usuário.
-          example: João Silva
-        email:
-          type: string
-          description: Endereço de e-mail do usuário.
-          example: joao.silva@example.com
-        cpf:
-          type: string
-          description: CPF do usuário.
-          example: '286.084.030-30'
-        login:
-          type: string
-          description: Login do usuário.
-          example: joaosilva123
-        role:
-          type: string
-          description: Papel/tipo do usuário no sistema.
-          example: CUSTOMER
-        active:
-          description: Indica se o usuário está ativo no sistema (true para ativo, false para inativo).
-          type: boolean
-          example: true
-        addresses:
-          type: array
-          items:
-            $ref: '#/components/schemas/AddressResponseDTO'
-          description: Lista dos endereços associados ao usuário.
-
-    AddressRequestDTO:
-      title: Address Request DTO
-      type: object
-      description: Representa os dados de um endereço para requisições.
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: ID do endereço (opcional para criação, obrigatório para atualização).
-          example: b1a7d7a3-2f18-4c91-a10d-9e4a5c0f3b99
-        publicPlace:
-          type: string
-          description: Nome da rua, avenida, praça, etc.
-          example: Rua das Acácias
-        number:
-          type: string
-          description: Número do imóvel.
-          example: '456'
-        complement:
-          type: string
-          description: Complemento do endereço (apartamento, bloco, etc.).
-          example: Bloco C, Apto 101
-        neighborhood:
-          type: string
-          description: Nome do bairro.
-          example: Bela Vista
-        city:
-          type: string
-          description: Nome da cidade.
-          example: Belo Horizonte
-        state:
-          type: string
-          description: Sigla do estado (UF).
-          example: MG
-        postalCode:
-          type: string
-          description: Código de Endereçamento Postal (CEP).
-          example: 30160-010
-
-    AddressResponseDTO:
-      title: Address Response DTO
-      description: Estrutura da resposta contendo os detalhes de um endereço.
-      type: object
-      properties:
-        id:
-          format: uuid
-          type: string
-          description: O ID único do endereço.
-          example: b1a7d7a3-2f18-4c91-a10d-9e4a5c0f3b99
-        publicPlace:
-          type: string
-          description: Nome da rua, avenida, praça, etc.
-          example: Rua das Flores
-        number:
-          type: string
-          description: Número do imóvel.
-          example: '123'
-        complement:
-          type: string
-          description: Complemento do endereço (apartamento, bloco, etc.).
-          example: Apto 202
-        neighborhood:
-          type: string
-          description: Nome do bairro.
-          example: Jardim Primavera
-        city:
-          type: string
-          description: Nome da cidade.
-          example: São Paulo
-        state:
-          type: string
-          description: Sigla do estado (UF).
-          example: SP
-        postalCode:
-          type: string
-          description: Código de Endereçamento Postal (CEP).
-          example: 01234-567
 
     CreateUserRequest:
       title: Solicitação de Criação de Usuário
@@ -1167,7 +1049,7 @@ components:
           type: string
           description: Login do usuário.
           example: joaosilva123
-        role:
+        userType:
           type: string
           description: Papel/tipo do usuário no sistema.
           example: CUSTOMER
