@@ -6,6 +6,7 @@ public class UserRequestDTO {
     private String cpf;
     private String login;
     private String password;
+    private Long userTypeId;
 
     public UserRequestDTO() {
     }
@@ -54,6 +55,14 @@ public class UserRequestDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Long getUserTypeId() {
+        return userTypeId;
+    }
+
+    public void setUserTypeId(Long userTypeId) {
+        this.userTypeId = userTypeId;
     }
 }
 

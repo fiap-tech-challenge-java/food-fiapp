@@ -1,8 +1,8 @@
 package com.fiap.foodfiapp.core.application.usecases.restaurant;
 
 import com.fiap.foodfiapp.core.domain.entities.CreateRestaurant;
-import com.fiap.foodfiapp.core.domain.entities.Restaurant;
+import com.fiap.foodfiapp.core.domain.entities.CreatedRestaurant;
 
 public interface CreateRestaurantUseCase {
-    Restaurant executar(CreateRestaurant createRestaurant);
+    CreatedRestaurant execute(CreateRestaurant createRestaurant);
 }

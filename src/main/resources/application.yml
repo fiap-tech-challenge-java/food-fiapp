@@ -20,10 +20,9 @@ spring:
 #    username: ${DB_USERNAME}
 #    password: ${DB_PASSWORD}
 
-
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: ${SHOW_SQL:true}
     properties:
       hibernate:

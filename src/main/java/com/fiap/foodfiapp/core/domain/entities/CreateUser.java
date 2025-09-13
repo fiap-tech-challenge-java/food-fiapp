@@ -6,16 +6,18 @@ public class CreateUser {
     private String cpf;
     private String login;
     private String password;
+    private Long userTypeId;
 
     public CreateUser() {
     }
 
-    public CreateUser(String name, String email, String cpf, String login, String password) {
+    public CreateUser(String name, String email, String cpf, String login, String password, Long userTypeId) {
         this.name = name;
         this.email = email;
         this.cpf = cpf;
         this.login = login;
         this.password = password;
+        this.userTypeId = userTypeId;
     }
 
     public String getName() {
@@ -56,5 +58,13 @@ public class CreateUser {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Long getUserTypeId() {
+        return userTypeId;
+    }
+
+    public void setUserTypeId(Long userTypeId) {
+        this.userTypeId = userTypeId;
     }
 }

@@ -11,7 +11,6 @@ import java.util.UUID;
 @Table(name = "restaurants")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class RestaurantEntity {
 
     @Id
@@ -22,11 +21,19 @@ public class RestaurantEntity {
     private String cuisineType;
     private String openingHours;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", nullable = false, unique = true)
+    @JoinColumn(name = "address_id", unique = true)
     private AddressesEntity address;
+
+    public RestaurantEntity(String name, String cuisineType, String openingHours,
+                            UUID userId, AddressesEntity address) {
+        this.name = name;
+        this.cuisineType = cuisineType;
+        this.openingHours = openingHours;
+        this.userId = userId;
+        this.address = address;
+    }
 }

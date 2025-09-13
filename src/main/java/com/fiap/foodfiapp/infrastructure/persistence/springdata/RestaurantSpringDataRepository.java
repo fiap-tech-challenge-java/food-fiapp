@@ -1,11 +1,13 @@
 package com.fiap.foodfiapp.infrastructure.persistence.springdata;
 
-import com.fiap.foodfiapp.core.domain.entities.Restaurant;
+import com.fiap.foodfiapp.infrastructure.persistence.entity.RestaurantEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface RestaurantSpringDataRepository extends JpaRepository<Restaurant, UUID> {
+public interface RestaurantSpringDataRepository extends JpaRepository<RestaurantEntity, UUID> {
+    Optional<RestaurantEntity> findByUserIdAndName(UUID userId, String name);
 }

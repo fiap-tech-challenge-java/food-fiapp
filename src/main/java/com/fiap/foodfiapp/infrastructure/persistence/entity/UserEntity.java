@@ -2,12 +2,9 @@ package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.usertype.UserType;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +38,8 @@ public class UserEntity extends BaseEntity {
     @JoinColumn(name = "user_type_id", nullable = false)
     private UserTypeEntity userType;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private List<RestaurantEntity> restaurants;
 
     public UserEntity(UUID id, String name, String email, String password) {

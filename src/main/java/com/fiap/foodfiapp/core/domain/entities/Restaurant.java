@@ -1,7 +1,6 @@
 package com.fiap.foodfiapp.core.domain.entities;
 
 import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressesEntity;
-import com.fiap.foodfiapp.infrastructure.persistence.entity.UserEntity;
 
 import java.util.UUID;
 
@@ -11,19 +10,19 @@ public class Restaurant {
     private String name;
     private String cuisineType;
     private String openingHours;
-    private UserEntity user;
+    private UUID userId;
     private AddressesEntity address;
 
     public Restaurant() {
     }
 
     public Restaurant(UUID id, String name, String cuisineType, String openingHours,
-                      UserEntity user, AddressesEntity address) {
+                      UUID userId, AddressesEntity address) {
         this.id = id;
         this.name = name;
         this.cuisineType = cuisineType;
         this.openingHours = openingHours;
-        this.user = user;
+        this.userId = userId;
         this.address = address;
     }
 
@@ -59,12 +58,12 @@ public class Restaurant {
         this.openingHours = openingHours;
     }
 
-    public UserEntity getUser() {
-        return user;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setUser(UserEntity user) {
-        this.user = user;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
     public AddressesEntity getAddress() {

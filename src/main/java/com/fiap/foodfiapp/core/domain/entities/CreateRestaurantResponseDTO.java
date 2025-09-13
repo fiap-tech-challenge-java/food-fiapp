@@ -2,7 +2,8 @@ package com.fiap.foodfiapp.core.domain.entities;
 
 import java.util.UUID;
 
-public record CreateRestaurant(
+public record CreateRestaurantResponseDTO(
+        UUID id,
         String name,
         String cuisineType,
         String openingHours,

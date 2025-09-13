@@ -5,8 +5,10 @@ import com.fiap.foodfiapp.core.domain.entities.CreateUser;
 import com.fiap.foodfiapp.core.domain.entities.User;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserEntity;
+import com.fiap.foodfiapp.infrastructure.persistence.entity.UserTypeEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.mapper.UserPersistenceMapper;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserSpringDataRepository;
+import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserTypeSpringDataRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +20,15 @@ import java.util.stream.Collectors;
 @Service
 public class UserRepositoryGatewayImpl implements UserRepositoryGateway {
     private final UserSpringDataRepository userSpringDataRepository;
+    private final UserTypeSpringDataRepository userTypeSpringDataRepository;
     private final PasswordEncoder passwordEncoder;
 
     private static final UserPersistenceMapper USER_PERSISTENCE_MAPPER = UserPersistenceMapper.INSTANCE;
 
-    public UserRepositoryGatewayImpl(UserSpringDataRepository userSpringDataRepository,
+    public UserRepositoryGatewayImpl(UserSpringDataRepository userSpringDataRepository, UserTypeSpringDataRepository userTypeSpringDataRepository,
                                      PasswordEncoder passwordEncoder) {
         this.userSpringDataRepository = userSpringDataRepository;
+        this.userTypeSpringDataRepository = userTypeSpringDataRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -65,13 +69,15 @@ public class UserRepositoryGatewayImpl implements UserRepositoryGateway {
         userSpringDataRepository.findByEmail(createUser.getEmail()).ifPresent(user -> {
             throw new BusinessException("User with this email already exists.");
         });
+        UserTypeEntity userTypeEntity = userTypeSpringDataRepository.findById(createUser.getUserTypeId())
+                .orElseThrow(() -> new BusinessException("UserType does not exists."));
 
         UserEntity savedEntity = USER_PERSISTENCE_MAPPER.mapToEntity(createUser);
 
         savedEntity.setActive(true);
         savedEntity.setPassword(passwordEncoder.encode(savedEntity.getPassword()));
         savedEntity.setRestaurants(null);
-        savedEntity.setUserType(null); // TODO para criar um enum e relacionar? A tbl userType só tera 3 linha certo?
+        savedEntity.setUserType(userTypeEntity);
 
         userSpringDataRepository.save(savedEntity);
 
