@@ -84,7 +84,7 @@ class UserControllerTest {
         UserResponse userResponse = new UserResponse();
         userResponse.setId(userId);
         userResponse.setName("Test User");
-        userResponse.setEmail("teste@gmail.com");
+        userResponse.setEmail("test@email.com");
         userResponse.setCpf("12345678901");
         userResponse.setLogin("login_test");
         userResponse.setAddresses(Collections.emptyList());
