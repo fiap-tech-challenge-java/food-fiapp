@@ -1,28 +1,45 @@
 package com.fiap.foodfiapp.infrastructure.rest.dto;
 
+import com.fiap.foodfiapp.model.UserResponse;
 import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserResponseDTOTest {
     @Test
     void shouldCreateAndSetFields() {
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.setId(1L);
+        UserResponse dto = new UserResponse();
+        UUID userId = UUID.randomUUID();
+        dto.setId(userId);
         dto.setName("Test");
         dto.setEmail("test@email.com");
 
-        assertEquals(1L, dto.getId());
+        assertEquals(userId, dto.getId());
         assertEquals("Test", dto.getName());
         assertEquals("test@email.com", dto.getEmail());
     }
 
     @Test
     void shouldCreateWithAllArgsConstructor() {
-        UserResponseDTO dto = new UserResponseDTO(2L, "Other", "other@email.com");
-        assertEquals(2L, dto.getId());
-        assertEquals("Other", dto.getName());
-        assertEquals("other@email.com", dto.getEmail());
+        UUID userId = UUID.randomUUID();
+        UserResponse dto = new UserResponse();
+
+        dto.setId(userId);
+        dto.setName("Test");
+        dto.setEmail("teste@gmail.com");
+        dto.setCpf("123.456.789-01");
+        dto.setLogin("otheruser");
+        dto.setAddresses(Collections.emptyList());
+        dto.setUserType("client");
+        dto.setActive(true);
+
+        assertEquals(userId, dto.getId());
+        assertEquals("Test", dto.getName());
+        assertEquals("teste@gmail.com", dto.getEmail());
+        assertEquals("client", dto.getUserType());
     }
 }
 
