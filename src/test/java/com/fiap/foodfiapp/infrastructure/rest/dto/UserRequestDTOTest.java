@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.rest.dto;
 
+import com.fiap.foodfiapp.model.UserRequest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -11,7 +12,7 @@ class UserRequestDTOTest {
 
     @Test
     void shouldCreateAndSetFields() {
-        UserRequestDTO dto = new UserRequestDTO();
+        UserRequest dto = new UserRequest();
         dto.setName("Test");
         dto.setEmail("test@email.com");
         dto.setCpf("12345678901");
@@ -29,7 +30,8 @@ class UserRequestDTOTest {
 
     @Test
     void shouldCreateWithAllArgsConstructor() {
-        UserRequestDTO dto = new UserRequestDTO("Other", "other@email.com", "09876543210", "other_login", "pass", Collections.emptyList(), UUID.randomUUID(), true);
+        UserRequest dto = new UserRequest("Other", "other@email.com", "09876543210", "other_login", "pass", UUID.randomUUID(), true);
+
 
         assertEquals("Other", dto.getName());
         assertEquals("other@email.com", dto.getEmail());
