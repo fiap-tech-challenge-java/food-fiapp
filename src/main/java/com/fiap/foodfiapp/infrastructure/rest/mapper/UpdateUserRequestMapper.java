@@ -7,6 +7,8 @@ import com.fiap.foodfiapp.model.UpdateUserRequest;
 import java.time.OffsetDateTime;
 
 public class UpdateUserRequestMapper {
+    private static final boolean DEFAULT_ACTIVE = true;
+
     private UpdateUserRequestMapper() {
     }
 
@@ -21,7 +23,7 @@ public class UpdateUserRequestMapper {
                 dto.getCpf(),
                 AddressRequestMapper.toEntity(dto.getAddresses()),
                 userType,
-                true,
+                DEFAULT_ACTIVE,
                 OffsetDateTime.now(),
                 OffsetDateTime.now(),
                 dto.getPassword()

@@ -6,7 +6,6 @@ import com.fiap.foodfiapp.infrastructure.persistence.entity.UserTypeEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserTypePersistenceMapper;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserTypeSpringDataRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
