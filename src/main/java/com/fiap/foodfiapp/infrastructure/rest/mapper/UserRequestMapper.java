@@ -23,7 +23,7 @@ public class UserRequestMapper {
                 dto.getCpf(),
                 AddressRequestMapper.toEntity(dto.getAddresses()),
                 userType,
-                DEFAULT_ACTIVE,
+                dto.getActive(),
                 OffsetDateTime.now(),
                 OffsetDateTime.now(),
                 dto.getPassword()
