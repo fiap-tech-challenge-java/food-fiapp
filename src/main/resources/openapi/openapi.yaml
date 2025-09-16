@@ -11,6 +11,8 @@ tags:
     description: Operações relacionadas a autenticação
   - name: users
     description: Operações relacionadas a usuários
+  - name: user-types
+    description: Operações relacionadas a tipos de usuários
   - name: addresses
     description: Operações relacionadas a endereços de usuários
   - name: restaurants
@@ -215,6 +217,163 @@ paths:
       summary: Troca a senha do usuário.
       description: Permite que um usuário altere sua senha de acesso.
 
+  /user-types:
+    get:
+      operationId: getUserTypes
+      tags:
+        - user-types
+      summary: Lista todos os tipos de usuário
+      description: Retorna uma lista de todos os tipos de usuário cadastrados no sistema. A lista pode ser vazia se não houver tipos de usuário.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserTypeResponse'
+          description: Lista de tipos de usuário retornada com sucesso (pode ser vazia).
+
+    post:
+      operationId: createUserType
+      tags:
+        - user-types
+      summary: Cria um novo tipo de usuário
+      description: Cadastra um novo tipo de usuário no sistema. Apenas administradores podem realizar esta operação.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTypeRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTypeResponse'
+          description: Tipo de usuário criado com sucesso. Retorna os detalhes do tipo de usuário recém-criado.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Dados inválidos fornecidos na requisição.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Tipo de usuário já existe ou conflito de dados.
+
+  /user-types/{uuid}:
+    get:
+      operationId: getUserType
+      tags:
+        - user-types
+      summary: Busca um tipo de usuário pelo UUID
+      description: Retorna os detalhes de um tipo de usuário específico, utilizando seu UUID único.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: uuid
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
+          description: O UUID único do tipo de usuário a ser buscado.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTypeResponse'
+          description: Tipo de usuário encontrado e seus detalhes retornados com sucesso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Tipo de usuário não encontrado para o UUID fornecido.
+
+    put:
+      operationId: updateUserType
+      tags:
+        - user-types
+      summary: Atualiza um tipo de usuário existente
+      description: Permite a atualização de informações de um tipo de usuário existente. Apenas administradores podem realizar esta operação.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTypeRequest'
+        required: true
+      parameters:
+        - name: uuid
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
+          description: O UUID único do tipo de usuário a ser atualizado.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTypeResponse'
+          description: Tipo de usuário atualizado com sucesso. Retorna os detalhes atualizados do tipo de usuário.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Tipo de usuário não encontrado para o UUID fornecido.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflito de dados ao atualizar o tipo de usuário.
+
+    delete:
+      operationId: deleteUserType
+      tags:
+        - user-types
+      security:
+        - bearerAuth: []
+      summary: Deleta um tipo de usuário existente
+      description: Remove um tipo de usuário do sistema com base no seu UUID. Esta operação só pode ser realizada por administradores e não é permitida se o tipo de usuário estiver sendo usado por usuários ativos.
+      parameters:
+        - name: uuid
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
+          description: O UUID único do tipo de usuário a ser deletado.
+      responses:
+        '204':
+          description: Tipo de usuário deletado com sucesso. Nenhuma resposta de conteúdo.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Tipo de usuário não encontrado para o UUID fornecido.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Não é possível deletar o tipo de usuário pois está sendo usado por usuários ativos.
   /users/{userId}/addresses:
     parameters:
       - name: userId
@@ -1205,3 +1364,31 @@ components:
           type: string
           description: Código de Endereçamento Postal (CEP).
           example: 30160-010
+          minLength: 1
+          maxLength: 50
+
+    UserTypeResponse:
+      title: Resposta de Tipo de Usuário
+      description: Estrutura da resposta contendo os detalhes de um tipo de usuário.
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: O UUID único do tipo de usuário.
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          description: Nome do tipo de usuário.
+          example: ADMIN
+    UserTypeRequest:
+      title: Solicitação de Tipo de Usuário
+      description: Estrutura da requisição para criar ou atualizar um tipo de usuário no sistema.
+      required:
+        - name
+      type: object
+      properties:
+          name:
+            type: string
+            description: Nome do tipo de usuário (deve ser único).
+            example: CUSTOMER
