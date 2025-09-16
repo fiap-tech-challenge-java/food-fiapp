@@ -1,21 +1,18 @@
 package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
-import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.entity.User;
-import com.fiap.foodfiapp.model.UserRequest;
+import com.fiap.foodfiapp.core.domain.entity.UserType;
+import com.fiap.foodfiapp.model.UpdateUserRequest;
 
 import java.time.OffsetDateTime;
 
-import java.time.OffsetDateTime;
-import java.util.UUID;
-
-public class UserRequestMapper {
+public class UpdateUserRequestMapper {
     private static final boolean DEFAULT_ACTIVE = true;
 
-    private UserRequestMapper() {
+    private UpdateUserRequestMapper() {
     }
 
-    public static User toEntity(UserRequest dto) {
+    public static User toEntity(UpdateUserRequest dto) {
         UserType userType = new UserType();
         userType.setUuid(dto.getUserTypeUuid());
         return new User(

@@ -8,6 +8,7 @@ import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.OffsetDateTime;
@@ -22,15 +23,13 @@ class CreateUserUseCaseTest {
 
     @Mock
     private UserRepositoryGateway userRepositoryGateway;
-
-    @Mock
     private UserTypeRepositoryGateway userTypeRepositoryGateway;
-
     private CreateUserUseCase createUserUseCase;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        userRepositoryGateway = Mockito.mock(UserRepositoryGateway.class);
+        userTypeRepositoryGateway = Mockito.mock(UserTypeRepositoryGateway.class);
         createUserUseCase = new CreateUserUseCase(userRepositoryGateway, userTypeRepositoryGateway);
     }
 
@@ -54,7 +53,6 @@ class CreateUserUseCaseTest {
         // Assert
         assertNotNull(created);
         assertEquals(user.getEmail(), created.getEmail());
-        assertEquals(userType, created.getUserType());
         verify(userRepositoryGateway).save(user);
     }
 

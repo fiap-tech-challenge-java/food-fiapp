@@ -15,7 +15,7 @@ public class UserTypePersistenceMapper {
 
     public static UserTypeEntity toEntity(UserType domain) {
         return new UserTypeEntity(
-                domain.getUuid(), // Para entidades novas, isso será null e o Hibernate gerará o UUID
+                domain.getUuid(),
                 domain.getName()
         );
     }
