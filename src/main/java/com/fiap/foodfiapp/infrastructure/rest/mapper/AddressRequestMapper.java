@@ -23,6 +23,9 @@ public class AddressRequestMapper {
     }
 
     public static List<Address> toEntity(List<AddressRequest> dto) {
+        if (dto == null) {
+            return List.of();
+        }
         return dto.stream().map(AddressRequestMapper::toEntity).toList();
     }
 }
