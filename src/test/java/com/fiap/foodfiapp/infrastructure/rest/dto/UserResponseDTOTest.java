@@ -37,8 +37,8 @@ class UserResponseDTOTest {
         dto.setActive(true);
 
         assertEquals(userId, dto.getId());
-        assertEquals("Other User", dto.getName());
-        assertEquals("other@email.com", dto.getEmail());
+        assertEquals("Test", dto.getName());
+        assertEquals("teste@gmail.com", dto.getEmail());
         assertEquals("client", dto.getUserType());
     }
 }
