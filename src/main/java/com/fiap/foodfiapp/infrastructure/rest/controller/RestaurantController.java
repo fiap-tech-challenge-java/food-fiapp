@@ -2,6 +2,7 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.core.application.usecases.restaurant.CreateRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantUseCase;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entities.*;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
 import jakarta.validation.Valid;
@@ -17,12 +18,15 @@ import java.util.UUID;
 public class RestaurantController {
     private final CreateRestaurantUseCase createRestaurantUseCase;
     private final FindRestaurantUseCase findRestaurantUseCase;
+    private final UpdateRestaurantUseCase updateRestaurantUseCase;
     private static final RestaurantMapper RESTAURANT_MAPPER = RestaurantMapper.INSTANCE;
 
     public RestaurantController(CreateRestaurantUseCase createRestaurantUseCase,
-                                FindRestaurantUseCase findRestaurantUseCase) {
+                                FindRestaurantUseCase findRestaurantUseCase,
+                                UpdateRestaurantUseCase updateRestaurantUseCase) {
         this.createRestaurantUseCase = createRestaurantUseCase;
         this.findRestaurantUseCase = findRestaurantUseCase;
+        this.updateRestaurantUseCase = updateRestaurantUseCase;
     }
 
     @PostMapping
@@ -54,8 +58,10 @@ public class RestaurantController {
     }
 
     @PutMapping
-    public Restaurant update(@RequestBody CreateRestaurantRequestDTO restaurant) {
-        return null;
+    public Restaurant update(@RequestBody UpdateRestaurantRequestDTO updateRestaurantRequestDTO) {
+        return this.updateRestaurantUseCase.update(
+                RESTAURANT_MAPPER.mapToUpdateRestaurant(updateRestaurantRequestDTO)
+        );
     }
 
     @DeleteMapping

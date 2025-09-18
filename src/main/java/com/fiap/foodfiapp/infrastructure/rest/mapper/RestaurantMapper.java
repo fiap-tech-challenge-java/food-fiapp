@@ -16,4 +16,6 @@ public interface RestaurantMapper {
     CreatedRestaurant mapToCreatedRestaurant(RestaurantEntity restaurantEntity);
 
     CreateRestaurantResponseDTO mapToCreateRestaurantResponseDTO(CreatedRestaurant createdRestaurant);
+
+    UpdateRestaurant mapToUpdateRestaurant(UpdateRestaurantRequestDTO updateRestaurantRequestDTO);
 }
