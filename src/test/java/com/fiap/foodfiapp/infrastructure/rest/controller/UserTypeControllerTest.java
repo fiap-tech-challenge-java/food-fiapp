@@ -7,7 +7,7 @@ import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCa
 import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
-import com.fiap.foodfiapp.infrastructure.rest.dto.UserTypeRequestDTO;
+import com.fiap.foodfiapp.model.UserTypeRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -45,7 +45,7 @@ class UserTypeControllerTest {
     private UserTypeController userTypeController;
 
     private ObjectMapper objectMapper;
-    private UserTypeRequestDTO userTypeRequestDTO;
+    private UserTypeRequest userTypeRequestDTO;
     private UserType userType;
     private UUID userTypeUuid;
 
@@ -59,7 +59,7 @@ class UserTypeControllerTest {
         objectMapper = new ObjectMapper();
         userTypeUuid = UUID.randomUUID();
 
-        userTypeRequestDTO = new UserTypeRequestDTO();
+        userTypeRequestDTO = new UserTypeRequest();
         userTypeRequestDTO.setName("Customer");
 
         userType = new UserType();

@@ -5,10 +5,10 @@ import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCa
 import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
-import com.fiap.foodfiapp.infrastructure.rest.dto.UserTypeRequestDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.UserTypeResponseDTO;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeRequestMapper;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeResponseMapper;
+import com.fiap.foodfiapp.model.UserTypeRequest;
+import com.fiap.foodfiapp.model.UserTypeResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +36,7 @@ public class UserTypeController {
     }
 
     @PostMapping
-    public ResponseEntity<UserTypeResponseDTO> createUserType(@RequestBody UserTypeRequestDTO userTypeRequestDTO) {
+    public ResponseEntity<UserTypeResponse> createUserType(@RequestBody UserTypeRequest userTypeRequestDTO) {
         try {
             var userType = UserTypeRequestMapper.toEntity(userTypeRequestDTO);
             var createdUserType = createUserTypeUseCase.execute(userType);
@@ -48,7 +48,7 @@ public class UserTypeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserTypeResponseDTO>> findAll() {
+    public ResponseEntity<List<UserTypeResponse>> findAll() {
         var userTypes = userTypeRepositoryGateway.findAll();
         var response = userTypes.stream()
                 .map(UserTypeResponseMapper::toDTO)
@@ -57,7 +57,7 @@ public class UserTypeController {
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<UserTypeResponseDTO> findById(@PathVariable UUID uuid) {
+    public ResponseEntity<UserTypeResponse> findById(@PathVariable UUID uuid) {
         return userTypeRepositoryGateway.findById(uuid)
                 .map(UserTypeResponseMapper::toDTO)
                 .map(ResponseEntity::ok)
@@ -65,7 +65,7 @@ public class UserTypeController {
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<UserTypeResponseDTO> updateUserType(@PathVariable UUID uuid, @RequestBody UserTypeRequestDTO userTypeRequestDTO) {
+    public ResponseEntity<UserTypeResponse> updateUserType(@PathVariable UUID uuid, @RequestBody UserTypeRequest userTypeRequestDTO) {
         try {
             var userTypeUpdates = UserTypeRequestMapper.toEntity(userTypeRequestDTO);
             var updatedUserType = updateUserTypeUseCase.execute(uuid, userTypeUpdates);
