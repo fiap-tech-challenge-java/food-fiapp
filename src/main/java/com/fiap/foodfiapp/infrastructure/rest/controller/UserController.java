@@ -39,7 +39,7 @@ public class UserController implements UsersApi {
             var responseDTO = UserResponseMapper.toDTO(createdUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (BusinessException ex) {
-            // Verificar se é erro de UserType não encontrado
+            // Check if the error is due to UserType not found
             if (ex.getMessage().contains("User type not found")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
