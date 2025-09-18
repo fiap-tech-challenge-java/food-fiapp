@@ -44,6 +44,11 @@ public class UserRepositoryAdapter implements UserRepository {
         springDataRepository.deleteById(id);
     }
 
+    @Override
+    public boolean existsByUserTypeUuid(UUID userTypeUuid) {
+        return springDataRepository.existsByUserType_Uuid(userTypeUuid);
+    }
+
     private UserEntity toEntity(User user) {
         return UserEntity.builder()
                 .id(user.getId())

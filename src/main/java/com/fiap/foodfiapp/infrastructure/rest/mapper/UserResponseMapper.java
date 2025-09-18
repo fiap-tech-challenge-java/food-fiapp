@@ -8,6 +8,7 @@ import com.fiap.foodfiapp.model.UserResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 public class UserResponseMapper {
     private UserResponseMapper() {
     }
@@ -49,4 +50,3 @@ public class UserResponseMapper {
         return addressResponse;
     }
 }
-

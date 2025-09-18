@@ -6,6 +6,7 @@ import com.fiap.foodfiapp.infrastructure.persistence.entity.UserTypeEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserTypePersistenceMapper;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserTypeSpringDataRepository;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,12 @@ public class UserTypeRepositoryGatewayImpl implements UserTypeRepositoryGateway 
     @Override
     public Optional<UserType> findById(UUID id) {
         return userTypeSpringDataRepository.findById(id)
+                .map(UserTypePersistenceMapper::toDomain);
+    }
+
+    @Override
+    public Optional<UserType> findByName(String name) {
+        return userTypeSpringDataRepository.findByName(name)
                 .map(UserTypePersistenceMapper::toDomain);
     }
 

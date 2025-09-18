@@ -10,6 +10,7 @@ import java.util.UUID;
 public interface UserTypeRepository {
     UserType save(UserType userType);
     Optional<UserType> findById(UUID id);
+    Optional<UserType> findByName(String name);
     List<UserType> findAll();
     void deleteById(UUID id);
 }

@@ -16,8 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserTypeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "uuid", updatable = false, nullable = false)
     private UUID uuid;
 
     @Column(nullable = false, unique = true)

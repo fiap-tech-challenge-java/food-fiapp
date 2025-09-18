@@ -2,6 +2,8 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.UsersApi;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
+import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.CreateUserRequestMapper;
@@ -17,13 +19,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
 public class UserController implements UsersApi {
     private final CreateUserUseCase createUserUseCase;
+    private final UpdateUserUseCase updateUserUseCase;
     private final UserRepositoryGateway userRepositoryGateway;
 
-    public UserController(CreateUserUseCase createUserUseCase, UserRepositoryGateway userRepositoryGateway) {
+    public UserController(CreateUserUseCase createUserUseCase, UpdateUserUseCase updateUserUseCase, UserRepositoryGateway userRepositoryGateway) {
         this.createUserUseCase = createUserUseCase;
+        this.updateUserUseCase = updateUserUseCase;
         this.userRepositoryGateway = userRepositoryGateway;
     }
 
@@ -35,11 +38,15 @@ public class UserController implements UsersApi {
             var responseDTO = UserResponseMapper.toDTO(createdUser);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
         } catch (BusinessException ex) {
+            // Check if the error is due to UserType not found
+            if (ex.getMessage().contains("User type not found")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
-    @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userRepositoryGateway.deleteById(id);
         return ResponseEntity.noContent().build();
@@ -69,9 +76,8 @@ public class UserController implements UsersApi {
             if (existingUser == null) {
                 return ResponseEntity.notFound().build();
             }
-            var updatedUser = UpdateUserRequestMapper.toEntity(updateUserRequest);
-            updatedUser.setId(id);
-            var savedUser = userRepositoryGateway.save(updatedUser);
+            var userUpdates = UpdateUserRequestMapper.toEntity(updateUserRequest);
+            User savedUser = updateUserUseCase.execute(id, userUpdates);
             var responseDTO = UserResponseMapper.toDTO(savedUser);
             return ResponseEntity.ok(responseDTO);
         } catch (BusinessException ex) {
