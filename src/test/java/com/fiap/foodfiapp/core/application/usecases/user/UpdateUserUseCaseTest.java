@@ -137,7 +137,7 @@ class UpdateUserUseCaseTest {
         // Arrange
         User userUpdates = new User();
         userUpdates.setName("Updated Name");
-        // UserType não fornecido (null)
+        // UserType not provided (null)
 
         when(userRepositoryGateway.findById(userId)).thenReturn(Optional.of(existingUser));
         when(userRepositoryGateway.save(any(User.class))).thenReturn(userUpdates);
