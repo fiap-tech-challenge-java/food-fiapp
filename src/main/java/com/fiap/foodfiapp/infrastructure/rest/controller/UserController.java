@@ -77,7 +77,8 @@ public class UserController implements UsersApi {
             if (existingUser == null) {
                 return ResponseEntity.notFound().build();
             }
-            User savedUser = updateUserUseCase.execute(id, existingUser);
+            var userUpdates = UpdateUserRequestMapper.toEntity(updateUserRequest);
+            User savedUser = updateUserUseCase.execute(id, userUpdates);
             var responseDTO = UserResponseMapper.toDTO(savedUser);
             return ResponseEntity.ok(responseDTO);
         } catch (BusinessException ex) {
