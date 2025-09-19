@@ -10,8 +10,12 @@ public record MenuItem(
     String description,
     BigDecimal price,
     boolean localOnly,
-    String photoBase64,
+    String photoUrl,
     UUID restaurantId,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
-) {}
+) {
+    public MenuItem withPhotoUrl(String photoUrl) {
+        return new MenuItem(id, name, description, price, localOnly, photoUrl, restaurantId, createdAt, updatedAt);
+    }
+}

@@ -33,8 +33,8 @@ public class MenuItemEntity {
     @Column(name = "local_only")
     private boolean localOnly;
 
-    @Column(name = "photo_base64", columnDefinition = "TEXT")
-    private String photoBase64;
+    @Column(name = "photo_url")
+    private String photoUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)

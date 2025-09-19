@@ -630,6 +630,7 @@ paths:
 
   /restaurants/{restaurantId}/menu-items:
     get:
+      operationId: listMenuItems
       tags:
         - menu-items
       summary: Lista os itens do cardápio de um restaurante
@@ -653,6 +654,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/MenuItemResponse'
     post:
+      operationId: createMenuItem
       tags:
         - menu-items
       summary: Adiciona um novo item ao cardápio
@@ -669,9 +671,27 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/MenuItemRequest'
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nome do item do cardápio
+                description:
+                  type: string
+                  description: Descrição do item
+                price:
+                  type: number
+                  format: double
+                  description: Preço do item
+                availableForInStoreOnly:
+                  type: boolean
+                  description: Disponível apenas para consumo no local
+                photo:
+                  type: string
+                  format: binary
+                  description: Arquivo de imagem do item
       responses:
         '201':
           description: Item do cardápio criado com sucesso.
@@ -679,21 +699,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuItemResponse'
-        '403':
-          description: Acesso negado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Restaurante não encontrado.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
 
   /restaurants/{restaurantId}/menu-items/{itemId}:
     get:
+      operationId: getMenuItem
       tags:
         - menu-items
       summary: Busca um item do cardápio pelo ID
@@ -727,6 +736,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     put:
+      operationId: updateMenuItem
       tags:
         - menu-items
       summary: Atualiza um item do cardápio
@@ -749,9 +759,27 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/MenuItemRequest'
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nome do item do cardápio
+                description:
+                  type: string
+                  description: Descrição do item
+                price:
+                  type: number
+                  format: double
+                  description: Preço do item
+                availableForInStoreOnly:
+                  type: boolean
+                  description: Disponível apenas para consumo no local
+                photo:
+                  type: string
+                  format: binary
+                  description: Arquivo de imagem do item
       responses:
         '200':
           description: Item do cardápio atualizado com sucesso.
@@ -772,10 +800,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
+      operationId: deleteMenuItem
       tags:
         - menu-items
-      summary: Deleta um item do cardápio
-      description: Deleta um item do cardápio. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operação.
+      summary: Remove um item do cardápio
+      description: Remove um item do cardápio. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operação.
       security:
         - bearerAuth: []
       parameters:
@@ -793,7 +822,7 @@ paths:
             format: uuid
       responses:
         '204':
-          description: Item do cardápio deletado com sucesso.
+          description: Item do cardápio removido com sucesso.
         '403':
           description: Acesso negado.
           content:
@@ -1248,15 +1277,14 @@ components:
         price:
           type: number
           format: double
-          description: Preço do item.
-          example: 89.90
+          minimum: 0
         availableForInStoreOnly:
           type: boolean
-          description: Disponível apenas para consumo no local.
-        photoBase64:
+          default: false
+        photo:
           type: string
-          description: Imagem do item em formato base64
-          example: "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+          format: binary
+          description: Arquivo de imagem do item do cardápio
 
     MenuItemResponse:
       type: object
@@ -1273,9 +1301,9 @@ components:
           format: double
         availableForInStoreOnly:
           type: boolean
-        photoBase64:
+        photoUrl:
           type: string
-          description: Imagem do item em formato base64
+          description: URL da imagem do item no MinIO
         restaurantId:
           type: string
           format: uuid

@@ -14,7 +14,7 @@ public class MenuItemEntityMapper {
             entity.getDescription(),
             entity.getPrice(),
             entity.isLocalOnly(),
-            entity.getPhotoBase64(),
+            entity.getPhotoUrl(),
             entity.getRestaurant().getId(),
             entity.getCreatedAt(),
             entity.getUpdatedAt()
@@ -28,7 +28,7 @@ public class MenuItemEntityMapper {
         entity.setDescription(domain.description());
         entity.setPrice(domain.price());
         entity.setLocalOnly(domain.localOnly());
-        entity.setPhotoBase64(domain.photoBase64());
+        entity.setPhotoUrl(domain.photoUrl());
 
         if (domain.restaurantId() != null) {
             var restaurant = new RestaurantEntity();

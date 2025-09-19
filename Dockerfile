@@ -63,6 +63,12 @@ COPY --from=extract /build/target/extracted/spring-boot-loader/    ./
 COPY --from=extract /build/target/extracted/snapshot-dependencies/ ./
 COPY --from=extract /build/target/extracted/application/           ./
 
+# Define variáveis de ambiente do MinIO
+ENV MINIO_ENDPOINT=http://minio:9000 \
+    MINIO_ACCESS_KEY=minioadmin \
+    MINIO_SECRET_KEY=minioadmin \
+    MINIO_BUCKET=menu-items
+
 EXPOSE 8080
 
 ENTRYPOINT ["java","org.springframework.boot.loader.launch.JarLauncher"]
