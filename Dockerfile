@@ -1,68 +1,46 @@
-# syntax=docker/dockerfile:1
-
-################################################################################
-# 1. Build dependencies and go-offline
-FROM eclipse-temurin:21-jdk-jammy AS deps
+#syntax=docker/dockerfile:1.4
+########## BUILD (Maven + OpenJDK 21) ##########
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
 WORKDIR /build
 
-# Copia wrapper e POM
-COPY mvnw pom.xml ./
-COPY .mvn/ .mvn/
-
-# Torna o wrapper executável
-RUN chmod +x mvnw
-
-# Baixa dependências para offline (BuildKit cache)
+#Cache de dependências
+COPY pom.xml ./
 RUN --mount=type=cache,target=/root/.m2 \
-    ./mvnw dependency:go-offline -B
+    mvn -B -U -Dmaven.repo.local=/root/.m2 dependency:go-offline || true
 
-################################################################################
-# 2. Compile, generate sources (OpenAPI) and package
-FROM deps AS builder
-WORKDIR /build
-
-# Copia TODO o projeto (fonte, specs, configs, mvnw, .mvn etc)
+#Código-fonte
 COPY . .
 
-# Garante que o mvnw tem permissões de execução
-RUN chmod +x mvnw
-
-# Executa clean → compile → generate-sources → package
+#Build completo com geração de fontes OpenAPI + testes unitários
+#Integração roda no serviço de testes do docker-compose (com DB/MinIO disponíveis)
 RUN --mount=type=cache,target=/root/.m2 \
-    ./mvnw clean compile generate-sources package -DskipTests -B \
-    && mv target/*.jar target/app.jar
+    mvn -B -Dmaven.repo.local=/root/.m2 clean compile generate-sources test package -DskipITs=true \
+ && sh -c 'JAR=$(ls -1 target/*.jar | grep -vE "(sources|javadoc|original)" | head -n1) && mv "$JAR" target/app.jar'
 
-################################################################################
-# 3. Extrai camadas do JAR (opcional)
-FROM builder AS extract
-WORKDIR /build
+########## EXTRACT LAYERS ##########
+FROM eclipse-temurin:21-jre-jammy AS extract
+WORKDIR /work
+COPY --from=builder /build/target/app.jar /work/app.jar
+RUN java -Djarmode=layertools -jar /work/app.jar extract --destination /work/extracted
 
-RUN java -Djarmode=layertools -jar target/app.jar extract --destination target/extracted
-
-################################################################################
-# 4. Imagem final apenas com JRE
+########## RUNTIME (JRE 21) ##########
 FROM eclipse-temurin:21-jre-jammy AS final
 ARG UID=10001
 
-# Cria usuário sem privilégios
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    appuser
-
+#Usuário sem privilégios
+RUN adduser --disabled-password --gecos "" --home "/nonexistent" --shell "/sbin/nologin" --no-create-home --uid "${UID}" appuser
 USER appuser
 WORKDIR /app
 
-# Copia camadas extraídas para otimizar rebuilds
-COPY --from=extract /build/target/extracted/dependencies/           ./
-COPY --from=extract /build/target/extracted/spring-boot-loader/    ./
-COPY --from=extract /build/target/extracted/snapshot-dependencies/ ./
-COPY --from=extract /build/target/extracted/application/           ./
+#Camadas extraídas do JAR
+COPY --from=extract /work/extracted/dependencies/           ./
+COPY --from=extract /work/extracted/snapshot-dependencies/ ./
+COPY --from=extract /work/extracted/spring-boot-loader/    ./
+COPY --from=extract /work/extracted/application/           ./
+
+#Parâmetros de execução padrão para produção
+ENV SPRING_PROFILES_ACTIVE=prod
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseG1GC -Dfile.encoding=UTF-8"
 
 EXPOSE 8080
-
-ENTRYPOINT ["java","org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
