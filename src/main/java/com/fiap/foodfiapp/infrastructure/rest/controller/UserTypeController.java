@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
+import com.fiap.foodfiapp.api.UserTypesApi;
 import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
@@ -11,15 +12,14 @@ import com.fiap.foodfiapp.model.UserTypeRequest;
 import com.fiap.foodfiapp.model.UserTypeResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/user-types")
-public class UserTypeController {
+public class UserTypeController implements UserTypesApi {
     private final CreateUserTypeUseCase createUserTypeUseCase;
     private final UpdateUserTypeUseCase updateUserTypeUseCase;
     private final DeleteUserTypeUseCase deleteUserTypeUseCase;
@@ -35,10 +35,10 @@ public class UserTypeController {
         this.userTypeRepositoryGateway = userTypeRepositoryGateway;
     }
 
-    @PostMapping
-    public ResponseEntity<UserTypeResponse> createUserType(@RequestBody UserTypeRequest userTypeRequestDTO) {
+    @Override
+    public ResponseEntity<UserTypeResponse> createUserType(UserTypeRequest userTypeRequest) {
         try {
-            var userType = UserTypeRequestMapper.toEntity(userTypeRequestDTO);
+            var userType = UserTypeRequestMapper.toEntity(userTypeRequest);
             var createdUserType = createUserTypeUseCase.execute(userType);
             var responseDTO = UserTypeResponseMapper.toDTO(createdUserType);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
@@ -47,40 +47,8 @@ public class UserTypeController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserTypeResponse>> findAll() {
-        var userTypes = userTypeRepositoryGateway.findAll();
-        var response = userTypes.stream()
-                .map(UserTypeResponseMapper::toDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{uuid}")
-    public ResponseEntity<UserTypeResponse> findById(@PathVariable UUID uuid) {
-        return userTypeRepositoryGateway.findById(uuid)
-                .map(UserTypeResponseMapper::toDTO)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PutMapping("/{uuid}")
-    public ResponseEntity<UserTypeResponse> updateUserType(@PathVariable UUID uuid, @RequestBody UserTypeRequest userTypeRequestDTO) {
-        try {
-            var userTypeUpdates = UserTypeRequestMapper.toEntity(userTypeRequestDTO);
-            var updatedUserType = updateUserTypeUseCase.execute(uuid, userTypeUpdates);
-            var responseDTO = UserTypeResponseMapper.toDTO(updatedUserType);
-            return ResponseEntity.ok(responseDTO);
-        } catch (BusinessException ex) {
-            if (ex.getMessage().contains("User type not found")) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-    }
-
-    @DeleteMapping("/{uuid}")
-    public ResponseEntity<Void> deleteUserType(@PathVariable UUID uuid) {
+    @Override
+    public ResponseEntity<Void> deleteUserType(UUID uuid) {
         try {
             deleteUserTypeUseCase.execute(uuid);
             return ResponseEntity.noContent().build();
@@ -91,6 +59,38 @@ public class UserTypeController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<UserTypeResponse> getUserType(UUID uuid) {
+        return userTypeRepositoryGateway.findById(uuid)
+                .map(UserTypeResponseMapper::toDTO)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Override
+    public ResponseEntity<List<UserTypeResponse>> getUserTypes() {
+        var userTypes = userTypeRepositoryGateway.findAll();
+        var response = userTypes.stream()
+                .map(UserTypeResponseMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<UserTypeResponse> updateUserType(UUID uuid, UserTypeRequest userTypeRequest) {
+        try {
+            var userTypeUpdates = UserTypeRequestMapper.toEntity(userTypeRequest);
+            var updatedUserType = updateUserTypeUseCase.execute(uuid, userTypeUpdates);
+            var responseDTO = UserTypeResponseMapper.toDTO(updatedUserType);
+            return ResponseEntity.ok(responseDTO);
+        } catch (BusinessException ex) {
+            if (ex.getMessage().contains("User type not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 }
