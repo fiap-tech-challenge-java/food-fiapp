@@ -1,4 +1,4 @@
-package com.fiap.foodfiapp.core.domain.entities;
+package com.fiap.foodfiapp.core.domain.entities.restaurant;
 
 import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressesEntity;
 

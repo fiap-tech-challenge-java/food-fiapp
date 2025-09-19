@@ -1,4 +1,4 @@
-package com.fiap.foodfiapp.core.domain.entities;
+package com.fiap.foodfiapp.infrastructure.rest.dto;
 
 import java.util.UUID;
 

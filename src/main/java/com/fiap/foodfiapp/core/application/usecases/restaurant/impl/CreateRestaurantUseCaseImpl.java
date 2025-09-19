@@ -2,8 +2,8 @@ package com.fiap.foodfiapp.core.application.usecases.restaurant.impl;
 
 import com.fiap.foodfiapp.core.application.gateways.RestaurantRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.CreateRestaurantUseCase;
-import com.fiap.foodfiapp.core.domain.entities.CreateRestaurant;
-import com.fiap.foodfiapp.core.domain.entities.CreatedRestaurant;
+import com.fiap.foodfiapp.core.domain.entities.restaurant.CreateRestaurant;
+import com.fiap.foodfiapp.core.domain.entities.restaurant.CreatedRestaurant;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -3,14 +3,16 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.CreateRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
-import com.fiap.foodfiapp.core.domain.entities.*;
+import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
+import com.fiap.foodfiapp.infrastructure.rest.dto.CreateRestaurantRequestDTO;
+import com.fiap.foodfiapp.infrastructure.rest.dto.CreateRestaurantResponseDTO;
+import com.fiap.foodfiapp.infrastructure.rest.dto.UpdateRestaurantRequestDTO;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.UUID;
 
 @RestController

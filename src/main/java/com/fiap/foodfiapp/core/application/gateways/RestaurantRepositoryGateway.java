@@ -1,13 +1,14 @@
 package com.fiap.foodfiapp.core.application.gateways;
 
-import com.fiap.foodfiapp.core.domain.entities.CreateRestaurant;
-import com.fiap.foodfiapp.core.domain.entities.CreatedRestaurant;
-import com.fiap.foodfiapp.core.domain.entities.Restaurant;
+import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface RestaurantRepositoryGateway {
+    CreatedRestaurant createRestaurant(CreateRestaurant createRestaurant);
     Restaurant findById(UUID id);
     Restaurant findByName(String name, UUID userId);
-    CreatedRestaurant createRestaurant(CreateRestaurant createRestaurant);
+    List<Restaurant> findAllByUserId(UUID userId);
+    Restaurant updateRestaurant(UpdateRestaurant updateRestaurant);
 }

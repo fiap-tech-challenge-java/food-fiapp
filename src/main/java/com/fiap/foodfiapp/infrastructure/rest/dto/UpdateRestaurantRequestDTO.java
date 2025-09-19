@@ -1,12 +1,21 @@
-package com.fiap.foodfiapp.core.domain.entities;
+package com.fiap.foodfiapp.infrastructure.rest.dto;
 
 import java.util.UUID;
 
-public class UpdateRestaurant {
+public class UpdateRestaurantRequestDTO {
+    private UUID id;
     private String cuisineType;
     private String name;
     private String openingHours;
     private UUID userId;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public String getCuisineType() {
         return cuisineType;

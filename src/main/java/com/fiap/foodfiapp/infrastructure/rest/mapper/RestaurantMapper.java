@@ -1,9 +1,14 @@
 package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
-import com.fiap.foodfiapp.core.domain.entities.*;
+import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.RestaurantEntity;
+import com.fiap.foodfiapp.infrastructure.rest.dto.CreateRestaurantRequestDTO;
+import com.fiap.foodfiapp.infrastructure.rest.dto.CreateRestaurantResponseDTO;
+import com.fiap.foodfiapp.infrastructure.rest.dto.UpdateRestaurantRequestDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface RestaurantMapper {
@@ -12,6 +17,7 @@ public interface RestaurantMapper {
     CreateRestaurant mapToCreateRestaurant(CreateRestaurantRequestDTO createRestaurantRequestDTO);
 
     Restaurant mapToRestaurant(RestaurantEntity restaurantEntity);
+    List<Restaurant> mapToListRestaurant(List<RestaurantEntity> restaurantEntities);
 
     CreatedRestaurant mapToCreatedRestaurant(RestaurantEntity restaurantEntity);
 
