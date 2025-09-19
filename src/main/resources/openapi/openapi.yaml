@@ -1253,15 +1253,13 @@ components:
         availableForInStoreOnly:
           type: boolean
           description: Disponível apenas para consumo no local.
-        photoPath:
+        photoBase64:
           type: string
-          description: Caminho para a foto do prato.
-          example: /images/moqueca.jpg
+          description: Imagem do item em formato base64
+          example: "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
 
     MenuItemResponse:
       type: object
-      title: Resposta de Item do Cardápio
-      description: Estrutura da resposta contendo os detalhes de um item do cardápio.
       properties:
         id:
           type: string
@@ -1275,8 +1273,18 @@ components:
           format: double
         availableForInStoreOnly:
           type: boolean
-        photoPath:
+        photoBase64:
           type: string
+          description: Imagem do item em formato base64
+        restaurantId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     UserRequest:
       title: User Request
