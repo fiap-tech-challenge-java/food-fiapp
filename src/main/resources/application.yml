@@ -11,9 +11,9 @@ spring:
     active: ${SPRING_PROFILE:local}
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://foodfiapp_postgres:5432/foodfiapp}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgrespass}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -33,5 +33,7 @@ minio:
   endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
   accessKey: ${MINIO_ACCESS_KEY:minioadmin}
   secretKey: ${MINIO_SECRET_KEY:minioadmin}
+  public:
+    endpoint: ${MINIO_PUBLIC_ENDPOINT:http://localhost:9000}
   bucket:
     name: ${MINIO_BUCKET:menu-items}

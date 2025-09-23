@@ -20,18 +20,21 @@ public class MinioStorageAdapter implements FileStorageRepository {
     @Value("${minio.endpoint}")
     private String minioEndpoint;
 
+    @Value("${minio.public.endpoint}")
+    private String minioPublicEndpoint;
+
     @Override
     public String store(MultipartFile file, String fileName) throws IOException {
         try {
             createBucketIfNotExists();
-            
+
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object(fileName)
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(file.getContentType())
                     .build());
-            
+
             return getFileUrl(fileName);
         } catch (Exception e) {
             throw new IOException("Failed to store file in MinIO", e);
@@ -52,7 +55,8 @@ public class MinioStorageAdapter implements FileStorageRepository {
 
     @Override
     public String getFileUrl(String fileName) {
-        return String.format("%s/%s/%s", minioEndpoint, bucketName, fileName);
+        // Sempre use o endpoint público para gerar URLs
+        return String.format("%s/%s/%s", minioPublicEndpoint, bucketName, fileName);
     }
 
     private void createBucketIfNotExists() throws IOException {
@@ -60,7 +64,7 @@ public class MinioStorageAdapter implements FileStorageRepository {
             boolean bucketExists = minioClient.bucketExists(BucketExistsArgs.builder()
                     .bucket(bucketName)
                     .build());
-            
+
             if (!bucketExists) {
                 minioClient.makeBucket(MakeBucketArgs.builder()
                         .bucket(bucketName)
