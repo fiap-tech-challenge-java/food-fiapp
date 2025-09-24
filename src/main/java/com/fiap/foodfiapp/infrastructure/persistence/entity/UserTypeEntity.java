@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserTypeEntity {
     @Id
-//    @GeneratedValue(strategy = GenerationType.UUID)
+    // UUID generation is intentionally disabled; manual assignment is required for compatibility with legacy systems.
     @Column(name = "uuid", updatable = false, nullable = false)
     private UUID uuid;
 
