@@ -25,7 +25,7 @@ public class CreateUserTypeUseCase {
         } else {
             // If UUID is provided by client, ensure it doesn't conflict
             userTypeRepositoryGateway.findById(userType.getUuid()).ifPresent(existing -> {
-                throw new BusinessException("User type with this UUID already exists.");
+                throw new BusinessException("UserType with UUID already exists");
             });
         }
 
