@@ -467,4 +467,259 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getMessage()).isEqualTo("Custom email error message");
     }
+
+    @Test
+    @DisplayName("Should handle multiple validation errors in MethodArgumentNotValidException")
+    void shouldHandleMultipleValidationErrors() {
+        MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
+        BindingResult bindingResult = mock(BindingResult.class);
+        FieldError nameError = new FieldError("user", "name", "Name is required");
+        FieldError emailError = new FieldError("user", "email", "Invalid email format");
+
+        when(exception.getBindingResult()).thenReturn(bindingResult);
+        when(bindingResult.getAllErrors()).thenReturn(List.of(nameError, emailError));
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleValidationExceptions(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getFieldErrors()).hasSize(2);
+        assertThat(response.getBody().getFieldErrors()).containsEntry("name", "Name is required");
+        assertThat(response.getBody().getFieldErrors()).containsEntry("email", "Invalid email format");
+    }
+
+    @Test
+    @DisplayName("Should handle UserNotFoundException with different field types")
+    void shouldHandleUserNotFoundWithDifferentFieldTypes() {
+        UserNotFoundException exception = new UserNotFoundException("email", "test@test.com");
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleUserNotFoundException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("User not found with email: 'test@test.com'");
+    }
+
+    @Test
+    @DisplayName("Should handle UserNotFoundException with default constructor")
+    void shouldHandleUserNotFoundWithDefaultConstructor() {
+        UserNotFoundException exception = new UserNotFoundException();
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleUserNotFoundException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("User not found");
+    }
+
+    @Test
+    @DisplayName("Should handle UserTypeNotFoundException with different field types")
+    void shouldHandleUserTypeNotFoundWithDifferentFieldTypes() {
+        UserTypeNotFoundException exception = new UserTypeNotFoundException("id", "123e4567-e89b-12d3-a456-426614174000");
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleUserTypeNotFoundException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("UserType not found with id: '123e4567-e89b-12d3-a456-426614174000'");
+    }
+
+    @Test
+    @DisplayName("Should handle UserTypeNotFoundException with default constructor")
+    void shouldHandleUserTypeNotFoundWithDefaultConstructor() {
+        UserTypeNotFoundException exception = new UserTypeNotFoundException();
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleUserTypeNotFoundException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("UserType not found");
+    }
+
+    @Test
+    @DisplayName("Should handle AddressNotFoundException with default constructor")
+    void shouldHandleAddressNotFoundWithDefaultConstructor() {
+        AddressNotFoundException exception = new AddressNotFoundException();
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleAddressNotFoundException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Address not found");
+    }
+
+    @Test
+    @DisplayName("Should handle InvalidPasswordException with default constructor")
+    void shouldHandleInvalidPasswordWithDefaultConstructor() {
+        InvalidPasswordException exception = new InvalidPasswordException();
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleInvalidPasswordException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Password does not meet security requirements");
+    }
+
+    @Test
+    @DisplayName("Should handle InvalidDataException with field and value constructor")
+    void shouldHandleInvalidDataWithFieldAndValue() {
+        InvalidDataException exception = new InvalidDataException("birthDate", "invalid-date-format");
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleInvalidDataException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).contains("Invalid data for field 'birthDate': invalid-date-format");
+    }
+
+    @Test
+    @DisplayName("Should handle InvalidDataException with default constructor")
+    void shouldHandleInvalidDataWithDefaultConstructor() {
+        InvalidDataException exception = new InvalidDataException();
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleInvalidDataException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Invalid data provided");
+    }
+
+    @Test
+    @DisplayName("Should handle BusinessException with cause")
+    void shouldHandleBusinessExceptionWithCause() {
+        RuntimeException cause = new RuntimeException("Root cause");
+        BusinessException exception = new BusinessException("Business error", cause);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleBusinessException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Business error");
+    }
+
+    @Test
+    @DisplayName("Should preserve timestamp consistency in error response")
+    void shouldPreserveTimestampConsistency() {
+        UserNotFoundException exception = new UserNotFoundException("Test");
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleUserNotFoundException(exception, request);
+
+        ErrorResponse errorResponse = response.getBody();
+        assertThat(errorResponse).isNotNull();
+        assertThat(errorResponse.getTimestamp()).isNotNull();
+        assertThat(errorResponse.getTimestamp()).isBefore(java.time.LocalDateTime.now().plusSeconds(1));
+        assertThat(errorResponse.getTimestamp()).isAfter(java.time.LocalDateTime.now().minusSeconds(5));
+    }
+
+    @Test
+    @DisplayName("Should handle EmailAlreadyExistsException with default constructor")
+    void shouldHandleEmailAlreadyExistsWithDefaultConstructor() {
+        EmailAlreadyExistsException exception = new EmailAlreadyExistsException();
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleEmailAlreadyExistsException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Email is already registered");
+    }
+
+    @Test
+    @DisplayName("Should handle LoginAlreadyExistsException with default constructor")
+    void shouldHandleLoginAlreadyExistsWithDefaultConstructor() {
+        LoginAlreadyExistsException exception = new LoginAlreadyExistsException();
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleLoginAlreadyExistsException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Login is already registered");
+    }
+
+    @Test
+    @DisplayName("Should handle exception with null message")
+    void shouldHandleExceptionWithNullMessage() {
+        BusinessException exception = new BusinessException(null);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleBusinessException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getCode()).isEqualTo("BUSINESS_RULE_VIOLATION");
+    }
+
+    @Test
+    @DisplayName("Should handle nested exception messages properly")
+    void shouldHandleNestedExceptions() {
+        RuntimeException rootCause = new RuntimeException("Database connection failed");
+        InfrastructureException exception = new InfrastructureException("Service unavailable", rootCause);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleInfrastructureException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("An infrastructure error occurred. Please try again later.");
+    }
+
+    @Test
+    @DisplayName("Should handle validation exception with empty errors list")
+    void shouldHandleValidationExceptionWithEmptyErrors() {
+        MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
+        BindingResult bindingResult = mock(BindingResult.class);
+
+        when(exception.getBindingResult()).thenReturn(bindingResult);
+        when(bindingResult.getAllErrors()).thenReturn(List.of());
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleValidationExceptions(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getFieldErrors()).isEmpty();
+        assertThat(response.getBody().getMessage()).isEqualTo("Data validation error");
+    }
+
+    @Test
+    @DisplayName("Should handle AuthenticationException with null message")
+    void shouldHandleAuthenticationExceptionWithNullMessage() {
+        AuthenticationException exception = mock(AuthenticationException.class);
+        when(exception.getMessage()).thenReturn(null);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleAuthenticationException(exception, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Authentication failed: null");
+    }
+
+    @Test
+    @DisplayName("Should maintain proper HTTP status codes for all exceptions")
+    void shouldMaintainProperStatusCodes() {
+        // Test all specific status codes
+        assertThat(globalExceptionHandler.handleUserNotFoundException(new UserNotFoundException(), request)
+                .getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+        assertThat(globalExceptionHandler.handleEmailAlreadyExistsException(new EmailAlreadyExistsException(), request)
+                .getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+
+        assertThat(globalExceptionHandler.handleInvalidEmailException(new InvalidEmailException(), request)
+                .getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        assertThat(globalExceptionHandler.handleUnauthorizedAccessException(new UnauthorizedAccessException(), request)
+                .getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+        assertThat(globalExceptionHandler.handleInfrastructureException(new InfrastructureException("Test error"), request)
+                .getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    @DisplayName("Should handle exception chaining properly")
+    void shouldHandleExceptionChaining() {
+        Exception rootCause = new IllegalArgumentException("Root cause");
+        BusinessException businessException = new BusinessException("Business layer error", rootCause);
+
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleBusinessException(businessException, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getMessage()).isEqualTo("Business layer error");
+    }
 }
