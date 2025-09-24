@@ -1,8 +1,11 @@
 package com.fiap.foodfiapp.core.application.usecases.menuitem;
 
+import com.fiap.foodfiapp.core.domain.exception.FileStorageException;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +15,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class DeleteMenuItemUseCase {
+    private static final Logger logger = LoggerFactory.getLogger(DeleteMenuItemUseCase.class);
     private final MenuItemRepository menuItemRepository;
     private final FileStorageRepository fileStorageRepository;
 
@@ -20,14 +24,12 @@ public class DeleteMenuItemUseCase {
         var menuItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Menu item not found"));
 
-        // Delete photo from MinIO if exists
         if (menuItem.photoUrl() != null) {
             try {
                 String fileName = menuItem.photoUrl().substring(menuItem.photoUrl().lastIndexOf('/') + 1);
                 fileStorageRepository.delete(fileName);
             } catch (IOException e) {
-                // Log error but continue with deletion
-                System.err.println("Failed to delete menu item photo: " + e.getMessage());
+                logger.warn("Failed to delete menu item photo, continuing with menu item deletion: {}", e.getMessage());
             }
         }
 

@@ -1,8 +1,13 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.MenuItemsApi;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.*;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.CreateMenuItemUseCase;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.DeleteMenuItemUseCase;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.GetMenuItemByIdUseCase;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.GetMenuItemsByRestaurantUseCase;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.UpdateMenuItemUseCase;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
+import com.fiap.foodfiapp.core.domain.exception.FileStorageException;
 import com.fiap.foodfiapp.model.MenuItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +24,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MenuItemController implements MenuItemsApi {
     private final CreateMenuItemUseCase createMenuItemUseCase;
-    private final GetAllMenuItemsUseCase getAllMenuItemsUseCase;
+    private final GetMenuItemsByRestaurantUseCase getMenuItemsByRestaurantUseCase;
     private final GetMenuItemByIdUseCase getMenuItemByIdUseCase;
     private final UpdateMenuItemUseCase updateMenuItemUseCase;
     private final DeleteMenuItemUseCase deleteMenuItemUseCase;
 
     @Override
     public ResponseEntity<List<MenuItemResponse>> listMenuItems(UUID restaurantId) {
-        List<MenuItemResponse> items = getAllMenuItemsUseCase.execute(restaurantId)
-                .stream()
+        List<MenuItem> menuItems = getMenuItemsByRestaurantUseCase.execute(restaurantId);
+        List<MenuItemResponse> responses = menuItems.stream()
                 .map(this::toResponse)
                 .toList();
-        return ResponseEntity.ok(items);
+        return ResponseEntity.ok(responses);
     }
 
     @Override
@@ -59,7 +64,7 @@ public class MenuItemController implements MenuItemsApi {
             MenuItem createdItem = createMenuItemUseCase.execute(menuItem, photo);
             return ResponseEntity.ok(toResponse(createdItem));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store menu item photo", e);
+            throw new FileStorageException("Failed to store menu item photo", e);
         }
     }
 
@@ -98,7 +103,7 @@ public class MenuItemController implements MenuItemsApi {
             MenuItem updatedItem = updateMenuItemUseCase.execute(itemId, menuItemUpdate, photo);
             return ResponseEntity.ok(toResponse(updatedItem));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store menu item photo", e);
+            throw new FileStorageException("Failed to store menu item photo", e);
         }
     }
 
