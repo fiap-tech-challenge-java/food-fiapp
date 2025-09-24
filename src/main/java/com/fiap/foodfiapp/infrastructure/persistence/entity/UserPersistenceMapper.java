@@ -83,7 +83,10 @@ public class UserPersistenceMapper {
     }
 
     private static UserTypeEntity toPersistenceUserType(UserType domainUserType) {
-        return new UserTypeEntity(domainUserType.getUuid(), domainUserType.getName());
+        return UserTypeEntity.builder()
+                .uuid(domainUserType.getUuid())
+                .name(domainUserType.getName())
+                .build();
     }
 
     private static UserType toDomainUserType(UserTypeEntity persistenceUserType) {

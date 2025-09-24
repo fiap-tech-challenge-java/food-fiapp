@@ -6,7 +6,6 @@ import com.fiap.foodfiapp.infrastructure.persistence.entity.UserTypeEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserTypePersistenceMapper;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserTypeSpringDataRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,9 +22,17 @@ public class UserTypeRepositoryGatewayImpl implements UserTypeRepositoryGateway 
 
     @Override
     public UserType save(UserType userType) {
-        UserTypeEntity entity = UserTypePersistenceMapper.toEntity(userType);
-        UserTypeEntity saved = userTypeSpringDataRepository.save(entity);
-        return UserTypePersistenceMapper.toDomain(saved);
+        if (userType.getUuid() != null && userTypeSpringDataRepository.existsById(userType.getUuid())) {
+            UserTypeEntity existing = userTypeSpringDataRepository.findById(userType.getUuid())
+                    .orElseThrow(() -> new RuntimeException("Entity not found"));
+            UserTypePersistenceMapper.updateEntityFromDomain(existing, userType);
+            UserTypeEntity saved = userTypeSpringDataRepository.save(existing);
+            return UserTypePersistenceMapper.toDomain(saved);
+        } else {
+            UserTypeEntity newEntity = UserTypePersistenceMapper.toEntity(userType);
+            UserTypeEntity saved = userTypeSpringDataRepository.save(newEntity);
+            return UserTypePersistenceMapper.toDomain(saved);
+        }
     }
 
     @Override

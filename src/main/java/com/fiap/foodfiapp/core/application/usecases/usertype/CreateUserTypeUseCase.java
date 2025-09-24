@@ -22,6 +22,11 @@ public class CreateUserTypeUseCase {
         // Generate UUID if not already set
         if (userType.getUuid() == null) {
             userType.setUuid(UUID.randomUUID());
+        } else {
+            // If UUID is provided by client, ensure it doesn't conflict
+            userTypeRepositoryGateway.findById(userType.getUuid()).ifPresent(existing -> {
+                throw new BusinessException("UserType with UUID already exists");
+            });
         }
 
         return userTypeRepositoryGateway.save(userType);
