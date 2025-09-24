@@ -55,7 +55,7 @@ public class MinioStorageAdapter implements FileStorageRepository {
 
     @Override
     public String getFileUrl(String fileName) {
-        // Sempre use o endpoint público para gerar URLs
+        // Always use public endpoint to generate URLs
         return String.format("%s/%s/%s", minioPublicEndpoint, bucketName, fileName);
     }
 
