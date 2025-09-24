@@ -40,7 +40,13 @@ COPY --from=extract /work/extracted/application/           ./
 
 #Parâmetros de execução padrão para produção
 ENV SPRING_PROFILES_ACTIVE=prod
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseG1GC -Dfile.encoding=UTF-8"
+# ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseG1GC -Dfile.encoding=UTF-8"
+
+# Define variáveis de ambiente do MinIO
+ENV MINIO_ENDPOINT=http://minio:9000 \
+    MINIO_ACCESS_KEY=minioadmin \
+    MINIO_SECRET_KEY=minioadmin \
+    MINIO_BUCKET=menu-items
 
 EXPOSE 8080
-ENTRYPOINT ["sh","-c","java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["sh","-c","java org.springframework.boot.loader.launch.JarLauncher"]
