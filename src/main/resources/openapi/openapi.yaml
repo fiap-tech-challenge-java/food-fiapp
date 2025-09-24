@@ -853,6 +853,7 @@ components:
         - code
         - status
         - path
+        - timestamp
       type: object
       properties:
         message:
@@ -871,6 +872,11 @@ components:
           description: URL da requisição que gerou o erro.
           type: string
           example: /api/v1/users
+        timestamp:
+          description: Data e hora quando o erro ocorreu.
+          type: string
+          format: date-time
+          example: '2025-09-23T22:30:00-03:00'
         fieldErrors:
           description: Mapa de erros de validação específicos do campo, onde a chave é o nome do campo e o valor é a mensagem de erro.
           type: object

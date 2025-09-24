@@ -3,7 +3,7 @@ package com.fiap.foodfiapp.infrastructure.rest.exception;
 import com.fiap.foodfiapp.core.domain.exception.*;
 import com.fiap.foodfiapp.infrastructure.exception.InfrastructureException;
 import com.fiap.foodfiapp.infrastructure.exception.ResourceNotFoundException;
-import com.fiap.foodfiapp.infrastructure.rest.dto.ErrorResponse;
+import com.fiap.foodfiapp.model.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -25,6 +25,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex,
-            HttpServletRequest request) {
+                                                                     HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "USER_NOT_FOUND",
@@ -48,7 +49,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserTypeNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserTypeNotFoundException(UserTypeNotFoundException ex,
-            HttpServletRequest request) {
+                                                                         HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "USER_TYPE_NOT_FOUND",
@@ -61,7 +62,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AddressNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleAddressNotFoundException(AddressNotFoundException ex,
-            HttpServletRequest request) {
+                                                                        HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "ADDRESS_NOT_FOUND",
@@ -74,7 +75,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex,
-            HttpServletRequest request) {
+                                                                           HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "EMAIL_ALREADY_EXISTS",
@@ -87,7 +88,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(LoginAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleLoginAlreadyExistsException(LoginAlreadyExistsException ex,
-            HttpServletRequest request) {
+                                                                           HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "LOGIN_ALREADY_EXISTS",
@@ -100,7 +101,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidEmailException.class)
     public ResponseEntity<ErrorResponse> handleInvalidEmailException(InvalidEmailException ex,
-            HttpServletRequest request) {
+                                                                     HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "INVALID_EMAIL",
@@ -113,7 +114,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidCpfException.class)
     public ResponseEntity<ErrorResponse> handleInvalidCpfException(InvalidCpfException ex,
-            HttpServletRequest request) {
+                                                                   HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "INVALID_CPF",
@@ -126,7 +127,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPasswordException(InvalidPasswordException ex,
-            HttpServletRequest request) {
+                                                                        HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "INVALID_PASSWORD",
@@ -139,7 +140,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidDataException.class)
     public ResponseEntity<ErrorResponse> handleInvalidDataException(InvalidDataException ex,
-            HttpServletRequest request) {
+                                                                    HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "INVALID_DATA",
@@ -152,7 +153,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<ErrorResponse> handleFileStorageException(FileStorageException ex,
-            HttpServletRequest request) {
+                                                                    HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "FILE_STORAGE_ERROR",
@@ -165,7 +166,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedAccessException(UnauthorizedAccessException ex,
-            HttpServletRequest request) {
+                                                                           HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "UNAUTHORIZED_ACCESS",
@@ -178,7 +179,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex,
-            HttpServletRequest request) {
+                                                                 HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "BUSINESS_RULE_VIOLATION",
@@ -191,7 +192,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex,
-            HttpServletRequest request) {
+                                                                         HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "RESOURCE_NOT_FOUND",
@@ -204,7 +205,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InfrastructureException.class)
     public ResponseEntity<ErrorResponse> handleInfrastructureException(InfrastructureException ex,
-            HttpServletRequest request) {
+                                                                       HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 "An infrastructure error occurred. Please try again later.",
                 "INFRASTRUCTURE_ERROR",
@@ -217,7 +218,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex,
-            HttpServletRequest request) {
+                                                                    HttpServletRequest request) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -239,7 +240,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex,
-            HttpServletRequest request) {
+                                                                            HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
                 "CONSTRAINT_VIOLATION",
@@ -252,7 +253,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex,
-            HttpServletRequest request) {
+                                                                               HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 "Invalid request. Please check the format of the submitted data",
                 "INVALID_REQUEST_BODY",
@@ -311,7 +312,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException ex,
-            HttpServletRequest request) {
+                                                                       HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 "Endpoint not found",
                 "ENDPOINT_NOT_FOUND",
@@ -324,7 +325,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex,
-            HttpServletRequest request) {
+                                                                               HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 "Data integrity error. Check if the data does not violate database constraints",
                 "DATA_INTEGRITY_VIOLATION",
@@ -337,7 +338,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex,
-            HttpServletRequest request) {
+                                                                       HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 "Authentication failed: " + ex.getMessage(),
                 "AUTHENTICATION_FAILED",
@@ -350,7 +351,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException ex,
-            HttpServletRequest request) {
+                                                                       HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 "Invalid credentials",
                 "INVALID_CREDENTIALS",
@@ -363,7 +364,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex,
-            HttpServletRequest request) {
+                                                                     HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 "Access denied. You do not have permission to access this resource",
                 "ACCESS_DENIED",
@@ -392,7 +393,7 @@ public class GlobalExceptionHandler {
         errorResponse.setCode(code);
         errorResponse.setStatus(status.value());
         errorResponse.setPath(path);
-        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setTimestamp(OffsetDateTime.now());
         return errorResponse;
     }
 }

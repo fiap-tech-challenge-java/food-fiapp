@@ -3,7 +3,7 @@ package com.fiap.foodfiapp.infrastructure.rest.exception;
 import com.fiap.foodfiapp.core.domain.exception.*;
 import com.fiap.foodfiapp.infrastructure.exception.InfrastructureException;
 import com.fiap.foodfiapp.infrastructure.exception.ResourceNotFoundException;
-import com.fiap.foodfiapp.infrastructure.rest.dto.ErrorResponse;
+import com.fiap.foodfiapp.model.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -607,8 +607,8 @@ class GlobalExceptionHandlerTest {
         ErrorResponse errorResponse = response.getBody();
         assertThat(errorResponse).isNotNull();
         assertThat(errorResponse.getTimestamp()).isNotNull();
-        assertThat(errorResponse.getTimestamp()).isBefore(java.time.LocalDateTime.now().plusSeconds(1));
-        assertThat(errorResponse.getTimestamp()).isAfter(java.time.LocalDateTime.now().minusSeconds(5));
+        assertThat(errorResponse.getTimestamp()).isBefore(java.time.OffsetDateTime.now().plusSeconds(1));
+        assertThat(errorResponse.getTimestamp()).isAfter(java.time.OffsetDateTime.now().minusSeconds(5));
     }
 
     @Test
