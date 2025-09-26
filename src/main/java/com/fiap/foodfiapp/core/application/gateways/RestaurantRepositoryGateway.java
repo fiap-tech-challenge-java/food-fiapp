@@ -11,4 +11,5 @@ public interface RestaurantRepositoryGateway {
     Restaurant findByName(String name, UUID userId);
     List<Restaurant> findAllByUserId(UUID userId);
     Restaurant updateRestaurant(UpdateRestaurant updateRestaurant);
+    void deleteRestaurant(UUID id);
 }

@@ -1,6 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.core.application.usecases.restaurant.CreateRestaurantUseCase;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.DeleteRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,14 +23,17 @@ public class RestaurantController {
     private final CreateRestaurantUseCase createRestaurantUseCase;
     private final FindRestaurantUseCase findRestaurantUseCase;
     private final UpdateRestaurantUseCase updateRestaurantUseCase;
+    private final DeleteRestaurantUseCase deleteRestaurantUseCase;
     private static final RestaurantMapper RESTAURANT_MAPPER = RestaurantMapper.INSTANCE;
 
     public RestaurantController(CreateRestaurantUseCase createRestaurantUseCase,
                                 FindRestaurantUseCase findRestaurantUseCase,
-                                UpdateRestaurantUseCase updateRestaurantUseCase) {
+                                UpdateRestaurantUseCase updateRestaurantUseCase,
+                                DeleteRestaurantUseCase deleteRestaurantUseCase) {
         this.createRestaurantUseCase = createRestaurantUseCase;
         this.findRestaurantUseCase = findRestaurantUseCase;
         this.updateRestaurantUseCase = updateRestaurantUseCase;
+        this.deleteRestaurantUseCase = deleteRestaurantUseCase;
     }
 
     @PostMapping
@@ -43,30 +48,41 @@ public class RestaurantController {
 
     @GetMapping
     @RequestMapping("/{id}")
-    public Restaurant findById(@PathVariable UUID id) {
-        return this.findRestaurantUseCase.findById(id);
+    public ResponseEntity<Restaurant> findById(@PathVariable UUID id) {
+        Restaurant restaurant = this.findRestaurantUseCase.findById(id);
+
+        return ResponseEntity.ok(restaurant);
     }
 
     @GetMapping
     @RequestMapping("/{name}/{userId}")
-    public Restaurant findByName(@PathVariable String name, @PathVariable UUID userId) {
-        return this.findRestaurantUseCase.findByName(name, userId);
+    public ResponseEntity<Restaurant> findByName(@PathVariable String name, @PathVariable UUID userId) {
+        Restaurant restaurant = this.findRestaurantUseCase.findByName(name, userId);
+
+        return ResponseEntity.ok(restaurant);
     }
 
     @GetMapping
-    @RequestMapping("/{userId}")
-    public Restaurant findAllByUserId(@PathVariable UUID userId) {
-        return this.findRestaurantUseCase.findAllByUserId(userId);
+    @RequestMapping("/user/{id}")
+    public ResponseEntity<List<Restaurant>> findAllByUserId(@PathVariable UUID id) {
+        List<Restaurant> restaurant = this.findRestaurantUseCase.findAllByUserId(id);
+
+        return ResponseEntity.ok(restaurant);
     }
 
     @PutMapping
-    public Restaurant update(@RequestBody UpdateRestaurantRequestDTO updateRestaurantRequestDTO) {
-        return this.updateRestaurantUseCase.update(
+    public ResponseEntity<Restaurant> update(@RequestBody UpdateRestaurantRequestDTO updateRestaurantRequestDTO) {
+        Restaurant restaurant = this.updateRestaurantUseCase.update(
                 RESTAURANT_MAPPER.mapToUpdateRestaurant(updateRestaurantRequestDTO)
         );
+
+        return ResponseEntity.ok(restaurant);
     }
 
     @DeleteMapping
-    public void delete(@RequestParam UUID id) {
+    public ResponseEntity<?> delete(@RequestParam UUID id) {
+        this.deleteRestaurantUseCase.deleteRestaurant(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

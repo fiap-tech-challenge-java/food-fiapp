@@ -1,7 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,7 +17,9 @@ public class RestaurantEntity {
     private UUID id;
 
     private String name;
+
     private String cuisineType;
+
     private String openingHours;
 
     @Column(name = "user_id", nullable = false)
@@ -28,12 +29,14 @@ public class RestaurantEntity {
     @JoinColumn(name = "address_id", unique = true)
     private AddressesEntity address;
 
-    public RestaurantEntity(String name, String cuisineType, String openingHours,
-                            UUID userId, AddressesEntity address) {
+    private Boolean active;
+
+    public RestaurantEntity(String name, String cuisineType, String openingHours, UUID userId, AddressesEntity address, Boolean active) {
         this.name = name;
         this.cuisineType = cuisineType;
         this.openingHours = openingHours;
         this.userId = userId;
         this.address = address;
+        this.active = active;
     }
 }

@@ -7,6 +7,7 @@ public record CreatedRestaurant(
         String name,
         String cuisineType,
         String openingHours,
+        Boolean active,
         UUID userId
 ) {
 }

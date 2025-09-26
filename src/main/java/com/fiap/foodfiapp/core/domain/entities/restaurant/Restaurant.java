@@ -11,18 +11,20 @@ public class Restaurant {
     private String cuisineType;
     private String openingHours;
     private UUID userId;
+    private Boolean active;
     private AddressesEntity address;
 
     public Restaurant() {
     }
 
     public Restaurant(UUID id, String name, String cuisineType, String openingHours,
-                      UUID userId, AddressesEntity address) {
+                      UUID userId, Boolean active, AddressesEntity address) {
         this.id = id;
         this.name = name;
         this.cuisineType = cuisineType;
         this.openingHours = openingHours;
         this.userId = userId;
+        this.active = active;
         this.address = address;
     }
 
@@ -64,6 +66,14 @@ public class Restaurant {
 
     public void setUserId(UUID userId) {
         this.userId = userId;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public AddressesEntity getAddress() {

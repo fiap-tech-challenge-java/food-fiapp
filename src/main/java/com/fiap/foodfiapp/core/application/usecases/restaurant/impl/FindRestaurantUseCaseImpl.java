@@ -5,6 +5,7 @@ import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantUse
 import com.fiap.foodfiapp.core.domain.entities.restaurant.Restaurant;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,7 +27,7 @@ public class FindRestaurantUseCaseImpl implements FindRestaurantUseCase {
     }
 
     @Override
-    public Restaurant findAllByUserId(UUID id) {
-        return null;
+    public List<Restaurant> findAllByUserId(UUID id) {
+       return this.restaurantRepositoryGateway.findAllByUserId(id);
     }
 }

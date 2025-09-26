@@ -43,7 +43,8 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
                         createRestaurant.cuisineType(),
                         createRestaurant.openingHours(),
                         createRestaurant.userId(),
-                        null
+                        null,
+                        true
                 );
 
                 restaurantSpringDataRepository.save(restaurantEntity);
@@ -99,5 +100,14 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
         }
 
         throw new BusinessException("New user not permitted");
+    }
+
+    @Override
+    public void deleteRestaurant(UUID id) {
+        RestaurantEntity restaurantEntity = this.restaurantSpringDataRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Restaurant not found"));
+
+        restaurantEntity.setActive(false);
+        restaurantSpringDataRepository.save(restaurantEntity);
     }
 }
