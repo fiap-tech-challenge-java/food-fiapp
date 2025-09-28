@@ -1,51 +1,24 @@
 package com.fiap.foodfiapp.infrastructure.rest.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.UUID;
 
-public class UpdateRestaurantRequestDTO {
-    private UUID id;
-    private String cuisineType;
-    private String name;
-    private String openingHours;
-    private UUID userId;
+public record UpdateRestaurantRequestDTO(
+        @NotNull(message = "The restaurant's ID is mandatory.")
+        UUID id,
 
-    public UUID getId() {
-        return id;
-    }
+        @NotBlank(message = "The name of the restaurant is mandatory.")
+        String name,
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+        @NotBlank(message = "The cuisine type of the restaurant is mandatory.")
+        String cuisineType,
 
-    public String getCuisineType() {
-        return cuisineType;
-    }
+        @NotBlank(message = "The time that the restaurant opens is mandatory.")
+        String openingHours,
 
-    public void setCuisineType(String cuisineType) {
-        this.cuisineType = cuisineType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getOpeningHours() {
-        return openingHours;
-    }
-
-    public void setOpeningHours(String openingHours) {
-        this.openingHours = openingHours;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
+        @NotNull(message = "The user's ID is mandatory.")
+        UUID userId
+) {
 }

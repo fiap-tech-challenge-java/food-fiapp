@@ -5,6 +5,7 @@ import com.fiap.foodfiapp.core.application.usecases.restaurant.DeleteRestaurantU
 import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
+import com.fiap.foodfiapp.infrastructure.rest.dto.ChangeOwnerRequestDTO;
 import com.fiap.foodfiapp.infrastructure.rest.dto.CreateRestaurantRequestDTO;
 import com.fiap.foodfiapp.infrastructure.rest.dto.CreateRestaurantResponseDTO;
 import com.fiap.foodfiapp.infrastructure.rest.dto.UpdateRestaurantRequestDTO;
@@ -46,32 +47,36 @@ public class RestaurantController {
                 .body(RESTAURANT_MAPPER.mapToCreateRestaurantResponseDTO(createdRestaurant));
     }
 
-    @GetMapping
-    @RequestMapping("/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Restaurant> findById(@PathVariable UUID id) {
         Restaurant restaurant = this.findRestaurantUseCase.findById(id);
 
         return ResponseEntity.ok(restaurant);
     }
 
-    @GetMapping
-    @RequestMapping("/{name}/{userId}")
+    @GetMapping("/name/{name}/user/{userId}")
     public ResponseEntity<Restaurant> findByName(@PathVariable String name, @PathVariable UUID userId) {
         Restaurant restaurant = this.findRestaurantUseCase.findByName(name, userId);
 
         return ResponseEntity.ok(restaurant);
     }
 
-    @GetMapping
-    @RequestMapping("/user/{id}")
+    @GetMapping("/user/{id}")
     public ResponseEntity<List<Restaurant>> findAllByUserId(@PathVariable UUID id) {
         List<Restaurant> restaurant = this.findRestaurantUseCase.findAllByUserId(id);
 
         return ResponseEntity.ok(restaurant);
     }
 
+    @PatchMapping("/{restaurantId}/owner")
+    public ResponseEntity<Restaurant> changeOwner(@PathVariable UUID restaurantId, @RequestBody @Valid ChangeOwnerRequestDTO requestDTO) {
+        Restaurant updated = updateRestaurantUseCase.changeOwner(restaurantId, requestDTO.newOwnerId());
+
+        return ResponseEntity.ok(updated);
+    }
+
     @PutMapping
-    public ResponseEntity<Restaurant> update(@RequestBody UpdateRestaurantRequestDTO updateRestaurantRequestDTO) {
+    public ResponseEntity<Restaurant> update(@RequestBody @Valid UpdateRestaurantRequestDTO updateRestaurantRequestDTO) {
         Restaurant restaurant = this.updateRestaurantUseCase.update(
                 RESTAURANT_MAPPER.mapToUpdateRestaurant(updateRestaurantRequestDTO)
         );
@@ -79,8 +84,8 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurant);
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> delete(@RequestParam UUID id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
         this.deleteRestaurantUseCase.deleteRestaurant(id);
 
         return ResponseEntity.noContent().build();

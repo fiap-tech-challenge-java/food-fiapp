@@ -12,4 +12,5 @@ public interface RestaurantRepositoryGateway {
     List<Restaurant> findAllByUserId(UUID userId);
     Restaurant updateRestaurant(UpdateRestaurant updateRestaurant);
     void deleteRestaurant(UUID id);
+    Restaurant changeOwner(UUID restaurantId, UUID newOwnerId);
 }

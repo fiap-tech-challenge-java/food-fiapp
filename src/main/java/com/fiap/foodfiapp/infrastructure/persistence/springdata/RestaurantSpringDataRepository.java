@@ -10,6 +10,10 @@ import java.util.UUID;
 
 @Repository
 public interface RestaurantSpringDataRepository extends JpaRepository<RestaurantEntity, UUID> {
-    Optional<RestaurantEntity> findByUserIdAndName(UUID userId, String name);
-    Optional<List<RestaurantEntity>> findAllByUserId(UUID userId);
+    Optional<RestaurantEntity> findByUserIdAndNameAndActiveTrue(UUID userId, String name);
+
+    Optional<List<RestaurantEntity>> findAllByUserIdAndActiveTrue(UUID userId);
+
+    Optional<RestaurantEntity> findByIdAndActiveTrue(UUID restaurantId);
 }
+
