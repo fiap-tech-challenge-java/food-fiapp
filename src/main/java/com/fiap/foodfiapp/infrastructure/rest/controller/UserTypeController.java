@@ -8,7 +8,8 @@ import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCa
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeRequestMapper;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeResponseMapper;
-import com.fiap.foodfiapp.model.UserTypeRequest;
+import com.fiap.foodfiapp.model.CreateUserTypeRequest;
+import com.fiap.foodfiapp.model.UpdateUserTypeRequest;
 import com.fiap.foodfiapp.model.UserTypeResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +37,9 @@ public class UserTypeController implements UserTypesApi {
     }
 
     @Override
-    public ResponseEntity<UserTypeResponse> createUserType(UserTypeRequest userTypeRequest) {
+    public ResponseEntity<UserTypeResponse> createUserType(CreateUserTypeRequest createUserTypeRequest) {
         try {
-            var userType = UserTypeRequestMapper.toEntity(userTypeRequest);
+            var userType = UserTypeRequestMapper.toEntity(createUserTypeRequest);
             var createdUserType = createUserTypeUseCase.execute(userType);
             var responseDTO = UserTypeResponseMapper.toDTO(createdUserType);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
@@ -80,9 +81,9 @@ public class UserTypeController implements UserTypesApi {
     }
 
     @Override
-    public ResponseEntity<UserTypeResponse> updateUserType(UUID uuid, UserTypeRequest userTypeRequest) {
+    public ResponseEntity<UserTypeResponse> updateUserType(UUID uuid, UpdateUserTypeRequest updateUserTypeRequest) {
         try {
-            var userTypeUpdates = UserTypeRequestMapper.toEntity(userTypeRequest);
+            var userTypeUpdates = UserTypeRequestMapper.toEntity(updateUserTypeRequest);
             var updatedUserType = updateUserTypeUseCase.execute(uuid, userTypeUpdates);
             var responseDTO = UserTypeResponseMapper.toDTO(updatedUserType);
             return ResponseEntity.ok(responseDTO);
