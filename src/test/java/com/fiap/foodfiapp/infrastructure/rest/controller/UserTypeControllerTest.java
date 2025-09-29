@@ -7,7 +7,8 @@ import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCa
 import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
-import com.fiap.foodfiapp.model.UserTypeRequest;
+import com.fiap.foodfiapp.model.CreateUserTypeRequest;
+import com.fiap.foodfiapp.model.UpdateUserTypeRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -45,7 +46,8 @@ class UserTypeControllerTest {
     private UserTypeController userTypeController;
 
     private ObjectMapper objectMapper;
-    private UserTypeRequest userTypeRequestDTO;
+    private CreateUserTypeRequest createUserTypeRequestDTO;
+    private UpdateUserTypeRequest updateUserTypeRequestDTO;
     private UserType userType;
     private UUID userTypeUuid;
 
@@ -59,12 +61,15 @@ class UserTypeControllerTest {
         objectMapper = new ObjectMapper();
         userTypeUuid = UUID.randomUUID();
 
-        userTypeRequestDTO = new UserTypeRequest();
-        userTypeRequestDTO.setName("Customer");
+        createUserTypeRequestDTO = new CreateUserTypeRequest();
+        createUserTypeRequestDTO.setName("CUSTOMER");
+
+        updateUserTypeRequestDTO = new UpdateUserTypeRequest();
+        updateUserTypeRequestDTO.setName("CUSTOMER_VIP");
 
         userType = new UserType();
         userType.setUuid(userTypeUuid);
-        userType.setName("Customer");
+        userType.setName("CUSTOMER");
     }
 
     @Test
@@ -73,7 +78,7 @@ class UserTypeControllerTest {
 
         mockMvc.perform(post("/user-types")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userTypeRequestDTO)))
+                        .content(objectMapper.writeValueAsString(createUserTypeRequestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.uuid").value(userType.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(userType.getName()));
@@ -87,7 +92,7 @@ class UserTypeControllerTest {
 
         mockMvc.perform(post("/user-types")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userTypeRequestDTO)))
+                        .content(objectMapper.writeValueAsString(createUserTypeRequestDTO)))
                 .andExpect(status().isConflict());
 
         verify(createUserTypeUseCase).execute(any(UserType.class));
@@ -134,7 +139,7 @@ class UserTypeControllerTest {
 
         mockMvc.perform(put("/user-types/{uuid}", userTypeUuid)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userTypeRequestDTO)))
+                        .content(objectMapper.writeValueAsString(updateUserTypeRequestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uuid").value(userTypeUuid.toString()))
                 .andExpect(jsonPath("$.name").value(userType.getName()));
@@ -149,7 +154,7 @@ class UserTypeControllerTest {
 
         mockMvc.perform(put("/user-types/{uuid}", userTypeUuid)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userTypeRequestDTO)))
+                        .content(objectMapper.writeValueAsString(updateUserTypeRequestDTO)))
                 .andExpect(status().isNotFound());
 
         verify(updateUserTypeUseCase).execute(eq(userTypeUuid), any(UserType.class));
