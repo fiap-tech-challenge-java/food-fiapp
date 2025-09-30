@@ -1,27 +1,35 @@
 package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
 
 @MappedSuperclass
-@Data
+@Getter
+@Setter
 public abstract class BaseEntity {
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private OffsetDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    @UpdateTimestamp
+    @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     private OffsetDateTime updatedAt;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = null;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = OffsetDateTime.now();
+    }
 }

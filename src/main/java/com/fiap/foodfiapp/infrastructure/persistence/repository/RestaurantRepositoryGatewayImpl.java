@@ -15,6 +15,7 @@ import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,25 +35,38 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
         UserEntity userEntity = userSpringDataRepository.findById(createRestaurant.userId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        if(userEntity.getUserType().getId() == 2){
-            boolean jaExisteRestaurante = userEntity.getRestaurants().stream()
-                    .anyMatch(r -> r.getName().equalsIgnoreCase(createRestaurant.name()));
+        if (userEntity.getUserType().getId() == 2) {
+            Optional<RestaurantEntity> restaurantAlreadyExists = userEntity.getRestaurants().stream()
+                    .filter(r -> r.getName().equalsIgnoreCase(createRestaurant.name()))
+                    .findFirst();
 
-            if(!jaExisteRestaurante){
-                RestaurantEntity restaurantEntity = new RestaurantEntity(
-                        createRestaurant.name(),
-                        createRestaurant.cuisineType(),
-                        createRestaurant.openingHours(),
-                        createRestaurant.userId(),
-                        null,
-                        true
-                );
+            if (restaurantAlreadyExists.isPresent()) {
+                RestaurantEntity restaurantEntity = restaurantAlreadyExists.get();
 
-                restaurantSpringDataRepository.save(restaurantEntity);
-                return RESTAURANT_MAPPER.mapToCreatedRestaurant(restaurantEntity);
+                if (!restaurantEntity.getActive()) {
+                    // Reativar restaurante
+                    restaurantEntity.setActive(true);
+                    restaurantEntity.setCuisineType(createRestaurant.cuisineType());
+                    restaurantEntity.setOpeningHours(createRestaurant.openingHours());
+                    restaurantSpringDataRepository.save(restaurantEntity);
+
+                    return RESTAURANT_MAPPER.mapToCreatedRestaurant(restaurantEntity);
+                } else {
+                    throw new BusinessException("Restaurant already created with this name for this user");
+                }
             }
 
-            throw new BusinessException("Restaurant already created with this name for this user");
+            RestaurantEntity restaurantEntity = new RestaurantEntity(
+                    createRestaurant.name(),
+                    createRestaurant.cuisineType(),
+                    createRestaurant.openingHours(),
+                    createRestaurant.userId(),
+                    null,
+                    true
+            );
+
+            restaurantSpringDataRepository.save(restaurantEntity);
+            return RESTAURANT_MAPPER.mapToCreatedRestaurant(restaurantEntity);
         }
 
         throw new BusinessException("User not permitted");
@@ -84,22 +98,18 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
 
     @Override
     public Restaurant updateRestaurant(UpdateRestaurant updateRestaurant) {
-        UserEntity userEntity = userSpringDataRepository.findById(updateRestaurant.getUserId())
+        userSpringDataRepository.findById(updateRestaurant.getUserId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        if(userEntity.getUserType().getId() == 2) {
-            RestaurantEntity restaurantEntity = this.restaurantSpringDataRepository.findByIdAndActiveTrue(updateRestaurant.getId())
-                    .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+        RestaurantEntity restaurantEntity = this.restaurantSpringDataRepository.findByIdAndActiveTrue(updateRestaurant.getId())
+                .orElseThrow(() -> new NotFoundException("Restaurant not found"));
 
-            restaurantEntity.setCuisineType(updateRestaurant.getCuisineType());
-            restaurantEntity.setName(updateRestaurant.getName());
-            restaurantEntity.setOpeningHours(updateRestaurant.getOpeningHours());
-            restaurantSpringDataRepository.save(restaurantEntity);
+        restaurantEntity.setCuisineType(updateRestaurant.getCuisineType());
+        restaurantEntity.setName(updateRestaurant.getName());
+        restaurantEntity.setOpeningHours(updateRestaurant.getOpeningHours());
+        restaurantSpringDataRepository.save(restaurantEntity);
 
-            return RESTAURANT_MAPPER.mapToRestaurant(restaurantEntity);
-        }
-
-        throw new BusinessException("User not Owner");
+        return RESTAURANT_MAPPER.mapToRestaurant(restaurantEntity);
     }
 
     @Override

@@ -2,15 +2,18 @@ package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "restaurants")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-public class RestaurantEntity {
+public class RestaurantEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
