@@ -156,23 +156,67 @@ class UserTypeControllerTest {
     }
 
     @Test
+    void shouldReturnConflictWhenUpdateUserTypeFails() throws Exception {
+        when(updateUserTypeUseCase.execute(eq(userTypeUuid), any(UserType.class)))
+                .thenThrow(new BusinessException("Name already exists"));
+
+        mockMvc.perform(put("/user-types/{uuid}", userTypeUuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userTypeRequestDTO)))
+                .andExpect(status().isConflict());
+
+        verify(updateUserTypeUseCase).execute(eq(userTypeUuid), any(UserType.class));
+    }
+
+    @Test
     void shouldDeleteUserTypeSuccessfully() throws Exception {
         doNothing().when(deleteUserTypeUseCase).execute(userTypeUuid);
 
         mockMvc.perform(delete("/user-types/{uuid}", userTypeUuid))
                 .andExpect(status().isNoContent());
 
-        verify(deleteUserTypeUseCase).execute(eq(userTypeUuid));
+        verify(deleteUserTypeUseCase).execute(userTypeUuid);
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenDeletingNonExistentUserType() throws Exception {
+        doThrow(new BusinessException("User type not found")).when(deleteUserTypeUseCase).execute(userTypeUuid);
+
+        mockMvc.perform(delete("/user-types/{uuid}", userTypeUuid))
+                .andExpect(status().isNotFound());
+
+        verify(deleteUserTypeUseCase).execute(userTypeUuid);
     }
 
     @Test
     void shouldReturnConflictWhenDeletingUserTypeInUse() throws Exception {
-        doThrow(new BusinessException("Cannot delete user type that is being used by users."))
-                .when(deleteUserTypeUseCase).execute(userTypeUuid);
+        doThrow(new BusinessException("Cannot delete user type that is being used")).when(deleteUserTypeUseCase).execute(userTypeUuid);
 
         mockMvc.perform(delete("/user-types/{uuid}", userTypeUuid))
                 .andExpect(status().isConflict());
 
-        verify(deleteUserTypeUseCase).execute(eq(userTypeUuid));
+        verify(deleteUserTypeUseCase).execute(userTypeUuid);
+    }
+
+    @Test
+    void shouldReturnInternalServerErrorWhenDeletingUserTypeFails() throws Exception {
+        doThrow(new BusinessException("Unexpected error")).when(deleteUserTypeUseCase).execute(userTypeUuid);
+
+        mockMvc.perform(delete("/user-types/{uuid}", userTypeUuid))
+                .andExpect(status().isInternalServerError());
+
+        verify(deleteUserTypeUseCase).execute(userTypeUuid);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoUserTypes() throws Exception {
+        when(userTypeRepositoryGateway.findAll()).thenReturn(List.of());
+
+        mockMvc.perform(get("/user-types"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+
+        verify(userTypeRepositoryGateway).findAll();
     }
 }

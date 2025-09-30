@@ -226,4 +226,50 @@ class UserControllerTest {
 
         verify(userRepositoryGateway).deleteById(eq(userId));
     }
+
+    @Test
+    void shouldReturnBadRequestWhenUserTypeNotFoundDuringCreation() throws Exception {
+        when(createUserUseCase.execute(any(User.class))).thenThrow(new BusinessException("User type not found"));
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRequestDTO)))
+                .andExpect(status().isBadRequest());
+
+        verify(createUserUseCase).execute(any(User.class));
+    }
+
+    @Test
+    void shouldReturnConflictWhenUpdateUserFails() throws Exception {
+        when(userRepositoryGateway.findById(eq(userId))).thenReturn(Optional.of(user));
+        when(updateUserUseCase.execute(eq(userId), any(User.class))).thenThrow(new BusinessException("Email already exists"));
+
+        mockMvc.perform(put("/users/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateUserRequestDTO)))
+                .andExpect(status().isConflict());
+
+        verify(userRepositoryGateway).findById(eq(userId));
+        verify(updateUserUseCase).execute(eq(userId), any(User.class));
+    }
+
+    @Test
+    void shouldReturnNotImplementedForChangePassword() throws Exception {
+        mockMvc.perform(post("/users/change-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"oldPassword\":\"old\",\"newPassword\":\"new\"}"))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoUsers() throws Exception {
+        when(userRepositoryGateway.findAll()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
+
+        verify(userRepositoryGateway).findAll();
+    }
 }
