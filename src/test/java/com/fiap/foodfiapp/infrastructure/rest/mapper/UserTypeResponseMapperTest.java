@@ -13,37 +13,37 @@ class UserTypeResponseMapperTest {
     @Test
     void shouldMapUserTypeToResponse() {
         UUID uuid = UUID.randomUUID();
-        UserType userType = new UserType(uuid, "ADMIN");
+        UserType userType = new UserType(uuid, "CUSTOMER");
 
         UserTypeResponse response = UserTypeResponseMapper.toDTO(userType);
 
         assertThat(response).isNotNull();
         assertThat(response.getUuid()).isEqualTo(uuid);
-        assertThat(response.getName()).isEqualTo("ADMIN");
+        assertThat(response.getName()).isEqualTo("CUSTOMER");
     }
 
     @Test
     void shouldMapUserTypeWithClientRole() {
         UUID uuid = UUID.randomUUID();
-        UserType userType = new UserType(uuid, "CLIENT");
+        UserType userType = new UserType(uuid, "CUSTOMER");
 
         UserTypeResponse response = UserTypeResponseMapper.toDTO(userType);
 
         assertThat(response).isNotNull();
         assertThat(response.getUuid()).isEqualTo(uuid);
-        assertThat(response.getName()).isEqualTo("CLIENT");
+        assertThat(response.getName()).isEqualTo("CUSTOMER");
     }
 
     @Test
     void shouldMapUserTypeWithManagerRole() {
         UUID uuid = UUID.randomUUID();
-        UserType userType = new UserType(uuid, "MANAGER");
+        UserType userType = new UserType(uuid, "OWNER");
 
         UserTypeResponse response = UserTypeResponseMapper.toDTO(userType);
 
         assertThat(response).isNotNull();
         assertThat(response.getUuid()).isEqualTo(uuid);
-        assertThat(response.getName()).isEqualTo("MANAGER");
+        assertThat(response.getName()).isEqualTo("OWNER");
     }
 
     @Test

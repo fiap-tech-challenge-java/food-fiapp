@@ -13,10 +13,10 @@ class UserTypeResponseTest {
 
         UserTypeResponse response = new UserTypeResponse()
                 .uuid(uuid)
-                .name("CLIENT");
+                .name("CUSTOMER");
 
         assertThat(response.getUuid()).isEqualTo(uuid);
-        assertThat(response.getName()).isEqualTo("CLIENT");
+        assertThat(response.getName()).isEqualTo("CUSTOMER");
     }
 
     @Test
@@ -29,19 +29,20 @@ class UserTypeResponseTest {
 
     @Test
     void shouldSupportFluentInterface() {
+        UUID uuid = UUID.randomUUID();
         UserTypeResponse response = new UserTypeResponse()
-                .name("ADMIN")
-                .uuid(UUID.randomUUID());
+                .uuid(uuid)
+                .name("CUSTOMER");
 
-        assertThat(response.getName()).isEqualTo("ADMIN");
-        assertThat(response.getUuid()).isNotNull();
+        assertThat(response.getUuid()).isEqualTo(uuid);
+        assertThat(response.getName()).isEqualTo("CUSTOMER");
     }
 
     @Test
     void shouldImplementEqualsAndHashCode() {
         UUID uuid = UUID.randomUUID();
-        UserTypeResponse response1 = new UserTypeResponse().uuid(uuid).name("CLIENT");
-        UserTypeResponse response2 = new UserTypeResponse().uuid(uuid).name("CLIENT");
+        UserTypeResponse response1 = new UserTypeResponse().uuid(uuid).name("CUSTOMER");
+        UserTypeResponse response2 = new UserTypeResponse().uuid(uuid).name("CUSTOMER");
 
         assertThat(response1).isEqualTo(response2);
         assertThat(response1.hashCode()).isEqualTo(response2.hashCode());

@@ -25,9 +25,9 @@ class UserTypeRequestTest {
     @Test
     void shouldSupportFluentInterface() {
         UserTypeRequest request = new UserTypeRequest()
-                .name("CLIENT");
+                .name("CUSTOMER");
 
-        assertThat(request.getName()).isEqualTo("CLIENT");
+        assertThat(request.getName()).isEqualTo("CUSTOMER");
     }
 
     @Test
@@ -41,8 +41,8 @@ class UserTypeRequestTest {
 
     @Test
     void shouldImplementToString() {
-        UserTypeRequest request = new UserTypeRequest().name("MANAGER");
+        UserTypeRequest request = new UserTypeRequest().name("OWNER");
 
-        assertThat(request.toString()).contains("MANAGER");
+        assertThat(request.toString()).contains("OWNER");
     }
 }

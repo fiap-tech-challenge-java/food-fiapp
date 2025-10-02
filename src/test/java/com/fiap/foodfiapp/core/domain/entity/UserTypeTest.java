@@ -68,13 +68,11 @@ class UserTypeTest {
     }
 
     @Test
-    void shouldHaveStringRepresentation() {
-        UserType userType = new UserType(UUID.randomUUID(), "MANAGER");
+    void shouldImplementToString() {
+        UserType userType = new UserType(UUID.randomUUID(), "OWNER");
 
         String result = userType.toString();
 
-        // Como toString não está implementado, apenas verificamos que retorna algo
-        assertThat(result).isNotNull();
-        assertThat(result).contains("UserType");
+        assertThat(result).contains("OWNER");
     }
 }

@@ -38,7 +38,7 @@ class UserRepositoryGatewayImplTest {
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
-        UserType userType = new UserType(UUID.randomUUID(), "CLIENT");
+        UserType userType = new UserType(UUID.randomUUID(), "CUSTOMER");
 
         UserTypeEntity userTypeEntity = UserTypeEntity.builder()
                 .uuid(userType.getUuid())

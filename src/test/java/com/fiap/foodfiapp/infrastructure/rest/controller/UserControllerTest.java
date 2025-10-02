@@ -77,7 +77,7 @@ class UserControllerTest {
         objectMapper = new ObjectMapper();
 
         userId = UUID.randomUUID();
-        userType = new UserType(UUID.randomUUID(), "CLIENT");
+        userType = new UserType(UUID.randomUUID(), "CUSTOMER");
 
         userRequestDTO = new CreateUserRequest();
         userRequestDTO.setName("Test User");
@@ -108,7 +108,7 @@ class UserControllerTest {
                 .cpf("12345678901")
                 .login("login_test")
                 .addresses(Collections.emptyList())
-                .userType("CLIENT")
+                .userType("CUSTOMER")
                 .active(true);
 
         userResponseMapperMockedStatic = mockStatic(UserResponseMapper.class);

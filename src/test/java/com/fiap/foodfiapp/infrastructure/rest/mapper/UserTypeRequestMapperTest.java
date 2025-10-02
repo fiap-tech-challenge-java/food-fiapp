@@ -23,23 +23,23 @@ class UserTypeRequestMapperTest {
     @Test
     void shouldMapUserTypeRequestWithClientRole() {
         UserTypeRequest request = new UserTypeRequest();
-        request.setName("CLIENT");
+        request.setName("CUSTOMER");
 
         UserType userType = UserTypeRequestMapper.toEntity(request);
 
         assertThat(userType).isNotNull();
-        assertThat(userType.getName()).isEqualTo("CLIENT");
+        assertThat(userType.getName()).isEqualTo("CUSTOMER");
     }
 
     @Test
-    void shouldMapUserTypeRequestWithManagerRole() {
+    void shouldMapUpdateUserTypeRequestWithManagerRole() {
         UserTypeRequest request = new UserTypeRequest();
-        request.setName("MANAGER");
+        request.setName("OWNER");
 
         UserType userType = UserTypeRequestMapper.toEntity(request);
 
         assertThat(userType).isNotNull();
-        assertThat(userType.getName()).isEqualTo("MANAGER");
+        assertThat(userType.getName()).isEqualTo("OWNER");
     }
 
     @Test

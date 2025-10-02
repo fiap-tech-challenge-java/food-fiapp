@@ -20,7 +20,7 @@ class UserPersistenceMapperTest {
         UUID userTypeId = UUID.randomUUID();
         UUID addressId = UUID.randomUUID();
 
-        UserType userType = new UserType(userTypeId, "CLIENT");
+        UserType userType = new UserType(userTypeId, "CUSTOMER");
         Address address = new Address(addressId, "Rua das Flores", "123", "Apt 1", "Centro", "São Paulo", "SP", "12345-678");
 
         User user = new User(
@@ -48,7 +48,7 @@ class UserPersistenceMapperTest {
         assertThat(entity.getPassword()).isEqualTo("password123");
         assertThat(entity.getUserType()).isNotNull();
         assertThat(entity.getUserType().getUuid()).isEqualTo(userTypeId);
-        assertThat(entity.getUserType().getName()).isEqualTo("CLIENT");
+        assertThat(entity.getUserType().getName()).isEqualTo("CUSTOMER");
         assertThat(entity.getAddressesList()).hasSize(1);
         assertThat(entity.getAddressesList().get(0).getId()).isEqualTo(addressId);
     }
@@ -61,7 +61,7 @@ class UserPersistenceMapperTest {
 
         UserTypeEntity userTypeEntity = UserTypeEntity.builder()
                 .uuid(userTypeId)
-                .name("CLIENT")
+                .name("CUSTOMER")
                 .build();
 
         AddressEntity addressEntity = new AddressEntity(
@@ -100,7 +100,7 @@ class UserPersistenceMapperTest {
         assertThat(user.getPassword()).isEqualTo("password123");
         assertThat(user.getUserType()).isNotNull();
         assertThat(user.getUserType().getUuid()).isEqualTo(userTypeId);
-        assertThat(user.getUserType().getName()).isEqualTo("CLIENT");
+        assertThat(user.getUserType().getName()).isEqualTo("CUSTOMER");
         assertThat(user.getAddresses()).hasSize(1);
         assertThat(user.getAddresses().get(0).getId()).isEqualTo(addressId);
     }
@@ -124,7 +124,7 @@ class UserPersistenceMapperTest {
         UUID userId = UUID.randomUUID();
         UUID userTypeId = UUID.randomUUID();
 
-        UserType userType = new UserType(userTypeId, "CLIENT");
+        UserType userType = new UserType(userTypeId, "CUSTOMER");
 
         User user = new User(
                 userId,
@@ -152,7 +152,7 @@ class UserPersistenceMapperTest {
 
         UserTypeEntity userTypeEntity = UserTypeEntity.builder()
                 .uuid(userTypeId)
-                .name("CLIENT")
+                .name("CUSTOMER")
                 .build();
 
         UserEntity entity = UserEntity.builder()

@@ -73,10 +73,11 @@ class UserTypeEntityTest {
     @Test
     void shouldImplementToString() {
         UserTypeEntity entity = new UserTypeEntity();
-        entity.setName("MANAGER");
+        entity.setUuid(UUID.randomUUID());
+        entity.setName("OWNER");
 
         String result = entity.toString();
 
-        assertThat(result).contains("MANAGER");
+        assertThat(result).contains("OWNER");
     }
 }

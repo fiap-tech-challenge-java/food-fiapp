@@ -17,7 +17,7 @@ class UserResponseTest {
                 .email("john@example.com")
                 .login("johndoe")
                 .cpf("12345678901")
-                .userType("CLIENT")
+                .userType("CUSTOMER")
                 .active(true);
 
         assertThat(response.getId()).isEqualTo(id);
@@ -25,7 +25,7 @@ class UserResponseTest {
         assertThat(response.getEmail()).isEqualTo("john@example.com");
         assertThat(response.getLogin()).isEqualTo("johndoe");
         assertThat(response.getCpf()).isEqualTo("12345678901");
-        assertThat(response.getUserType()).isEqualTo("CLIENT");
+        assertThat(response.getUserType()).isEqualTo("CUSTOMER");
         assertThat(response.getActive()).isTrue();
     }
 
@@ -44,14 +44,23 @@ class UserResponseTest {
 
     @Test
     void shouldSupportFluentInterface() {
+        UUID uuid = UUID.randomUUID();
         UserResponse response = new UserResponse()
-                .name("Jane Doe")
-                .email("jane@example.com")
-                .active(false);
+                .id(uuid)
+                .name("John Doe")
+                .email("john@example.com")
+                .login("johndoe")
+                .cpf("12345678901")
+                .userType("CUSTOMER")
+                .active(true);
 
-        assertThat(response.getName()).isEqualTo("Jane Doe");
-        assertThat(response.getEmail()).isEqualTo("jane@example.com");
-        assertThat(response.getActive()).isFalse();
+        assertThat(response.getId()).isEqualTo(uuid);
+        assertThat(response.getName()).isEqualTo("John Doe");
+        assertThat(response.getEmail()).isEqualTo("john@example.com");
+        assertThat(response.getLogin()).isEqualTo("johndoe");
+        assertThat(response.getCpf()).isEqualTo("12345678901");
+        assertThat(response.getUserType()).isEqualTo("CUSTOMER");
+        assertThat(response.getActive()).isTrue();
     }
 
     @Test

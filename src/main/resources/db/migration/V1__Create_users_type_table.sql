@@ -1,3 +1,6 @@
+-- Enable pgcrypto extension for UUID generation functions
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 CREATE TABLE IF NOT EXISTS users_type (
     uuid UUID PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,

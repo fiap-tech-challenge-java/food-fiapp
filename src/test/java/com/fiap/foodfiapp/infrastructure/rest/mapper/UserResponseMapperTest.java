@@ -19,7 +19,7 @@ class UserResponseMapperTest {
     void shouldMapUserToUserResponse() {
         UUID userId = UUID.randomUUID();
         UUID userTypeId = UUID.randomUUID();
-        UserType userType = new UserType(userTypeId, "CLIENT");
+        UserType userType = new UserType(userTypeId, "CUSTOMER");
 
         User user = new User(
                 userId,
@@ -42,7 +42,7 @@ class UserResponseMapperTest {
         assertThat(result.getEmail()).isEqualTo("john@example.com");
         assertThat(result.getLogin()).isEqualTo("johndoe");
         assertThat(result.getCpf()).isEqualTo("12345678901");
-        assertThat(result.getUserType()).isEqualTo("CLIENT");
+        assertThat(result.getUserType()).isEqualTo("CUSTOMER");
         assertThat(result.getActive()).isTrue();
         assertThat(result.getAddresses()).isEmpty();
     }
@@ -74,7 +74,7 @@ class UserResponseMapperTest {
     @Test
     void shouldMapUserWithNullAddresses() {
         UUID userId = UUID.randomUUID();
-        UserType userType = new UserType(UUID.randomUUID(), "CLIENT");
+        UserType userType = new UserType(UUID.randomUUID(), "CUSTOMER");
 
         User user = new User(
                 userId,
@@ -99,7 +99,7 @@ class UserResponseMapperTest {
     void shouldMapUserWithAddresses() {
         UUID userId = UUID.randomUUID();
         UUID addressId = UUID.randomUUID();
-        UserType userType = new UserType(UUID.randomUUID(), "CLIENT");
+        UserType userType = new UserType(UUID.randomUUID(), "CUSTOMER");
 
         Address address = new Address(
                 addressId,
@@ -136,7 +136,7 @@ class UserResponseMapperTest {
     @Test
     void shouldHandleInactiveUser() {
         UUID userId = UUID.randomUUID();
-        UserType userType = new UserType(UUID.randomUUID(), "CLIENT");
+        UserType userType = new UserType(UUID.randomUUID(), "CUSTOMER");
 
         User user = new User(
                 userId,
