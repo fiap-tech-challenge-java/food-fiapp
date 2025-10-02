@@ -65,7 +65,8 @@ public class UserPersistenceMapper {
                 address.getNeighborhood(),
                 address.getCity(),
                 address.getState(),
-                address.getPostalCode()
+                address.getPostalCode(),
+                true
         );
     }
 

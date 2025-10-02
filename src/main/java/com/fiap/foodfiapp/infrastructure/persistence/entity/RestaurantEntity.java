@@ -1,13 +1,8 @@
 package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,9 +10,11 @@ import java.util.UUID;
 @Entity
 @Table(name = "restaurants")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RestaurantEntity {
+@EqualsAndHashCode(callSuper = false)
+public class RestaurantEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -25,16 +22,24 @@ public class RestaurantEntity {
     @Column(nullable = false)
     private String name;
 
-    private String description;
+    @Column(nullable = false)
+    private String address;
+
+    @Column(name = "cuisine_type", nullable = false)
+    private String cuisineType;
+
+    @Column(name = "opening_hours", nullable = false)
+    private String openingHours;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private UserEntity owner;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<MenuItemEntity> menuItems = new ArrayList<>();
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 }

@@ -73,7 +73,8 @@ class UserPersistenceMapperTest {
                 "Centro",
                 "São Paulo",
                 "SP",
-                "12345-678"
+                "12345-678",
+                true
         );
 
         UserEntity entity = UserEntity.builder()

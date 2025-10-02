@@ -63,7 +63,7 @@ class MenuItemRepositoryAdapterTest {
         menuItemEntity.setName("Test Menu Item");
         menuItemEntity.setDescription("Test Description");
         menuItemEntity.setPrice(BigDecimal.valueOf(29.99));
-        menuItemEntity.setLocalOnly(false);
+        menuItemEntity.setAvailableForInStoreOnly(false);
         menuItemEntity.setPhotoUrl("photo-url.jpg");
         menuItemEntity.setRestaurant(restaurantEntity);
     }

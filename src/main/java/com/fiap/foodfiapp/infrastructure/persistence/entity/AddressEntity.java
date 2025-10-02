@@ -1,10 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -14,7 +11,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressEntity {
+@EqualsAndHashCode(callSuper = false)
+public class AddressEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
@@ -43,4 +41,8 @@ public class AddressEntity {
 
     @Column(name = "postal_code", nullable = false)
     private String postalCode;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
 }

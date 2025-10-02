@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 public class MenuItemEntityMapper {
     public MenuItem toDomain(MenuItemEntity entity) {
         return new MenuItem(
-            entity.getId(),
-            entity.getName(),
-            entity.getDescription(),
-            entity.getPrice(),
-            entity.isLocalOnly(),
-            entity.getPhotoUrl(),
-            entity.getRestaurant().getId(),
-            entity.getCreatedAt(),
-            entity.getUpdatedAt()
+                entity.getId(),
+                entity.getName(),
+                entity.getDescription(),
+                entity.getPrice(),
+                entity.isAvailableForInStoreOnly(),
+                entity.getPhotoUrl(),
+                entity.getRestaurant().getId(),
+                entity.getCreatedAt().toLocalDateTime(),
+                entity.getUpdatedAt().toLocalDateTime()
         );
     }
 
@@ -27,7 +27,7 @@ public class MenuItemEntityMapper {
         entity.setName(domain.name());
         entity.setDescription(domain.description());
         entity.setPrice(domain.price());
-        entity.setLocalOnly(domain.localOnly());
+        entity.setAvailableForInStoreOnly(domain.localOnly());
         entity.setPhotoUrl(domain.photoUrl());
 
         if (domain.restaurantId() != null) {

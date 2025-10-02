@@ -1,22 +1,19 @@
 package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "menu_items")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MenuItemEntity {
+@EqualsAndHashCode(callSuper = false)
+public class MenuItemEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -30,21 +27,18 @@ public class MenuItemEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "local_only")
-    private boolean localOnly;
+    @Column(name = "available_for_in_store_only", nullable = false)
+    @Builder.Default
+    private boolean availableForInStoreOnly = false;
 
     @Column(name = "photo_url")
     private String photoUrl;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private RestaurantEntity restaurant;
-
-    @CreationTimestamp
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 }
