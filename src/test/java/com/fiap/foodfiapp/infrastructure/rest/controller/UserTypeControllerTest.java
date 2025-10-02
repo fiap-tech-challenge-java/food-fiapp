@@ -167,7 +167,7 @@ class UserTypeControllerTest {
 
         mockMvc.perform(put("/user-types/{uuid}", userTypeUuid)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userTypeRequestDTO)))
+                        .content(objectMapper.writeValueAsString(updateUserTypeRequestDTO)))
                 .andExpect(status().isConflict());
 
         verify(updateUserTypeUseCase).execute(eq(userTypeUuid), any(UserType.class));

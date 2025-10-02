@@ -17,7 +17,7 @@ class UserTypeRequestMapperTest {
 
         assertThat(userType).isNotNull();
         assertThat(userType.getName()).isEqualTo("ADMIN");
-        assertThat(userType.getUuid()).isNull(); // UUID is not set in the mapper
+        assertThat(userType.getUuid()).isNull();
     }
 
     @Test
