@@ -17,11 +17,11 @@ class UserTypeRequestMapperTest {
 
         assertThat(userType).isNotNull();
         assertThat(userType.getName()).isEqualTo("ADMIN");
-        assertThat(userType.getUuid()).isNull(); // UUID is not set in the mapper
+        assertThat(userType.getUuid()).isNull();
     }
 
     @Test
-    void shouldMapUserTypeRequestWithClientRole() {
+    void shouldMapUserTypeRequestWithCustomerRole() {
         UserTypeRequest request = new UserTypeRequest();
         request.setName("CUSTOMER");
 
@@ -32,7 +32,7 @@ class UserTypeRequestMapperTest {
     }
 
     @Test
-    void shouldMapUpdateUserTypeRequestWithManagerRole() {
+    void shouldMapUserTypeRequestWithOwnerRole() {
         UserTypeRequest request = new UserTypeRequest();
         request.setName("OWNER");
 
