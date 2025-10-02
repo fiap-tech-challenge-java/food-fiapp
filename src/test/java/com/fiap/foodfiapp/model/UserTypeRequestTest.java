@@ -8,8 +8,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserTypeRequestTest {
 
     @Test
-    void shouldCreateUserTypeRequestWithAllFields() {
-        UserTypeRequest request = new UserTypeRequest()
+    void shouldCreateCreateUserTypeRequestWithAllFields() {
+        CreateUserTypeRequest request = new CreateUserTypeRequest()
                 .name("ADMIN");
 
         assertThat(request.getName()).isEqualTo("ADMIN");
@@ -17,14 +17,14 @@ class UserTypeRequestTest {
 
     @Test
     void shouldHandleNullValues() {
-        UserTypeRequest request = new UserTypeRequest();
+        CreateUserTypeRequest request = new CreateUserTypeRequest();
 
         assertThat(request.getName()).isNull();
     }
 
     @Test
     void shouldSupportFluentInterface() {
-        UserTypeRequest request = new UserTypeRequest()
+        UpdateUserTypeRequest request = new UpdateUserTypeRequest()
                 .name("CLIENT");
 
         assertThat(request.getName()).isEqualTo("CLIENT");
@@ -32,8 +32,8 @@ class UserTypeRequestTest {
 
     @Test
     void shouldImplementEqualsAndHashCode() {
-        UserTypeRequest request1 = new UserTypeRequest().name("OWNER");
-        UserTypeRequest request2 = new UserTypeRequest().name("OWNER");
+        CreateUserTypeRequest request1 = new CreateUserTypeRequest().name("OWNER");
+        CreateUserTypeRequest request2 = new CreateUserTypeRequest().name("OWNER");
 
         assertThat(request1).isEqualTo(request2);
         assertThat(request1.hashCode()).isEqualTo(request2.hashCode());
@@ -41,7 +41,7 @@ class UserTypeRequestTest {
 
     @Test
     void shouldImplementToString() {
-        UserTypeRequest request = new UserTypeRequest().name("MANAGER");
+        UpdateUserTypeRequest request = new UpdateUserTypeRequest().name("MANAGER");
 
         assertThat(request.toString()).contains("MANAGER");
     }

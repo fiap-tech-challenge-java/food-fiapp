@@ -1,7 +1,8 @@
 package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
 import com.fiap.foodfiapp.core.domain.entity.UserType;
-import com.fiap.foodfiapp.model.UserTypeRequest;
+import com.fiap.foodfiapp.model.CreateUserTypeRequest;
+import com.fiap.foodfiapp.model.UpdateUserTypeRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,8 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserTypeRequestMapperTest {
 
     @Test
-    void shouldMapUserTypeRequestToEntity() {
-        UserTypeRequest request = new UserTypeRequest();
+    void shouldMapCreateUserTypeRequestToEntity() {
+        CreateUserTypeRequest request = new CreateUserTypeRequest();
         request.setName("ADMIN");
 
         UserType userType = UserTypeRequestMapper.toEntity(request);
@@ -21,8 +22,8 @@ class UserTypeRequestMapperTest {
     }
 
     @Test
-    void shouldMapUserTypeRequestWithClientRole() {
-        UserTypeRequest request = new UserTypeRequest();
+    void shouldMapCreateUserTypeRequestWithClientRole() {
+        CreateUserTypeRequest request = new CreateUserTypeRequest();
         request.setName("CLIENT");
 
         UserType userType = UserTypeRequestMapper.toEntity(request);
@@ -32,8 +33,8 @@ class UserTypeRequestMapperTest {
     }
 
     @Test
-    void shouldMapUserTypeRequestWithManagerRole() {
-        UserTypeRequest request = new UserTypeRequest();
+    void shouldMapUpdateUserTypeRequestWithManagerRole() {
+        UpdateUserTypeRequest request = new UpdateUserTypeRequest();
         request.setName("MANAGER");
 
         UserType userType = UserTypeRequestMapper.toEntity(request);
@@ -43,8 +44,8 @@ class UserTypeRequestMapperTest {
     }
 
     @Test
-    void shouldMapUserTypeRequestWithNullName() {
-        UserTypeRequest request = new UserTypeRequest();
+    void shouldMapCreateUserTypeRequestWithNullName() {
+        CreateUserTypeRequest request = new CreateUserTypeRequest();
         request.setName(null);
 
         UserType userType = UserTypeRequestMapper.toEntity(request);
@@ -54,13 +55,13 @@ class UserTypeRequestMapperTest {
     }
 
     @Test
-    void shouldMapUserTypeRequestWithEmptyName() {
-        UserTypeRequest request = new UserTypeRequest();
-        request.setName("");
+    void shouldMapUpdateUserTypeRequestWithNullName() {
+        UpdateUserTypeRequest request = new UpdateUserTypeRequest();
+        request.setName(null);
 
         UserType userType = UserTypeRequestMapper.toEntity(request);
 
         assertThat(userType).isNotNull();
-        assertThat(userType.getName()).isEmpty();
+        assertThat(userType.getName()).isNull();
     }
 }

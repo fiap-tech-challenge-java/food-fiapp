@@ -44,7 +44,7 @@ public class UserEntity {
     @Column(name = "active", nullable = false)
     private boolean active;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AddressEntity> addressesList = new ArrayList<>();
 }
-
