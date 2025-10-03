@@ -1,4 +1,4 @@
-package com.fiap.foodfiapp.infrastructure.rest.dto;
+package com.fiap.foodfiapp.infrastructure.rest.dto.restaurant;
 
 import jakarta.validation.constraints.NotNull;
 

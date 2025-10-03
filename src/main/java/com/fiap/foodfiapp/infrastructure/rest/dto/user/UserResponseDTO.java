@@ -1,4 +1,4 @@
-package com.fiap.foodfiapp.infrastructure.rest.dto;
+package com.fiap.foodfiapp.infrastructure.rest.dto.user;
 
 import com.fiap.foodfiapp.core.domain.entities.Address;
 

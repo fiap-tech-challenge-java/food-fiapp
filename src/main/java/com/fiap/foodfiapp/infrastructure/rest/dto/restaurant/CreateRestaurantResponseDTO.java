@@ -1,4 +1,4 @@
-package com.fiap.foodfiapp.infrastructure.rest.dto;
+package com.fiap.foodfiapp.infrastructure.rest.dto.restaurant;
 
 import java.util.UUID;
 

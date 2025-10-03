@@ -5,10 +5,10 @@ import com.fiap.foodfiapp.core.application.usecases.restaurant.DeleteRestaurantU
 import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
-import com.fiap.foodfiapp.infrastructure.rest.dto.ChangeOwnerRequestDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.CreateRestaurantRequestDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.CreateRestaurantResponseDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.UpdateRestaurantRequestDTO;
+import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.ChangeOwnerRequestDTO;
+import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.CreateRestaurantRequestDTO;
+import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.CreateRestaurantResponseDTO;
+import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.UpdateRestaurantRequestDTO;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

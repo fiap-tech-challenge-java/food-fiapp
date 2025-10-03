@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.rest.dto;
 
+import com.fiap.foodfiapp.infrastructure.rest.dto.user.UserRequestDTO;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,4 +1,4 @@
-package com.fiap.foodfiapp.infrastructure.rest.dto;
+package com.fiap.foodfiapp.infrastructure.rest.dto.user;
 
 public class UserRequestDTO {
     private String name;
