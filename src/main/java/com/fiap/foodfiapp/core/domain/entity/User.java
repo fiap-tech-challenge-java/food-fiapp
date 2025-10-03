@@ -4,7 +4,7 @@ import java.util.List;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public class User {
+public class User extends BaseEntity {
 
     private UUID id;
     private String name;

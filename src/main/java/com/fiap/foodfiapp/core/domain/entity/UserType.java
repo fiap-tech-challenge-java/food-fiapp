@@ -2,7 +2,7 @@ package com.fiap.foodfiapp.core.domain.entity;
 
 import java.util.UUID;
 
-public class UserType {
+public class UserType extends BaseEntity {
 
     private UUID uuid;
     private String name;

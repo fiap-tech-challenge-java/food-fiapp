@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserTypeEntity {
+public class UserTypeEntity extends BaseEntity {
     @Id
     // UUID generation is intentionally disabled; manual assignment is required for compatibility with legacy systems.
     @Column(name = "uuid", updatable = false, nullable = false)

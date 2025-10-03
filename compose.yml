@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT:-5439}:5432"
     volumes:
       - foodfiapp_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -74,7 +74,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
       MINIO_BUCKET: ${MINIO_BUCKET:-menu-items}
-      JAVA_OPTS: ${JAVA_OPTS:-"-XX:MaxRAMPercentage=75 -XX:+UseG1GC -Dfile.encoding=UTF-8"}
+      JAVA_OPTS: ${JAVA_OPTS:--XX:MaxRAMPercentage=75 -XX:+UseG1GC -Dfile.encoding=UTF-8}
     depends_on:
       foodfiapp_postgres:
         condition: service_healthy

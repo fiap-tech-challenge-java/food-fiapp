@@ -10,4 +10,5 @@ import java.time.OffsetDateTime;
 public abstract class BaseEntity {
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
+    private Boolean isActive = true;
 }

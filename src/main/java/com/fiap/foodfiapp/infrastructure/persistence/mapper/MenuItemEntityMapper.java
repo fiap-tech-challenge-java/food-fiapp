@@ -16,8 +16,8 @@ public class MenuItemEntityMapper {
             entity.isLocalOnly(),
             entity.getPhotoUrl(),
             entity.getRestaurant().getId(),
-            entity.getCreatedAt(),
-            entity.getUpdatedAt()
+            entity.getCreatedAt() != null ? entity.getCreatedAt().toLocalDateTime() : null,
+            entity.getUpdatedAt() != null ? entity.getUpdatedAt().toLocalDateTime() : null
         );
     }
 
