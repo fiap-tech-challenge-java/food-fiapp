@@ -39,7 +39,7 @@ public class UserEntity extends BaseEntity {
     private UserTypeEntity userType;
 
     @OneToMany
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_owner_id", referencedColumnName = "id")
     private List<RestaurantEntity> restaurants;
 
     public UserEntity(UUID id, String name, String email, String password) {

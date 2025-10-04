@@ -7,7 +7,6 @@ public class UpdateRestaurant {
     private String name;
     private String cuisineType;
     private String openingHours;
-    private UUID userOwnerId;
 
     public UUID getId() {
         return id;
@@ -39,13 +38,5 @@ public class UpdateRestaurant {
 
     public void setOpeningHours(String openingHours) {
         this.openingHours = openingHours;
-    }
-
-    public UUID getUserOwnerId() {
-        return userOwnerId;
-    }
-
-    public void setUserOwnerId(UUID userOwnerId) {
-        this.userOwnerId = userOwnerId;
     }
 }

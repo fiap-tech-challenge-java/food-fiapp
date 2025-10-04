@@ -30,7 +30,7 @@ public class AddressesRestaurantGatewayImpl implements AddressesRestaurantReposi
 
     @Override
     public CreatedAddressesRestaurant createAddressesRestaurant(CreateAddressesRestaurant createAddressesRestaurant) {
-        RestaurantEntity restaurantEntity = restaurantSpringDataRepository.findById(createAddressesRestaurant.restaurantId())
+        RestaurantEntity restaurantEntity = restaurantSpringDataRepository.findByIdAndActiveTrue(createAddressesRestaurant.restaurantId())
                 .orElseThrow(() -> new NotFoundException("Restaurant not found"));
 
         AddressesEntity addressesEntity = ADDRESSES_RESTAURANT_PERSISTENCE_MAPPER.mapToAddressesEntity(createAddressesRestaurant);
@@ -47,7 +47,7 @@ public class AddressesRestaurantGatewayImpl implements AddressesRestaurantReposi
     @Transactional
     @Override
     public void deleteAddressesRestaurant(UUID restaurantId) {
-        RestaurantEntity restaurantEntity = restaurantSpringDataRepository.findById(restaurantId)
+        RestaurantEntity restaurantEntity = restaurantSpringDataRepository.findByIdAndActiveTrue(restaurantId)
                 .orElseThrow(() -> new NotFoundException("Restaurant not found"));
 
         AddressesEntity addressesEntity = addressesRestaurantSpringDataRepository
