@@ -29,7 +29,9 @@ public class UserResponseMapper {
         userResponse.setLogin(user.getLogin());
         userResponse.setAddresses(addresses);
         userResponse.setUserType(user.getUserType() != null ? user.getUserType().getName() : null);
-        userResponse.setActive(user.isActive());
+        userResponse.setIsActive(user.isActive());
+        userResponse.setCreatedAt(user.getCreatedAt());
+        userResponse.setUpdatedAt(user.getUpdatedAt());
 
         return userResponse;
     }
@@ -45,7 +47,9 @@ public class UserResponseMapper {
         addressResponse.setCity(address.getCity());
         addressResponse.setState(address.getState());
         addressResponse.setPostalCode(address.getPostalCode());
-
+        addressResponse.setCreatedAt(address.getCreatedAt());
+        addressResponse.setUpdatedAt(address.getUpdatedAt());
+        addressResponse.setIsActive(address.isActive());
 
         return addressResponse;
     }

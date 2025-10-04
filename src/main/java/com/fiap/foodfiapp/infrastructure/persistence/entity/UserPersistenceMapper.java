@@ -49,8 +49,8 @@ public class UserPersistenceMapper {
                                 .collect(Collectors.toList()) : null,
                 toDomainUserType(entity.getUserType()),
                 Boolean.TRUE.equals(entity.getIsActive()),
+                                entity.getUpdatedAt(), // Parameter order must match User domain entity constructor
                 entity.getCreatedAt(),
-                entity.getUpdatedAt(),
                 entity.getPassword()
         );
     }
@@ -92,6 +92,11 @@ public class UserPersistenceMapper {
 
     private static UserType toDomainUserType(UserTypeEntity persistenceUserType) {
         if (persistenceUserType == null) return null;
-        return new UserType(persistenceUserType.getUuid(), persistenceUserType.getName());
+        return new UserType(
+                persistenceUserType.getUuid(),
+                persistenceUserType.getName(),
+                persistenceUserType.getCreatedAt(),
+                persistenceUserType.getUpdatedAt()
+        );
     }
 }

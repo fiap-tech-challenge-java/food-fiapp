@@ -7,13 +7,18 @@ public class UserTypePersistenceMapper {
     }
 
     public static UserType toDomain(UserTypeEntity entity) {
+        if (entity == null) return null;
         return new UserType(
                 entity.getUuid(),
-                entity.getName()
+                entity.getName(),
+                Boolean.TRUE.equals(entity.getIsActive()),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt()
         );
     }
 
     public static UserTypeEntity toEntity(UserType domain) {
+        if (domain == null) return null;
         return UserTypeEntity.builder()
                 .uuid(domain.getUuid())
                 .name(domain.getName())
