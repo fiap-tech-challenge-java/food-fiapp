@@ -3,22 +3,16 @@ package com.fiap.foodfiapp.core.domain.entities;
 import java.util.UUID;
 
 public class Address {
-
     private UUID id;
-
     private String publicPlace;
-
     private String number;
-
     private String complement;
-
     private String neighborhood;
-
     private String city;
-
     private String state;
-
     private String postalCode;
+    private String ownerType;
+    private UUID ownerId;
 
     public UUID getId() {
         return id;
@@ -82,5 +76,21 @@ public class Address {
 
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+
+    public String getOwnerType() {
+        return ownerType;
+    }
+
+    public void setOwnerType(String ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(UUID ownerId) {
+        this.ownerId = ownerId;
     }
 }

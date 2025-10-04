@@ -32,7 +32,7 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
 
     @Override
     public CreatedRestaurant createRestaurant(CreateRestaurant createRestaurant) {
-        UserEntity userEntity = userSpringDataRepository.findById(createRestaurant.userId())
+        UserEntity userEntity = userSpringDataRepository.findById(createRestaurant.userOwnerId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (userEntity.getUserType().getId() == 2) {
@@ -60,7 +60,7 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
                     createRestaurant.name(),
                     createRestaurant.cuisineType(),
                     createRestaurant.openingHours(),
-                    createRestaurant.userId(),
+                    createRestaurant.userOwnerId(),
                     null,
                     true
             );
@@ -82,7 +82,7 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
 
     @Override
     public Restaurant findByName(String name, UUID userId) {
-        RestaurantEntity entity = this.restaurantSpringDataRepository.findByUserIdAndNameAndActiveTrue(userId, name)
+        RestaurantEntity entity = this.restaurantSpringDataRepository.findByUserOwnerIdAndNameAndActiveTrue(userId, name)
                 .orElseThrow(() -> new NotFoundException("User's restaurant not found"));
 
         return RESTAURANT_MAPPER.mapToRestaurant(entity);
@@ -90,7 +90,7 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
 
     @Override
     public List<Restaurant> findAllByUserId(UUID userId) {
-        List<RestaurantEntity> entities = this.restaurantSpringDataRepository.findAllByUserIdAndActiveTrue(userId)
+        List<RestaurantEntity> entities = this.restaurantSpringDataRepository.findAllByUserOwnerIdAndActiveTrue(userId)
                 .orElseThrow(() -> new NotFoundException("User's restaurant not found"));
 
         return RESTAURANT_MAPPER.mapToListRestaurant(entities);
@@ -98,7 +98,7 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
 
     @Override
     public Restaurant updateRestaurant(UpdateRestaurant updateRestaurant) {
-        userSpringDataRepository.findById(updateRestaurant.getUserId())
+        userSpringDataRepository.findById(updateRestaurant.getUserOwnerId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         RestaurantEntity restaurantEntity = this.restaurantSpringDataRepository.findByIdAndActiveTrue(updateRestaurant.getId())
@@ -130,7 +130,7 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
                 .orElseThrow(() -> new NotFoundException("New Owner not found"));
 
         if(userEntity.getUserType().getId() == 2) {
-            restaurantEntity.setUserId(newOwnerId);
+            restaurantEntity.setUserOwnerId(newOwnerId);
             restaurantSpringDataRepository.save(restaurantEntity);
 
             return RESTAURANT_MAPPER.mapToRestaurant(restaurantEntity);

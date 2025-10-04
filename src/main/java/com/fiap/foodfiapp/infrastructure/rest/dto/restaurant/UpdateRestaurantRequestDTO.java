@@ -19,6 +19,6 @@ public record UpdateRestaurantRequestDTO(
         String openingHours,
 
         @NotNull(message = "The user's ID is mandatory.")
-        UUID userId
+        UUID userOwnerId
 ) {
 }

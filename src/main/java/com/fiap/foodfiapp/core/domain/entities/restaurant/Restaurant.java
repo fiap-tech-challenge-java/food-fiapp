@@ -1,29 +1,27 @@
 package com.fiap.foodfiapp.core.domain.entities.restaurant;
 
-import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressesEntity;
-
+import com.fiap.foodfiapp.core.domain.entities.Address;
 import java.util.UUID;
 
 public class Restaurant {
-
     private UUID id;
     private String name;
     private String cuisineType;
     private String openingHours;
-    private UUID userId;
+    private UUID userOwnerId;
     private Boolean active;
-    private AddressesEntity address;
+    private Address address;
 
     public Restaurant() {
     }
 
     public Restaurant(UUID id, String name, String cuisineType, String openingHours,
-                      UUID userId, Boolean active, AddressesEntity address) {
+                      UUID userOwnerId, Boolean active, Address address) {
         this.id = id;
         this.name = name;
         this.cuisineType = cuisineType;
         this.openingHours = openingHours;
-        this.userId = userId;
+        this.userOwnerId = userOwnerId;
         this.active = active;
         this.address = address;
     }
@@ -60,12 +58,12 @@ public class Restaurant {
         this.openingHours = openingHours;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UUID getUserOwnerId() {
+        return userOwnerId;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUserOwnerId(UUID userOwnerId) {
+        this.userOwnerId = userOwnerId;
     }
 
     public Boolean getActive() {
@@ -76,11 +74,11 @@ public class Restaurant {
         this.active = active;
     }
 
-    public AddressesEntity getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(AddressesEntity address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 }

@@ -7,11 +7,16 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Entity
-@Table(name = "addresses")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(
+        name = "addresses",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"owner_type", "owner_id"})
+        }
+)
 public class AddressesEntity {
 
     @Id
@@ -30,11 +35,9 @@ public class AddressesEntity {
     @Column(name = "postal_code")
     private String postalCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
-    private UserEntity user;
+    @Column(name = "owner_type", nullable = false)
+    private String ownerType; // "USER" or "RESTAURANT"
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id", nullable = true, unique = true)
-    private RestaurantEntity restaurant;
+    @Column(name = "owner_id", nullable = false)
+    private UUID ownerId;
 }

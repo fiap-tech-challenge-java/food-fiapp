@@ -16,7 +16,6 @@ public class CreateAddressesRestaurantUseCaseImpl implements CreateAddressesRest
 
     @Override
     public CreatedAddressesRestaurant execute(CreateAddressesRestaurant createAddressesRestaurant) {
-        this.addressesRestaurantRepositoryGateway.createAddressesRestaurant(createAddressesRestaurant);
-        return null;
+        return this.addressesRestaurantRepositoryGateway.createAddressesRestaurant(createAddressesRestaurant);
     }
 }

@@ -1,6 +1,8 @@
 package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
+import com.fiap.foodfiapp.core.domain.entities.Address;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
+import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressesEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.RestaurantEntity;
 import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.CreateRestaurantRequestDTO;
 import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.CreateRestaurantResponseDTO;
@@ -17,6 +19,8 @@ public interface RestaurantMapper {
     CreateRestaurant mapToCreateRestaurant(CreateRestaurantRequestDTO createRestaurantRequestDTO);
 
     Restaurant mapToRestaurant(RestaurantEntity restaurantEntity);
+    Address mapToAddress(AddressesEntity addressesEntity);
+
     List<Restaurant> mapToListRestaurant(List<RestaurantEntity> restaurantEntities);
 
     CreatedRestaurant mapToCreatedRestaurant(RestaurantEntity restaurantEntity);

@@ -11,6 +11,7 @@ public record CreatedAddressesRestaurant(
         String city,
         String state,
         String postalCode,
-        UUID restaurantId
+        String ownerType,
+        UUID ownerId
 ) {
 }

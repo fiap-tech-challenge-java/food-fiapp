@@ -6,10 +6,14 @@ import com.fiap.foodfiapp.core.domain.entities.addressesrestaurant.CreatedAddres
 import com.fiap.foodfiapp.core.domain.exception.NotFoundException;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressesEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.RestaurantEntity;
+import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressesOwnerTypeEnum;
 import com.fiap.foodfiapp.infrastructure.persistence.mapper.AddressesRestaurantPersistenceMapper;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.AddressesRestaurantSpringDataRepository;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.RestaurantSpringDataRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 public class AddressesRestaurantGatewayImpl implements AddressesRestaurantRepositoryGateway {
@@ -30,20 +34,29 @@ public class AddressesRestaurantGatewayImpl implements AddressesRestaurantReposi
                 .orElseThrow(() -> new NotFoundException("Restaurant not found"));
 
         AddressesEntity addressesEntity = ADDRESSES_RESTAURANT_PERSISTENCE_MAPPER.mapToAddressesEntity(createAddressesRestaurant);
-
-//        AddressesEntity addressesEntity = new AddressesEntity();
-//        addressesEntity.setPublicPlace(createdAddressesRestaurant.publicPlace());
-//        addressesEntity.setNumber(createdAddressesRestaurant.number());
-//        addressesEntity.setComplement(createdAddressesRestaurant.complement());
-//        addressesEntity.setNeighborhood(createdAddressesRestaurant.neighborhood());
-//        addressesEntity.setCity(createdAddressesRestaurant.city());
-//        addressesEntity.setState(createdAddressesRestaurant.state());
-//        addressesEntity.setPostalCode(createdAddressesRestaurant.postalCode());
-//        addressesEntity.setRestaurant(restaurantEntity);
+        addressesEntity.setOwnerType(AddressesOwnerTypeEnum.RESTAURANT.getDescription());
+        addressesEntity.setOwnerId(restaurantEntity.getId());
         addressesRestaurantSpringDataRepository.save(addressesEntity);
 
         restaurantEntity.setAddress(addressesEntity);
         restaurantSpringDataRepository.save(restaurantEntity);
-        return null;
+
+        return ADDRESSES_RESTAURANT_PERSISTENCE_MAPPER.mapToCreatedAddressesRestaurant(addressesEntity);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAddressesRestaurant(UUID restaurantId) {
+        RestaurantEntity restaurantEntity = restaurantSpringDataRepository.findById(restaurantId)
+                .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+
+        AddressesEntity addressesEntity = addressesRestaurantSpringDataRepository
+                .findByOwnerTypeAndOwnerId(AddressesOwnerTypeEnum.RESTAURANT.getDescription(), restaurantId)
+                .orElseThrow(() -> new NotFoundException("Address not found for restaurant"));
+
+        restaurantEntity.setAddress(null);
+        restaurantSpringDataRepository.save(restaurantEntity);
+
+        addressesRestaurantSpringDataRepository.delete(addressesEntity);
     }
 }

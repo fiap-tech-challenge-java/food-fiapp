@@ -6,6 +6,6 @@ public record CreateRestaurant(
         String name,
         String cuisineType,
         String openingHours,
-        UUID userId
+        UUID userOwnerId
 ) {
 }
