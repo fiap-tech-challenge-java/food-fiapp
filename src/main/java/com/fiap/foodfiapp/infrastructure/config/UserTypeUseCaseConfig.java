@@ -17,8 +17,8 @@ public class UserTypeUseCaseConfig {
     }
 
     @Bean
-    public UpdateUserTypeUseCase updateUserTypeUseCase(UserTypeRepositoryGateway userTypeRepositoryGateway) {
-        return new UpdateUserTypeUseCase(userTypeRepositoryGateway);
+    public UpdateUserTypeUseCase updateUserTypeUseCase(UserTypeRepositoryGateway userTypeRepositoryGateway, UserRepositoryGateway userRepositoryGateway) {
+        return new UpdateUserTypeUseCase(userTypeRepositoryGateway, userRepositoryGateway);
     }
 
     @Bean

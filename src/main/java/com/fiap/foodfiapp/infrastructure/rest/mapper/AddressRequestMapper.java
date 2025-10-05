@@ -19,9 +19,9 @@ public class AddressRequestMapper {
                 dto.getCity(),
                 dto.getState(),
                 dto.getPostalCode(),
-                dto.getIsActive(),
-                dto.getCreatedAt(),
-                dto.getUpdatedAt()
+                true, // Defaulting active to true
+                null, // CreatedAt should be handled by persistence
+                null  // UpdatedAt should be handled by persistence
         );
     }
 

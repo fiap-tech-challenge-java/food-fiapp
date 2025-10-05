@@ -9,6 +9,8 @@ public interface UserRepository {
     User save(User user);
     Optional<User> findById(UUID id);
     Optional<User> findByEmail(String email);
+    Optional<User> findByCpf(String cpf);
+    Optional<User> findByLogin(String login);
     List<User> findAll();
     void deleteById(UUID id);
     boolean existsByUserTypeUuid(UUID userTypeUuid);

@@ -3,6 +3,7 @@ package com.fiap.foodfiapp.core.application.usecases.usertype;
 import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsException;
 
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public class CreateUserTypeUseCase {
     public UserType execute(UserType userType) {
         // Validate that the name is unique
         userTypeRepositoryGateway.findByName(userType.getName()).ifPresent(existingUserType -> {
-            throw new BusinessException("User type with this name already exists.");
+            throw new UserTypeNameAlreadyExistsException(userType.getName());
         });
 
         // Generate UUID if not already set
