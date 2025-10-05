@@ -15,21 +15,21 @@ public class User extends BaseEntity {
     private OffsetDateTime updatedAt;
     private OffsetDateTime createdAt;
     private UserType userType;
-    private boolean active;
+    private Boolean isActive;
     private String password;
 
     public User() {
     }
 
     public User(UUID id, String name, String email, String login, String cpf, List<Address> address, UserType userType,
-                boolean active, OffsetDateTime updatedAt, OffsetDateTime createdAt, String password) {
+                Boolean isActive, OffsetDateTime updatedAt, OffsetDateTime createdAt, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.cpf = cpf;
         this.login = login;
         this.addresses = address;
-        this.active = active;
+        this.isActive = isActive;
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
         this.userType = userType;
@@ -110,11 +110,11 @@ public class User extends BaseEntity {
     }
 
     public boolean isActive() {
-        return active;
+        return isActive;
     }
 
     public void setActive(boolean active) {
-        this.active = active;
+        this.isActive = active;
     }
 
     public String getPassword() {

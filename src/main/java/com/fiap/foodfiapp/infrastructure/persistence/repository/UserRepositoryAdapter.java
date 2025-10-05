@@ -68,7 +68,6 @@ public class UserRepositoryAdapter implements UserRepository {
                 .login(user.getLogin())
                 .password(user.getPassword())
                 .userType(null)
-                .active(user.isActive())
                 .build();
     }
 
@@ -81,7 +80,7 @@ public class UserRepositoryAdapter implements UserRepository {
                 entity.getCpf(),
                 null,
                 null,
-                entity.isActive(),
+                entity.getIsActive(),
                 null,
                 null,
                 entity.getPassword()

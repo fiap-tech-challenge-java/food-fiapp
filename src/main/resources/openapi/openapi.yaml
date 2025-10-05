@@ -1168,10 +1168,6 @@ components:
           type: string
           description: Papel/tipo do usuario no sistema.
           example: CUSTOMER
-        active:
-          description: Indica se o usuario esta ativo no sistema (true para ativo, false para inativo).
-          type: boolean
-          example: true
         isActive:
           description: Indica se o usuario esta ativo no sistema (alias de 'active').
           type: boolean

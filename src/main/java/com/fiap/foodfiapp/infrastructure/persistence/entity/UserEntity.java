@@ -41,10 +41,7 @@ public class UserEntity extends BaseEntity {
     @JoinColumn(name = "user_type_uuid", referencedColumnName = "uuid")
     private UserTypeEntity userType;
 
-    @Builder.Default
-    @Column(name = "active", nullable = false)
-    private boolean active = true;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AddressEntity> addressesList = new ArrayList<>();
+
 }
