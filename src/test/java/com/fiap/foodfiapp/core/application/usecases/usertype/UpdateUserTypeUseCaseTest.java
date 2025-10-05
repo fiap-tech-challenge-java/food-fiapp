@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.core.application.usecases.usertype;
 
+import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
@@ -20,6 +21,9 @@ class UpdateUserTypeUseCaseTest {
     @Mock
     private UserTypeRepositoryGateway userTypeRepositoryGateway;
 
+    @Mock
+    private UserRepositoryGateway userRepositoryGateway;
+
     private UpdateUserTypeUseCase updateUserTypeUseCase;
 
     private UUID userTypeUuid;
@@ -29,7 +33,7 @@ class UpdateUserTypeUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        updateUserTypeUseCase = new UpdateUserTypeUseCase(userTypeRepositoryGateway);
+        updateUserTypeUseCase = new UpdateUserTypeUseCase(userTypeRepositoryGateway, userRepositoryGateway);
 
         userTypeUuid = UUID.randomUUID();
 
@@ -45,6 +49,7 @@ class UpdateUserTypeUseCaseTest {
     void shouldUpdateUserTypeSuccessfully() {
         // Arrange
         when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userRepositoryGateway.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
         when(userTypeRepositoryGateway.findByName("Premium Customer")).thenReturn(Optional.empty());
         when(userTypeRepositoryGateway.save(any(UserType.class))).thenReturn(userTypeUpdates);
 
@@ -55,6 +60,7 @@ class UpdateUserTypeUseCaseTest {
         assertNotNull(result);
         assertEquals(userTypeUuid, userTypeUpdates.getUuid());
         verify(userTypeRepositoryGateway).findById(userTypeUuid);
+        verify(userRepositoryGateway).existsByUserTypeUuid(userTypeUuid);
         verify(userTypeRepositoryGateway).findByName("Premium Customer");
         verify(userTypeRepositoryGateway).save(userTypeUpdates);
     }

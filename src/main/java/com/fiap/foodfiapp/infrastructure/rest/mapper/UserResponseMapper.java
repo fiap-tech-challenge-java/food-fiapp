@@ -49,7 +49,7 @@ public class UserResponseMapper {
         addressResponse.setPostalCode(address.getPostalCode());
         addressResponse.setCreatedAt(address.getCreatedAt());
         addressResponse.setUpdatedAt(address.getUpdatedAt());
-        addressResponse.setIsActive(address.isActive());
+        addressResponse.setIsActive(address.getIsActive());
 
         return addressResponse;
     }
