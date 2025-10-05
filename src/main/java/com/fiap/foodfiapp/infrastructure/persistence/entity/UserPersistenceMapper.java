@@ -49,8 +49,8 @@ public class UserPersistenceMapper {
                                 .collect(Collectors.toList()) : null,
                 toDomainUserType(entity.getUserType()),
                 Boolean.TRUE.equals(entity.getIsActive()),
-                                entity.getUpdatedAt(), // Parameter order must match User domain entity constructor
-                entity.getCreatedAt(),
+                entity.getCreatedAt(), // Parameter order must match User domain entity constructor
+                entity.getUpdatedAt(),
                 entity.getPassword()
         );
     }
