@@ -100,7 +100,6 @@ class UserEntityTest {
         assertNull(entity.getLogin());
         assertNull(entity.getPassword());
         assertNull(entity.getUserType());
-//        assertFalse(entity.isActive());
         assertNotNull(entity.getAddressesList());
         assertTrue(entity.getAddressesList().isEmpty());
     }
