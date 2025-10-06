@@ -40,6 +40,18 @@ public class UserRepositoryGatewayImpl implements UserRepositoryGateway {
     }
 
     @Override
+    public Optional<User> findByCpf(String cpf) {
+        return userSpringDataRepository.findByCpf(cpf)
+                .map(UserPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByLogin(String login) {
+        return userSpringDataRepository.findByLogin(login)
+                .map(UserPersistenceMapper::toDomain);
+    }
+
+    @Override
     public List<User> findAll() {
         return userSpringDataRepository.findAll().stream()
                 .map(UserPersistenceMapper::toDomain)

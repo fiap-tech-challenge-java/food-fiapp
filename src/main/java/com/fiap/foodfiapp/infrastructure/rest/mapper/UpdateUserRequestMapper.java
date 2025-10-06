@@ -15,6 +15,7 @@ public class UpdateUserRequestMapper {
     public static User toEntity(UpdateUserRequest dto) {
         UserType userType = new UserType();
         userType.setUuid(dto.getUserTypeUuid());
+        boolean isActive = dto.getActive() == null ? DEFAULT_ACTIVE : dto.getActive();
         return new User(
                 null,
                 dto.getName(),
@@ -23,7 +24,7 @@ public class UpdateUserRequestMapper {
                 dto.getCpf(),
                 AddressRequestMapper.toEntity(dto.getAddresses()),
                 userType,
-                dto.getActive(),
+                isActive,
                 OffsetDateTime.now(),
                 OffsetDateTime.now(),
                 dto.getPassword()
@@ -32,4 +33,3 @@ public class UpdateUserRequestMapper {
 
 
 }
-

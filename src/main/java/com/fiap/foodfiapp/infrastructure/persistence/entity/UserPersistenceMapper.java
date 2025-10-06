@@ -4,7 +4,6 @@ import com.fiap.foodfiapp.core.domain.entity.Address;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 
-import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
 
 public class UserPersistenceMapper {
@@ -16,20 +15,21 @@ public class UserPersistenceMapper {
             return null;
         }
 
-        return UserEntity.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .cpf(user.getCpf())
-                .email(user.getEmail())
-                .login(user.getLogin())
-                .password(user.getPassword())
-                .userType(toPersistenceUserType(user.getUserType()))
-                .active(user.isActive())
-                .addressesList(user.getAddresses() != null ?
-                        user.getAddresses().stream()
-                                .map(UserPersistenceMapper::toAddressesEntity)
-                                .collect(Collectors.toList()) : null)
-                .build();
+        UserEntity entity = new UserEntity();
+        entity.setId(user.getId());
+        entity.setName(user.getName());
+        entity.setCpf(user.getCpf());
+        entity.setEmail(user.getEmail());
+        entity.setLogin(user.getLogin());
+        entity.setPassword(user.getPassword());
+        entity.setUserType(toPersistenceUserType(user.getUserType()));
+        entity.setIsActive(user.isActive());
+        if (user.getAddresses() != null) {
+            entity.setAddressesList(user.getAddresses().stream()
+                    .map(UserPersistenceMapper::toAddressesEntity)
+                    .collect(Collectors.toList()));
+        }
+        return entity;
     }
 
     public static User toDomain(UserEntity entity) {
@@ -48,9 +48,9 @@ public class UserPersistenceMapper {
                                 .map(UserPersistenceMapper::toAddressDomain)
                                 .collect(Collectors.toList()) : null,
                 toDomainUserType(entity.getUserType()),
-                entity.isActive(),
-                OffsetDateTime.now(),
-                OffsetDateTime.now(),
+                Boolean.TRUE.equals(entity.getIsActive()),
+                entity.getCreatedAt(), // Parameter order must match User domain entity constructor
+                entity.getUpdatedAt(),
                 entity.getPassword()
         );
     }
@@ -83,6 +83,7 @@ public class UserPersistenceMapper {
     }
 
     private static UserTypeEntity toPersistenceUserType(UserType domainUserType) {
+        if (domainUserType == null) return null;
         return UserTypeEntity.builder()
                 .uuid(domainUserType.getUuid())
                 .name(domainUserType.getName())
@@ -90,6 +91,12 @@ public class UserPersistenceMapper {
     }
 
     private static UserType toDomainUserType(UserTypeEntity persistenceUserType) {
-        return new UserType(persistenceUserType.getUuid(), persistenceUserType.getName());
+        if (persistenceUserType == null) return null;
+        return new UserType(
+                persistenceUserType.getUuid(),
+                persistenceUserType.getName(),
+                persistenceUserType.getCreatedAt(),
+                persistenceUserType.getUpdatedAt()
+        );
     }
 }

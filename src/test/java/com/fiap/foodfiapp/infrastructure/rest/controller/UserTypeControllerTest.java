@@ -6,9 +6,10 @@ import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCa
 import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
-import com.fiap.foodfiapp.core.domain.exception.BusinessException;
-import com.fiap.foodfiapp.model.CreateUserTypeRequest;
-import com.fiap.foodfiapp.model.UpdateUserTypeRequest;
+import com.fiap.foodfiapp.core.domain.exception.UserTypeInUseException;
+import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsException;
+import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
+import com.fiap.foodfiapp.infrastructure.rest.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -46,8 +47,8 @@ class UserTypeControllerTest {
     private UserTypeController userTypeController;
 
     private ObjectMapper objectMapper;
-    private CreateUserTypeRequest createUserTypeRequestDTO;
-    private UpdateUserTypeRequest updateUserTypeRequestDTO;
+    private String createUserTypeJson;
+    private String updateUserTypeJson;
     private UserType userType;
     private UUID userTypeUuid;
 
@@ -56,16 +57,21 @@ class UserTypeControllerTest {
         MockitoAnnotations.openMocks(this);
         userTypeController = new UserTypeController(createUserTypeUseCase, updateUserTypeUseCase,
                 deleteUserTypeUseCase, userTypeRepositoryGateway);
-        mockMvc = MockMvcBuilders.standaloneSetup(userTypeController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(userTypeController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
 
         objectMapper = new ObjectMapper();
         userTypeUuid = UUID.randomUUID();
 
-        createUserTypeRequestDTO = new CreateUserTypeRequest();
-        createUserTypeRequestDTO.setName("CUSTOMER");
+        // Build JSON bodies instead of using generated DTOs
+        createUserTypeJson = objectMapper.createObjectNode()
+                .put("name", "CUSTOMER")
+                .toString();
 
-        updateUserTypeRequestDTO = new UpdateUserTypeRequest();
-        updateUserTypeRequestDTO.setName("CUSTOMER_VIP");
+        updateUserTypeJson = objectMapper.createObjectNode()
+                .put("name", "CUSTOMER_VIP")
+                .toString();
 
         userType = new UserType();
         userType.setUuid(userTypeUuid);
@@ -78,7 +84,7 @@ class UserTypeControllerTest {
 
         mockMvc.perform(post("/user-types")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createUserTypeRequestDTO)))
+                        .content(createUserTypeJson))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.uuid").value(userType.getUuid().toString()))
                 .andExpect(jsonPath("$.name").value(userType.getName()));
@@ -88,11 +94,12 @@ class UserTypeControllerTest {
 
     @Test
     void shouldReturnConflictWhenUserTypeCreationFails() throws Exception {
-        when(createUserTypeUseCase.execute(any(UserType.class))).thenThrow(new BusinessException("Name already exists."));
+        when(createUserTypeUseCase.execute(any(UserType.class)))
+                .thenThrow(new UserTypeNameAlreadyExistsException("CUSTOMER"));
 
         mockMvc.perform(post("/user-types")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createUserTypeRequestDTO)))
+                        .content(createUserTypeJson))
                 .andExpect(status().isConflict());
 
         verify(createUserTypeUseCase).execute(any(UserType.class));
@@ -139,7 +146,7 @@ class UserTypeControllerTest {
 
         mockMvc.perform(put("/user-types/{uuid}", userTypeUuid)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateUserTypeRequestDTO)))
+                        .content(updateUserTypeJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uuid").value(userTypeUuid.toString()))
                 .andExpect(jsonPath("$.name").value(userType.getName()));
@@ -150,11 +157,11 @@ class UserTypeControllerTest {
     @Test
     void shouldReturnNotFoundWhenUpdatingNonExistentUserType() throws Exception {
         when(updateUserTypeUseCase.execute(eq(userTypeUuid), any(UserType.class)))
-                .thenThrow(new BusinessException("User type not found"));
+                .thenThrow(new UserTypeNotFoundException("User type not found."));
 
         mockMvc.perform(put("/user-types/{uuid}", userTypeUuid)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateUserTypeRequestDTO)))
+                        .content(updateUserTypeJson))
                 .andExpect(status().isNotFound());
 
         verify(updateUserTypeUseCase).execute(eq(userTypeUuid), any(UserType.class));

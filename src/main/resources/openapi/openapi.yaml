@@ -1025,6 +1025,20 @@ components:
           type: string
           description: Codigo de Enderecamento Postal (CEP).
           example: 01234-567
+        isActive:
+          type: boolean
+          description: Indica se o endereco esta ativo.
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e hora de criacao do endereco.
+          example: '2025-01-15T14:30:00-03:00'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data e hora da ultima atualizacao do endereco.
+          example: '2025-01-20T10:15:30-03:00'
 
     CreateUserRequest:
       title: Solicitacao de Criacao de Usuario
@@ -1154,8 +1168,8 @@ components:
           type: string
           description: Papel/tipo do usuario no sistema.
           example: CUSTOMER
-        active:
-          description: Indica se o usuario esta ativo no sistema (true para ativo, false para inativo).
+        isActive:
+          description: Indica se o usuario esta ativo no sistema (alias de 'active').
           type: boolean
           example: true
         addresses:
@@ -1163,6 +1177,16 @@ components:
           items:
             $ref: '#/components/schemas/AddressResponse'
           description: Lista dos enderecos associados ao usuario.
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e hora de criacao do usuario.
+          example: '2025-01-15T14:30:00-03:00'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data e hora da ultima atualizacao do usuario.
+          example: '2025-01-20T10:15:30-03:00'
 
     LoginResponse:
       title: Resposta de Login
@@ -1322,6 +1346,10 @@ components:
         owner:
           $ref: '#/components/schemas/UserResponse'
           description: Dados do dono do restaurante.
+        isActive:
+          type: boolean
+          description: Indica se o restaurante esta ativo.
+          example: true
         createdAt:
           type: string
           format: date-time
@@ -1439,6 +1467,10 @@ components:
           format: uuid
           description: ID do restaurante a que este item pertence.
           example: 123e4567-e89b-12d3-a456-426614174000
+        isActive:
+          type: boolean
+          description: Indica se o item do cardapio esta ativo.
+          example: true
         createdAt:
           type: string
           format: date-time
@@ -1573,6 +1605,9 @@ components:
       title: Resposta de Tipo de Usuario
       description: Estrutura da resposta contendo os detalhes de um tipo de usuario.
       type: object
+      required:
+        - uuid
+        - name
       properties:
         uuid:
           type: string
@@ -1583,6 +1618,10 @@ components:
           type: string
           description: Nome do tipo de usuario.
           example: CUSTOMER
+        isActive:
+          type: boolean
+          description: Indica se o tipo de usuario esta ativo.
+          example: true
         createdAt:
           type: string
           format: date-time

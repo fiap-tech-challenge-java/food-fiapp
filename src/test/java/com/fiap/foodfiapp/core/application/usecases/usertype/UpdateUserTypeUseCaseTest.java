@@ -1,8 +1,12 @@
 package com.fiap.foodfiapp.core.application.usecases.usertype;
 
+import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
-import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsException;
+import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
+import com.fiap.foodfiapp.core.domain.exception.UserTypeInUseException;
+import com.fiap.foodfiapp.core.domain.exception.CoreUserTypeModificationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -20,6 +24,9 @@ class UpdateUserTypeUseCaseTest {
     @Mock
     private UserTypeRepositoryGateway userTypeRepositoryGateway;
 
+    @Mock
+    private UserRepositoryGateway userRepositoryGateway;
+
     private UpdateUserTypeUseCase updateUserTypeUseCase;
 
     private UUID userTypeUuid;
@@ -29,13 +36,13 @@ class UpdateUserTypeUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        updateUserTypeUseCase = new UpdateUserTypeUseCase(userTypeRepositoryGateway);
+        updateUserTypeUseCase = new UpdateUserTypeUseCase(userTypeRepositoryGateway, userRepositoryGateway);
 
         userTypeUuid = UUID.randomUUID();
 
         existingUserType = new UserType();
         existingUserType.setUuid(userTypeUuid);
-        existingUserType.setName("Customer");
+        existingUserType.setName("BASIC");
 
         userTypeUpdates = new UserType();
         userTypeUpdates.setName("Premium Customer");
@@ -45,6 +52,7 @@ class UpdateUserTypeUseCaseTest {
     void shouldUpdateUserTypeSuccessfully() {
         // Arrange
         when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userRepositoryGateway.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
         when(userTypeRepositoryGateway.findByName("Premium Customer")).thenReturn(Optional.empty());
         when(userTypeRepositoryGateway.save(any(UserType.class))).thenReturn(userTypeUpdates);
 
@@ -55,6 +63,7 @@ class UpdateUserTypeUseCaseTest {
         assertNotNull(result);
         assertEquals(userTypeUuid, userTypeUpdates.getUuid());
         verify(userTypeRepositoryGateway).findById(userTypeUuid);
+        verify(userRepositoryGateway).existsByUserTypeUuid(userTypeUuid);
         verify(userTypeRepositoryGateway).findByName("Premium Customer");
         verify(userTypeRepositoryGateway).save(userTypeUpdates);
     }
@@ -65,10 +74,9 @@ class UpdateUserTypeUseCaseTest {
         when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.empty());
 
         // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class,
+        assertThrows(UserTypeNotFoundException.class,
             () -> updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates));
 
-        assertEquals("User type not found.", exception.getMessage());
         verify(userTypeRepositoryGateway).findById(userTypeUuid);
         verify(userTypeRepositoryGateway, never()).save(any());
     }
@@ -81,25 +89,54 @@ class UpdateUserTypeUseCaseTest {
         otherUserType.setName("Premium Customer");
 
         when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userRepositoryGateway.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
         when(userTypeRepositoryGateway.findByName("Premium Customer")).thenReturn(Optional.of(otherUserType));
 
         // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class,
+        assertThrows(UserTypeNameAlreadyExistsException.class,
             () -> updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates));
 
-        assertEquals("User type with this name already exists.", exception.getMessage());
         verify(userTypeRepositoryGateway).findById(userTypeUuid);
         verify(userTypeRepositoryGateway).findByName("Premium Customer");
         verify(userTypeRepositoryGateway, never()).save(any());
     }
 
     @Test
+    void shouldThrowExceptionWhenUserTypeInUse() {
+        // Arrange
+        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userRepositoryGateway.existsByUserTypeUuid(userTypeUuid)).thenReturn(true);
+
+        // Act & Assert
+        assertThrows(UserTypeInUseException.class,
+            () -> updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates));
+
+        verify(userTypeRepositoryGateway).findById(userTypeUuid);
+        verify(userRepositoryGateway).existsByUserTypeUuid(userTypeUuid);
+        verify(userTypeRepositoryGateway, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenModifyingCoreUserType() {
+        // Arrange
+        existingUserType.setName("ADMIN");
+        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+
+        // Act & Assert
+        assertThrows(CoreUserTypeModificationException.class,
+            () -> updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates));
+
+        verify(userTypeRepositoryGateway).findById(userTypeUuid);
+        verify(userTypeRepositoryGateway, never()).save(any());
+    }
+
+    @Test
     void shouldUpdateWithSameNameForSameUserType() {
         // Arrange
-        userTypeUpdates.setName("Customer"); // Same name as existing
+        userTypeUpdates.setName("BASIC"); // Same name as existing
 
         when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
-        when(userTypeRepositoryGateway.findByName("Customer")).thenReturn(Optional.of(existingUserType));
+        when(userTypeRepositoryGateway.findByName("BASIC")).thenReturn(Optional.of(existingUserType));
         when(userTypeRepositoryGateway.save(any(UserType.class))).thenReturn(userTypeUpdates);
 
         // Act
@@ -122,7 +159,7 @@ class UpdateUserTypeUseCaseTest {
         updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates);
 
         // Assert
-        assertEquals("Customer", userTypeUpdates.getName());
+        assertEquals("BASIC", userTypeUpdates.getName());
         verify(userTypeRepositoryGateway).save(userTypeUpdates);
     }
 }

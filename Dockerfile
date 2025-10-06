@@ -49,4 +49,4 @@ ENV MINIO_ENDPOINT=http://minio:9000 \
     MINIO_BUCKET=menu-items
 
 EXPOSE 8080
-ENTRYPOINT ["sh","-c","java org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]

@@ -10,5 +10,7 @@ import java.util.UUID;
 // O adapter UserRepositoryAdapter faz a ponte entre UserSpringDataRepository e UserRepository.
 public interface UserSpringDataRepository extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findByEmail(String email);
+    Optional<UserEntity> findByCpf(String cpf);
+    Optional<UserEntity> findByLogin(String login);
     boolean existsByUserType_Uuid(UUID userTypeUuid);
 }

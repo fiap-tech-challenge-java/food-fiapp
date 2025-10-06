@@ -2,7 +2,7 @@ package com.fiap.foodfiapp.core.application.usecases.usertype;
 
 import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
-import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -59,10 +59,10 @@ class CreateUserTypeUseCaseTest {
         when(userTypeRepositoryGateway.findByName("Customer")).thenReturn(Optional.of(existingUserType));
 
         // Act & Assert
-        BusinessException exception = assertThrows(BusinessException.class,
+        UserTypeNameAlreadyExistsException exception = assertThrows(UserTypeNameAlreadyExistsException.class,
             () -> createUserTypeUseCase.execute(userType));
 
-        assertEquals("User type with this name already exists.", exception.getMessage());
+        assertEquals("User type with name 'Customer' already exists.", exception.getMessage());
         verify(userTypeRepositoryGateway).findByName("Customer");
         verify(userTypeRepositoryGateway, never()).save(any(UserType.class));
     }
