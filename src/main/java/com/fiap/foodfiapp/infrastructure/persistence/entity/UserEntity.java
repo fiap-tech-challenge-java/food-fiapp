@@ -2,54 +2,45 @@ package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "cpf")
     private String cpf;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "login", unique = true, nullable = false)
     private String login;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private boolean active;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_type_uuid", nullable = false, referencedColumnName = "uuid")
+    @JoinColumn(name = "user_type_uuid", referencedColumnName = "uuid")
     private UserTypeEntity userType;
-
-    @OneToMany
-    @JoinColumn(name = "user_owner_id", referencedColumnName = "id")
-    private List<RestaurantEntity> restaurants;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AddressEntity> addressesList = new ArrayList<>();
-
-    public UserEntity(UUID id, String name, String email, String password) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-    }
-
 }

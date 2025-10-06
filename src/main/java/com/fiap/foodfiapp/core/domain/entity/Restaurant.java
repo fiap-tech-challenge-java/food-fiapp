@@ -1,9 +1,8 @@
-package com.fiap.foodfiapp.core.domain.entities.restaurant;
+package com.fiap.foodfiapp.core.domain.entity;
 
-import com.fiap.foodfiapp.core.domain.entities.Address;
 import java.util.UUID;
 
-public class Restaurant {
+public class Restaurant extends BaseEntity {
     private UUID id;
     private String name;
     private String cuisineType;
