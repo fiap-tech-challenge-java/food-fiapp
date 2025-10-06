@@ -2,21 +2,24 @@ package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
-@Table(name = "user_types")
+@Table(name = "users_type")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserTypeEntity {
-
-    //TODO CRIAR MIGRATION PARA OS TRÊS TIPOS??  // 1 Costumer, 2 Owner e 3 Admin
+public class UserTypeEntity extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    // UUID generation is intentionally disabled; manual assignment is required for compatibility with legacy systems.
+    @Column(name = "uuid", updatable = false, nullable = false)
+    private UUID uuid;
 
     @Column(nullable = false, unique = true)
-    private String description;
+    private String name;
 }

@@ -35,12 +35,15 @@ public class UserEntity extends BaseEntity {
     private boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_type_id", nullable = false)
+    @JoinColumn(name = "user_type_uuid", nullable = false, referencedColumnName = "uuid")
     private UserTypeEntity userType;
 
     @OneToMany
     @JoinColumn(name = "user_owner_id", referencedColumnName = "id")
     private List<RestaurantEntity> restaurants;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AddressEntity> addressesList = new ArrayList<>();
 
     public UserEntity(UUID id, String name, String email, String password) {
         this.id = id;
@@ -48,4 +51,5 @@ public class UserEntity extends BaseEntity {
         this.email = email;
         this.password = password;
     }
+
 }

@@ -1,61 +1,60 @@
 package com.fiap.foodfiapp.infrastructure.persistence.repository;
 
 import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.core.domain.entities.CreateUser;
-import com.fiap.foodfiapp.core.domain.entities.User;
-import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserEntity;
-import com.fiap.foodfiapp.infrastructure.persistence.entity.UserTypeEntity;
-import com.fiap.foodfiapp.infrastructure.persistence.mapper.UserPersistenceMapper;
+import com.fiap.foodfiapp.infrastructure.persistence.entity.UserPersistenceMapper;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserSpringDataRepository;
-import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserTypeSpringDataRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Service
+@Repository
 public class UserRepositoryGatewayImpl implements UserRepositoryGateway {
     private final UserSpringDataRepository userSpringDataRepository;
-    private final UserTypeSpringDataRepository userTypeSpringDataRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    private static final UserPersistenceMapper USER_PERSISTENCE_MAPPER = UserPersistenceMapper.INSTANCE;
-
-    public UserRepositoryGatewayImpl(UserSpringDataRepository userSpringDataRepository, UserTypeSpringDataRepository userTypeSpringDataRepository,
-                                     PasswordEncoder passwordEncoder) {
+    public UserRepositoryGatewayImpl(UserSpringDataRepository userSpringDataRepository) {
         this.userSpringDataRepository = userSpringDataRepository;
-        this.userTypeSpringDataRepository = userTypeSpringDataRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public User save(User user) {
-        UserEntity entity = USER_PERSISTENCE_MAPPER.mapToEntity(user);
+        UserEntity entity = UserPersistenceMapper.toEntity(user);
         UserEntity saved = userSpringDataRepository.save(entity);
-
-        return USER_PERSISTENCE_MAPPER.mapToUser(saved);
+        return UserPersistenceMapper.toDomain(saved);
     }
 
     @Override
     public Optional<User> findById(UUID id) {
         return userSpringDataRepository.findById(id)
-                .map(USER_PERSISTENCE_MAPPER::mapToUser);
+                .map(UserPersistenceMapper::toDomain);
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
         return userSpringDataRepository.findByEmail(email)
-                .map(USER_PERSISTENCE_MAPPER::mapToUser);
+                .map(UserPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByCpf(String cpf) {
+        return userSpringDataRepository.findByCpf(cpf)
+                .map(UserPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByLogin(String login) {
+        return userSpringDataRepository.findByLogin(login)
+                .map(UserPersistenceMapper::toDomain);
     }
 
     @Override
     public List<User> findAll() {
         return userSpringDataRepository.findAll().stream()
-                .map(USER_PERSISTENCE_MAPPER::mapToUser)
+                .map(UserPersistenceMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
@@ -65,23 +64,7 @@ public class UserRepositoryGatewayImpl implements UserRepositoryGateway {
     }
 
     @Override
-    public User createUser(CreateUser createUser) {
-        userSpringDataRepository.findByEmail(createUser.getEmail()).ifPresent(user -> {
-            throw new BusinessException("User with this email already exists.");
-        });
-        UserTypeEntity userTypeEntity = userTypeSpringDataRepository.findById(createUser.getUserTypeId())
-                .orElseThrow(() -> new BusinessException("UserType does not exists."));
-
-        UserEntity savedEntity = USER_PERSISTENCE_MAPPER.mapToEntity(createUser);
-
-        savedEntity.setActive(true);
-        savedEntity.setPassword(passwordEncoder.encode(savedEntity.getPassword()));
-        savedEntity.setRestaurants(null);
-        savedEntity.setUserType(userTypeEntity);
-
-        userSpringDataRepository.save(savedEntity);
-
-        return USER_PERSISTENCE_MAPPER.mapToUser(savedEntity);
+    public boolean existsByUserTypeUuid(UUID userTypeUuid) {
+        return userSpringDataRepository.existsByUserType_Uuid(userTypeUuid);
     }
 }
-

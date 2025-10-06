@@ -1,10 +1,13 @@
 package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -12,12 +15,14 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class RestaurantEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(nullable = false)
     private String name;
 
     private String cuisineType;
@@ -30,8 +35,12 @@ public class RestaurantEntity extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", unique = true)
     private AddressesEntity address;
+    private String description;
 
     private Boolean active;
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MenuItemEntity> menuItems = new ArrayList<>();
 
     public RestaurantEntity(String name, String cuisineType, String openingHours, UUID userOwnerId, AddressesEntity address, Boolean active) {
         this.name = name;

@@ -1,0 +1,1634 @@
+openapi: 3.0.3
+info:
+  title: Food FiApp
+  version: 1.0.0
+  description: API para gerenciar usuarios (dono de restaurante e cliente), restaurantes e itens de cardapio.
+servers:
+  - url: http://localhost:8080/api/v1
+
+tags:
+  - name: auth
+    description: Operacoes relacionadas a autenticacao
+  - name: users
+    description: Operacoes relacionadas a usuarios
+  - name: user-types
+    description: Operacoes relacionadas a tipos de usuarios
+  - name: addresses
+    description: Operacoes relacionadas a enderecos de usuarios
+  - name: restaurants
+    description: Operacoes relacionadas a restaurantes
+  - name: menu-items
+    description: Operacoes relacionadas a itens do cardapio
+
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      tags:
+        - auth
+      summary: Autentica um usuario e retorna um token JWT
+      description: >
+        Este endpoint permite que um usuario (dono de restaurante ou cliente) realize login no sistema.
+        Se as credenciais forem validas, um JSON Web Token (JWT) sera retornado.
+        O token deve ser usado no header Authorization das requisicoes subsequentes no formato:
+        Authorization: Bearer {token}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Usuario autenticado com sucesso e token JWT retornado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Credenciais invalidas fornecidas.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    get:
+      operationId: getUsers
+      tags:
+        - users
+      summary: Lista todos os usuarios
+      description: Retorna uma lista de todos os usuarios cadastrados no sistema. A lista pode ser vazia se nao houver usuarios.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+          description: Lista de usuarios retornada com sucesso (pode ser vazia).
+
+    post:
+      operationId: createUser
+      tags:
+        - users
+      summary: Cria um novo usuario
+      description: Cadastra um novo usuario no sistema, podendo ser um dono de restaurante ou um cliente. Um endereco inicial e obrigatorio no momento da criacao.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+          description: Usuario criado com sucesso. Retorna os detalhes do usuario recem-criado, incluindo seu ID.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Dados invalidos fornecidos na requisicao.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflito - usuario ja existe com os dados fornecidos.
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags:
+        - users
+      summary: Busca um usuario pelo ID
+      description: Retorna os detalhes de um usuario especifico, utilizando seu ID unico.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
+          description: O ID unico do usuario a ser buscado.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+          description: Usuario encontrado e seus detalhes retornados com sucesso.
+        '404':
+          description: Usuario nao encontrado para o ID fornecido.
+
+    put:
+      operationId: updateUser
+      tags:
+        - users
+      summary: Atualiza um usuario existente
+      description: Permite a atualizacao de informacoes de um usuario existente, como nome e login.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+        required: true
+      parameters:
+        - name: id
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
+          description: O ID unico do usuario a ser atualizado.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+          description: Usuario atualizado com sucesso. Retorna os detalhes atualizados do usuario.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Usuario nao encontrado para o ID fornecido.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflito durante a atualizacao.
+
+    delete:
+      operationId: deleteUser
+      tags:
+        - users
+      security:
+        - bearerAuth: []
+      summary: Deleta um usuario existente
+      description: Remove um usuario do sistema com base no seu ID. Esta e uma exclusao logica.
+      parameters:
+        - name: id
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
+          description: O ID unico do usuario a ser deletado.
+      responses:
+        '204':
+          description: Usuario deletado com sucesso. Nenhuma resposta de conteudo.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Usuario nao encontrado para o ID fornecido.
+
+  /users/change-password:
+    put:
+      tags:
+        - users
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      responses:
+        '204':
+          description: Senha trocada com sucesso. Nenhuma resposta de conteudo.
+      operationId: changePassword
+      summary: Troca a senha do usuario.
+      description: Permite que um usuario altere sua senha de acesso.
+
+  /user-types:
+    get:
+      operationId: getUserTypes
+      tags:
+        - user-types
+      summary: Lista todos os tipos de usuario
+      description: Retorna uma lista de todos os tipos de usuario cadastrados no sistema. A lista pode ser vazia se nao houver tipos de usuario.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserTypeResponse'
+          description: Lista de tipos de usuario retornada com sucesso (pode ser vazia).
+
+    post:
+      operationId: createUserType
+      tags:
+        - user-types
+      summary: Cria um novo tipo de usuario
+      description: Cadastra um novo tipo de usuario no sistema. Apenas administradores podem realizar esta operacao.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserTypeRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTypeResponse'
+          description: Tipo de usuario criado com sucesso. Retorna os detalhes do tipo de usuario recem-criado.
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Dados invalidos fornecidos na requisicao.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Tipo de usuario ja existe ou conflito de dados.
+
+  /user-types/{uuid}:
+    get:
+      operationId: getUserType
+      tags:
+        - user-types
+      summary: Busca um tipo de usuario pelo UUID
+      description: Retorna os detalhes de um tipo de usuario especifico, utilizando seu UUID unico.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: uuid
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
+          description: O UUID unico do tipo de usuario a ser buscado.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTypeResponse'
+          description: Tipo de usuario encontrado e seus detalhes retornados com sucesso.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Tipo de usuario nao encontrado para o UUID fornecido.
+
+    put:
+      operationId: updateUserType
+      tags:
+        - user-types
+      summary: Atualiza um tipo de usuario existente
+      description: Permite a atualizacao de informacoes de um tipo de usuario existente. Apenas administradores podem realizar esta operacao.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserTypeRequest'
+        required: true
+      parameters:
+        - name: uuid
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
+          description: O UUID unico do tipo de usuario a ser atualizado.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTypeResponse'
+          description: Tipo de usuario atualizado com sucesso. Retorna os detalhes atualizados do tipo de usuario.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Tipo de usuario nao encontrado para o UUID fornecido.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Conflito de dados ao atualizar o tipo de usuario.
+
+    delete:
+      operationId: deleteUserType
+      tags:
+        - user-types
+      security:
+        - bearerAuth: []
+      summary: Deleta um tipo de usuario existente
+      description: Remove um tipo de usuario do sistema com base no seu UUID. Esta operacao so pode ser realizada por administradores e nao e permitida se o tipo de usuario estiver sendo usado por usuarios ativos.
+      parameters:
+        - name: uuid
+          schema:
+            format: uuid
+            type: string
+          in: path
+          required: true
+          description: O UUID unico do tipo de usuario a ser deletado.
+      responses:
+        '204':
+          description: Tipo de usuario deletado com sucesso. Nenhuma resposta de conteudo.
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Tipo de usuario nao encontrado para o UUID fornecido.
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Nao e possivel deletar o tipo de usuario pois esta sendo usado por usuarios ativos.
+  /users/{userId}/addresses:
+    parameters:
+      - name: userId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID unico do usuario.
+
+
+    get:
+      tags:
+        - addresses
+      security:
+        - bearerAuth: []
+      operationId: listAddressesByUserId
+      summary: Lista todos os enderecos de um usuario.
+      description: Retorna uma lista de todos os enderecos associados a um usuario especifico.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AddressResponse'
+          description: Lista com sucesso todos os enderecos do usuario. Pode retornar uma lista vazia.
+
+    post:
+      tags:
+        - addresses
+      security:
+        - bearerAuth: []
+      operationId: createAddressForUser
+      summary: Cria um novo endereco para um usuario.
+      description: Adiciona um novo endereco a lista de enderecos de um usuario existente.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAddressRequest'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+          description: Cria com sucesso um endereco para o usuario. Retorna os detalhes do endereco recem-criado.
+
+  /users/{userId}/addresses/{addressId}:
+    parameters:
+      - name: userId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID unico do usuario proprietario do endereco.
+      - name: addressId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID unico do endereco.
+
+
+    put:
+      tags:
+        - addresses
+      security:
+        - bearerAuth: []
+      operationId: updateAddressForUser
+      summary: Atualiza um endereco especifico de um usuario.
+      description: Permite a atualizacao dos detalhes de um endereco especifico associado a um usuario.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAddressRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressResponse'
+          description: Endereco atualizado com sucesso. Retorna os detalhes atualizados do endereco.
+        '404':
+          description: Usuario ou endereco nao encontrado.
+
+    delete:
+      tags:
+        - addresses
+      security:
+        - bearerAuth: []
+      operationId: deleteAddressForUser
+      summary: Deleta logicamente um endereco de um usuario.
+      description: Marca um endereco especifico como inativo para um determinado usuario, nao o removendo fisicamente do banco de dados.
+      responses:
+        '204':
+          description: Endereco deletado com sucesso. Nenhuma resposta de conteudo.
+        '404':
+          description: Usuario ou endereco nao encontrado.
+
+  /restaurants:
+    get:
+      tags:
+        - restaurants
+      summary: Lista todos os restaurantes
+      description: Retorna uma lista de todos os restaurantes cadastrados.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de restaurantes retornada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RestaurantResponse'
+    post:
+      tags:
+        - restaurants
+      summary: Cria um novo restaurante
+      description: Cadastra um novo restaurante. Apenas usuarios do tipo "Owner" ou "Admin" podem realizar esta operacao.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRestaurantRequest'
+      responses:
+        '201':
+          description: Restaurante criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantResponse'
+        '400':
+          description: Dados invalidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Acesso negado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurants/{id}:
+    get:
+      tags:
+        - restaurants
+      summary: Busca um restaurante pelo ID
+      description: Retorna os detalhes de um restaurante especifico.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Restaurante encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantResponse'
+        '404':
+          description: Restaurante nao encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - restaurants
+      summary: Atualiza um restaurante existente
+      description: Atualiza os dados de um restaurante. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRestaurantRequest'
+      responses:
+        '200':
+          description: Restaurante atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantResponse'
+        '403':
+          description: Acesso negado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Restaurante nao encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - restaurants
+      summary: Deleta um restaurante
+      description: Deleta um restaurante. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Restaurante deletado com sucesso.
+        '403':
+          description: Acesso negado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Restaurante nao encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /restaurants/{restaurantId}/menu-items:
+    get:
+      operationId: listMenuItems
+      tags:
+        - menu-items
+      summary: Lista os itens do cardapio de um restaurante
+      description: Retorna todos os itens do cardapio de um restaurante especifico.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de itens do cardapio retornada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenuItemResponse'
+    post:
+      operationId: createMenuItem
+      tags:
+        - menu-items
+      summary: Adiciona um novo item ao cardapio
+      description: Adiciona um novo item ao cardapio de um restaurante. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nome do item do cardapio
+                description:
+                  type: string
+                  description: Descricao do item
+                price:
+                  type: number
+                  format: double
+                  description: Preco do item
+                availableForInStoreOnly:
+                  type: boolean
+                  description: Disponivel apenas para consumo no local
+                photo:
+                  type: string
+                  format: binary
+                  description: Arquivo de imagem do item
+      responses:
+        '201':
+          description: Item do cardapio criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+
+  /restaurants/{restaurantId}/menu-items/{itemId}:
+    get:
+      operationId: getMenuItem
+      tags:
+        - menu-items
+      summary: Busca um item do cardapio pelo ID
+      description: Retorna os detalhes de um item especifico do cardapio.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Item do cardapio encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+        '404':
+          description: Item do cardapio nao encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateMenuItem
+      tags:
+        - menu-items
+      summary: Atualiza um item do cardapio
+      description: Atualiza os dados de um item do cardapio. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Nome do item do cardapio
+                description:
+                  type: string
+                  description: Descricao do item
+                price:
+                  type: number
+                  format: double
+                  description: Preco do item
+                availableForInStoreOnly:
+                  type: boolean
+                  description: Disponivel apenas para consumo no local
+                photo:
+                  type: string
+                  format: binary
+                  description: Arquivo de imagem do item
+      responses:
+        '200':
+          description: Item do cardapio atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemResponse'
+        '403':
+          description: Acesso negado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Item do cardapio nao encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteMenuItem
+      tags:
+        - menu-items
+      summary: Remove um item do cardapio
+      description: Remove um item do cardapio. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: restaurantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Item do cardapio removido com sucesso.
+        '403':
+          description: Acesso negado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Item do cardapio nao encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Insira o token JWT obtido do endpoint /auth/login no formato: Bearer {token}
+
+  schemas:
+    ErrorResponse:
+      title: Resposta de Erro
+      required:
+        - message
+        - code
+        - status
+        - path
+        - timestamp
+      type: object
+      properties:
+        message:
+          description: Mensagem de erro detalhada.
+          type: string
+          example: Dados de entrada invalidos.
+        code:
+          description: Codigo interno do erro.
+          type: string
+          example: INVALID_INPUT
+        status:
+          description: Codigo de status HTTP.
+          type: integer
+          example: 400
+        path:
+          description: URL da requisicao que gerou o erro.
+          type: string
+          example: /api/v1/users
+        timestamp:
+          description: Data e hora quando o erro ocorreu.
+          type: string
+          format: date-time
+          example: '2025-09-23T22:30:00-03:00'
+        fieldErrors:
+          description: Mapa de erros de validacao especificos do campo, onde a chave e o nome do campo e o valor e a mensagem de erro.
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            email: O formato do e-mail e invalido.
+            password: A senha deve ter no minimo 8 caracteres.
+
+    ChangePasswordRequest:
+      title: Solicitacao de Mudanca de Senha
+      description: Estrutura da requisicao para alterar a senha de um usuario.
+      type: object
+      properties:
+        id:
+          format: uuid
+          type: string
+          description: O ID unico do usuario cuja senha sera alterada.
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        lastPassword:
+          type: string
+          description: A senha antiga do usuario.
+          example: MinhaAntigaSenha123!
+        newPassword:
+          type: string
+          description: A nova senha desejada pelo o usuario.
+          example: MinhaNovaSenha123!
+        confirmPassword:
+          type: string
+          description: A confirmacao da senha desejada pelo o usuario.
+          example: MinhaNovaSenha123!
+
+    UserRole:
+      title: Papel do Usuario
+      description: Papel do usuario no sistema. Define as permissoes e funcionalidades disponiveis.
+      enum:
+        - OWNER
+        - CUSTOMER
+        - ADMIN
+      type: string
+
+
+    CreateAddressRequest:
+      title: Solicitacao de Criacao de Endereco
+      description: Estrutura da requisicao para criar um novo endereco para um usuario.
+      type: object
+      properties:
+        publicPlace:
+          type: string
+          description: Nome da rua, avenida, praca, etc.
+          example: Rua das Flores
+        number:
+          type: string
+          description: Numero do imovel.
+          example: '123'
+        complement:
+          type: string
+          description: Complemento do endereco (apartamento, bloco, etc.).
+          example: Apto 45
+        neighborhood:
+          type: string
+          description: Nome do bairro.
+          example: Jardim Primavera
+        city:
+          type: string
+          description: Nome da cidade.
+          example: Sao Paulo
+        state:
+          type: string
+          description: Sigla do estado (UF).
+          example: SP
+        postalCode:
+          type: string
+          description: Codigo de Enderecamento Postal (CEP).
+          example: 01234-567
+
+    UpdateAddressRequest:
+      title: Solicitacao de Atualizacao de Endereco
+      description: Estrutura da requisicao para atualizar um endereco existente de um usuario.
+      type: object
+      properties:
+        publicPlace:
+          type: string
+          description: Novo nome da rua, avenida, praca, etc.
+          example: Avenida Central
+        number:
+          type: string
+          description: Novo numero do imovel.
+          example: '999'
+        complement:
+          type: string
+          description: Novo complemento do endereco (apartamento, bloco, etc.).
+          example: Casa
+        neighborhood:
+          type: string
+          description: Novo nome do bairro.
+          example: Centro
+        city:
+          type: string
+          description: Nova cidade.
+          example: Rio de Janeiro
+        state:
+          type: string
+          description: Nova sigla do estado (UF).
+          example: RJ
+        postalCode:
+          type: string
+          description: Novo Codigo de Enderecamento Postal (CEP).
+          example: 98765-432
+
+    AddressResponse:
+      title: Resposta de Endereco
+      description: Estrutura da resposta contendo os detalhes de um endereco.
+      type: object
+      properties:
+        id:
+          format: uuid
+          type: string
+          description: O ID unico do endereco.
+          example: b1a7d7a3-2f18-4c91-a10d-9e4a5c0f3b99
+        publicPlace:
+          type: string
+          description: Nome da rua, avenida, praca, etc.
+          example: Rua das Flores
+        number:
+          type: string
+          description: Numero do imovel.
+          example: '123'
+        complement:
+          type: string
+          description: Complemento do endereco (apartamento, bloco, etc.).
+          example: Apto 202
+        neighborhood:
+          type: string
+          description: Nome do bairro.
+          example: Jardim Primavera
+        city:
+          type: string
+          description: Nome da cidade.
+          example: Sao Paulo
+        state:
+          type: string
+          description: Sigla do estado (UF).
+          example: SP
+        postalCode:
+          type: string
+          description: Codigo de Enderecamento Postal (CEP).
+          example: 01234-567
+        isActive:
+          type: boolean
+          description: Indica se o endereco esta ativo.
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e hora de criacao do endereco.
+          example: '2025-01-15T14:30:00-03:00'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data e hora da ultima atualizacao do endereco.
+          example: '2025-01-20T10:15:30-03:00'
+
+    CreateUserRequest:
+      title: Solicitacao de Criacao de Usuario
+      description: Estrutura da requisicao para criar um novo usuario no sistema.
+      required:
+        - address
+        - name
+        - email
+        - cpf
+        - login
+        - password
+        - userTypeUuid
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome completo do usuario.
+          example: Joao Silva
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          description: Endereco de e-mail unico do usuario.
+          example: joao.silva@example.com
+          minLength: 1
+          maxLength: 255
+        cpf:
+          type: string
+          description: Cadastro de Pessoa Fisica (CPF) do usuario. Deve ser unico.
+          example: '286.084.030-30'
+          minLength: 11
+          maxLength: 14
+        login:
+          type: string
+          description: Nome de usuario para login. Deve ser unico.
+          example: joaosilva123
+          minLength: 1
+          maxLength: 50
+        password:
+          type: string
+          description: Senha do usuario.
+          example: MyStrongPassword123!
+          minLength: 8
+          maxLength: 64
+        userTypeUuid:
+          type: string
+          format: uuid
+          description: UUID do tipo de usuario (OWNER, CUSTOMER, etc.).
+          example: 123e4567-e89b-12d3-a456-426614174000
+        active:
+          type: boolean
+          description: Status de ativacao do usuario.
+          example: true
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressRequest'
+          description: Lista de enderecos do usuario.
+
+    UpdateUserRequest:
+      title: Solicitacao de Atualizacao de Usuario
+      description: Estrutura da requisicao para atualizar informacoes de um usuario existente.
+      type: object
+      properties:
+        name:
+          type: string
+          description: Novo nome completo do usuario.
+          example: Larissa Fiap Santos
+        email:
+          type: string
+          description: Novo email do usuario.
+          example: larissa@email.com
+        cpf:
+          type: string
+          description: Novo CPF do usuario.
+          example: '123.456.789-00'
+        login:
+          type: string
+          description: Novo login do usuario.
+          example: LarissaLuana
+        password:
+          type: string
+          description: Nova senha do usuario.
+          example: NovaSenh@123
+        userTypeUuid:
+          type: string
+          format: uuid
+          description: Novo UUID do tipo de usuario.
+          example: 123e4567-e89b-12d3-a456-426614174000
+        active:
+          type: boolean
+          description: Novo status de ativacao do usuario.
+          example: true
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressRequest'
+          description: Nova lista de enderecos do usuario.
+
+    UserResponse:
+      title: Resposta de Usuario
+      description: Estrutura da resposta contendo os detalhes completos de um usuario.
+      type: object
+      properties:
+        id:
+          format: uuid
+          type: string
+          description: O ID unico gerado para o novo usuario.
+          example: fdsgasfdg234-sfdgh-39468956-adfg
+        name:
+          type: string
+          description: Nome completo do usuario.
+          example: Joao Silva
+        email:
+          type: string
+          description: Endereco de e-mail do usuario.
+          example: joao.silva@example.com
+        cpf:
+          type: string
+          description: CPF do usuario.
+          example: '286.084.030-30'
+        login:
+          type: string
+          description: Login do usuario.
+          example: joaosilva123
+        userType:
+          type: string
+          description: Papel/tipo do usuario no sistema.
+          example: CUSTOMER
+        isActive:
+          description: Indica se o usuario esta ativo no sistema (alias de 'active').
+          type: boolean
+          example: true
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressResponse'
+          description: Lista dos enderecos associados ao usuario.
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e hora de criacao do usuario.
+          example: '2025-01-15T14:30:00-03:00'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data e hora da ultima atualizacao do usuario.
+          example: '2025-01-20T10:15:30-03:00'
+
+    LoginResponse:
+      title: Resposta de Login
+      description: Estrutura da resposta do endpoint de login, incluindo informacoes de autenticacao e token
+      required:
+        - token
+        - login
+        - email
+        - expiresAt
+        - expiresIn
+        - userId
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token JWT para autenticacao
+          example: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQGV4YW1wbGUuY29tIiwiaWF0IjoxNjg5MjY4MDUwLCJleHAiOjE2ODkyNzA0NTB9.X
+        login:
+          type: string
+          description: Login do usuario
+          example: joaosilva123
+        email:
+          type: string
+          description: Email do usuario
+          example: joao.silva@example.com
+        expiresAt:
+          type: string
+          format: date-time
+          description: Data e hora de expiracao do token
+          example: '2025-07-10T23:09:24-03:00'
+        expiresIn:
+          type: integer
+          format: int32
+          description: Tempo restante ate a expiracao do token em segundos
+          example: 3600
+        userId:
+          type: string
+          format: uuid
+          description: ID unico do usuario
+          example: 123e4567-e89b-12d3-a456-426614174000
+
+    LoginRequest:
+      title: Solicitacao de Login
+      type: object
+      description: Estrutura da requisicao para autenticacao de um usuario.
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          description: O login do usuario cadastrado.
+          example: joaosilva123
+        password:
+          type: string
+          format: password
+          example: MyStrongPassword123!
+          description: A senha do usuario.
+
+    CreateRestaurantRequest:
+      title: Solicitacao de Criacao de Restaurante
+      type: object
+      description: Estrutura da requisicao para criar um novo restaurante.
+      required:
+        - name
+        - address
+        - cuisineType
+        - openingHours
+        - ownerId
+      properties:
+        name:
+          type: string
+          description: Nome do restaurante.
+          example: Restaurante da Praca
+          minLength: 3
+          maxLength: 100
+        address:
+          type: string
+          description: Endereco completo do restaurante.
+          example: Rua Principal, 123, Centro, Sao Paulo - SP
+          minLength: 10
+          maxLength: 255
+        cuisineType:
+          type: string
+          description: Tipo de cozinha servida no restaurante.
+          example: Brasileira
+          minLength: 3
+          maxLength: 50
+        openingHours:
+          type: string
+          description: Horario de funcionamento em formato legivel.
+          example: 'Segunda a Sexta: 11:00 - 15:00, 18:00 - 23:00 | Sabado e Domingo: 12:00 - 23:00'
+          minLength: 5
+          maxLength: 255
+        ownerId:
+          type: string
+          format: uuid
+          description: ID do usuario que sera o dono do restaurante. Deve ser um usuario do tipo OWNER.
+          example: 123e4567-e89b-12d3-a456-426614174000
+
+    UpdateRestaurantRequest:
+      title: Solicitacao de Atualizacao de Restaurante
+      type: object
+      description: Estrutura da requisicao para atualizar um restaurante existente.
+      properties:
+        name:
+          type: string
+          description: Novo nome para o restaurante.
+          example: Restaurante da Praca - Unidade Centro
+          minLength: 3
+          maxLength: 100
+        address:
+          type: string
+          description: Novo endereco do restaurante.
+          example: Avenida Central, 456, Centro, Sao Paulo - SP
+          minLength: 10
+          maxLength: 255
+        cuisineType:
+          type: string
+          description: Novo tipo de cozinha servida.
+          example: Comida Brasileira Contemporanea
+          minLength: 3
+          maxLength: 50
+        openingHours:
+          type: string
+          description: Novo horario de funcionamento.
+          example: 'Terca a Domingo: 12:00 - 23:00 | Segunda: Fechado'
+          minLength: 5
+          maxLength: 255
+
+    RestaurantResponse:
+      title: Resposta de Restaurante
+      type: object
+      description: Estrutura da resposta contendo os detalhes completos de um restaurante.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID unico do restaurante no sistema.
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          description: Nome do restaurante.
+          example: Restaurante da Praca
+        address:
+          type: string
+          description: Endereco completo do restaurante.
+          example: Rua Principal, 123, Centro, Sao Paulo - SP
+        cuisineType:
+          type: string
+          description: Tipo de cozinha servida no restaurante.
+          example: Brasileira
+        openingHours:
+          type: string
+          description: Horario de funcionamento formatado.
+          example: 'Segunda a Sexta: 11:00 - 15:00, 18:00 - 23:00 | Sabado e Domingo: 12:00 - 23:00'
+        owner:
+          $ref: '#/components/schemas/UserResponse'
+          description: Dados do dono do restaurante.
+        isActive:
+          type: boolean
+          description: Indica se o restaurante esta ativo.
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e hora de criacao do registro do restaurante.
+          example: '2025-01-10T10:30:00-03:00'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data e hora da ultima atualizacao dos dados do restaurante.
+          example: '2025-01-15T14:45:00-03:00'
+
+    CreateMenuItemRequest:
+      title: Solicitacao de Criacao de Item do Cardapio
+      type: object
+      description: Estrutura da requisicao para criar um novo item no cardapio.
+      required:
+        - name
+        - price
+        - restaurantId
+      properties:
+        name:
+          type: string
+          description: Nome do item do cardapio.
+          example: Moqueca de Camarao
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          description: Descricao detalhada do item.
+          example: Deliciosa moqueca de camarao com arroz e pirao.
+          maxLength: 500
+        price:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Preco do item em reais.
+          example: 59.90
+        availableForInStoreOnly:
+          type: boolean
+          default: false
+          description: Indica se o item so esta disponivel para consumo no local.
+        photo:
+          type: string
+          format: binary
+          description: 'Arquivo de imagem do item do cardapio (formato: jpg, png, ate 5MB).'
+        restaurantId:
+          type: string
+          format: uuid
+          description: ID do restaurante a que este item pertence.
+          example: 123e4567-e89b-12d3-a456-426614174000
+
+    UpdateMenuItemRequest:
+      title: Solicitacao de Atualizacao de Item do Cardapio
+      type: object
+      description: Estrutura da requisicao para atualizar um item existente no cardapio.
+      properties:
+        name:
+          type: string
+          description: Novo nome para o item do cardapio.
+          example: Moqueca de Camarao Especial
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          description: Nova descricao para o item.
+          example: Deliciosa moqueca de camarao com arroz, pirao e acompanhamentos.
+          maxLength: 500
+        price:
+          type: number
+          format: double
+          minimum: 0.01
+          description: Novo preco para o item em reais.
+          example: 64.90
+        availableForInStoreOnly:
+          type: boolean
+          description: Atualiza se o item esta disponivel apenas para consumo no local.
+        photo:
+          type: string
+          format: binary
+          description: 'Novo arquivo de imagem para o item (opcional, formato: jpg, png, ate 5MB)'
+
+    MenuItemResponse:
+      title: Resposta de Item do Cardapio
+      type: object
+      description: Estrutura da resposta contendo os detalhes de um item do cardapio.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID unico do item no sistema.
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          description: Nome do item.
+          example: Moqueca de Camarao
+        description:
+          type: string
+          description: Descricao detalhada do item.
+          example: Deliciosa moqueca de camarao com arroz e pirao.
+        price:
+          type: number
+          format: double
+          description: Preco do item em reais.
+          example: 59.90
+        availableForInStoreOnly:
+          type: boolean
+          description: Indica se o item so esta disponivel para consumo no local.
+          example: false
+        photoUrl:
+          type: string
+          description: URL da imagem do item no servico de armazenamento.
+          example: https://storage.example.com/menu-items/123e4567-e89b-12d3-a456-426614174000.jpg
+        restaurantId:
+          type: string
+          format: uuid
+          description: ID do restaurante a que este item pertence.
+          example: 123e4567-e89b-12d3-a456-426614174000
+        isActive:
+          type: boolean
+          description: Indica se o item do cardapio esta ativo.
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e hora de criacao do item.
+          example: '2025-01-15T14:30:00-03:00'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data e hora da ultima atualizacao do item.
+          example: '2025-01-20T10:15:30-03:00'
+
+    UserRequest:
+      title: User Request
+      description: Estrutura da requisicao para criar um novo usuario no sistema.
+      required:
+        - name
+        - email
+        - cpf
+        - login
+        - password
+        - userTypeUuid
+        - active
+      type: object
+      properties:
+        name:
+          type: string
+          description: Nome completo do usuario.
+          example: Joao Silva
+        email:
+          type: string
+          description: Endereco de e-mail unico do usuario.
+          example: joao.silva@example.com
+        cpf:
+          type: string
+          description: Cadastro de Pessoa Fisica (CPF) do usuario. Deve ser unico.
+          example: '286.084.030-30'
+        login:
+          type: string
+          description: Nome de usuario para login. Deve ser unico.
+          example: joaosilva123
+        password:
+          type: string
+          description: Senha do usuario.
+          example: MyStrongPassword123!
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressRequest'
+          description: Lista de enderecos do usuario.
+        userTypeUuid:
+          type: string
+          format: uuid
+          description: UUID do tipo de usuario (OWNER, CUSTOMER, etc.).
+          example: 123e4567-e89b-12d3-a456-426614174000
+        active:
+          type: boolean
+          description: Status de ativacao do usuario.
+          example: true
+
+    AddressRequest:
+      title: Solicitacao de Endereco
+      type: object
+      description: Representa os dados de um endereco para requisicoes.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID do endereco (opcional para criacao, obrigatorio para atualizacao).
+          example: b1a7d7a3-2f18-4c91-a10d-9e4a5c0f3b99
+        publicPlace:
+          type: string
+          description: Nome da rua, avenida, praca, etc.
+          example: Rua das Acacias
+        number:
+          type: string
+          description: Numero do imovel.
+          example: '456'
+        complement:
+          type: string
+          description: Complemento do endereco (apartamento, bloco, etc.).
+          example: Bloco C, Apto 101
+        neighborhood:
+          type: string
+          description: Nome do bairro.
+          example: Bela Vista
+        city:
+          type: string
+          description: Nome da cidade.
+          example: Belo Horizonte
+        state:
+          type: string
+          description: Sigla do estado (UF).
+          example: MG
+        postalCode:
+          type: string
+          description: Codigo de Enderecamento Postal (CEP).
+          example: 30160-010
+          minLength: 1
+          maxLength: 50
+
+    CreateUserTypeRequest:
+      title: Solicitacao de Criacao de Tipo de Usuario
+      description: Estrutura da requisicao para criar um novo tipo de usuario no sistema.
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: 'Nome unico do tipo de usuario (ex: CUSTOMER, OWNER, ADMIN).'
+          example: CUSTOMER
+          minLength: 3
+          maxLength: 50
+          pattern: '^[A-Z_]+$'
+
+    UpdateUserTypeRequest:
+      title: Solicitacao de Atualizacao de Tipo de Usuario
+      description: Estrutura da requisicao para atualizar um tipo de usuario existente.
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Novo nome para o tipo de usuario (deve ser unico).
+          example: CUSTOMER_VIP
+          minLength: 3
+          maxLength: 50
+          pattern: '^[A-Z_]+$'
+
+    UserTypeResponse:
+      title: Resposta de Tipo de Usuario
+      description: Estrutura da resposta contendo os detalhes de um tipo de usuario.
+      type: object
+      required:
+        - uuid
+        - name
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Identificador unico do tipo de usuario.
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          description: Nome do tipo de usuario.
+          example: CUSTOMER
+        isActive:
+          type: boolean
+          description: Indica se o tipo de usuario esta ativo.
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Data e hora de criacao do tipo de usuario.
+          example: '2025-01-15T14:30:00-03:00'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data e hora da ultima atualizacao do tipo de usuario.
+          example: '2025-01-20T10:15:30-03:00'

@@ -1,46 +1,84 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
+import com.fiap.foodfiapp.api.UsersApi;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
-import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
-import com.fiap.foodfiapp.core.domain.entities.User;
+import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
+import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
-import com.fiap.foodfiapp.infrastructure.rest.dto.user.UserRequestDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.user.UserResponseDTO;
-import com.fiap.foodfiapp.infrastructure.rest.mapper.UserMapper;
+import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
+import com.fiap.foodfiapp.infrastructure.rest.mapper.CreateUserRequestMapper;
+import com.fiap.foodfiapp.infrastructure.rest.mapper.UpdateUserRequestMapper;
+import com.fiap.foodfiapp.infrastructure.rest.mapper.UserResponseMapper;
+import com.fiap.foodfiapp.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users")
-public class UserController {
+public class UserController implements UsersApi {
     private final CreateUserUseCase createUserUseCase;
-    private final FindUserUseCase findUserUseCase;
-    private static final UserMapper USER_MAPPER = UserMapper.INSTANCE;
+    private final UpdateUserUseCase updateUserUseCase;
+    private final UserRepositoryGateway userRepositoryGateway;
 
-    public UserController(CreateUserUseCase createUserUseCase, FindUserUseCase findUserUseCase) {
+    public UserController(CreateUserUseCase createUserUseCase, UpdateUserUseCase updateUserUseCase, UserRepositoryGateway userRepositoryGateway) {
         this.createUserUseCase = createUserUseCase;
-        this.findUserUseCase = findUserUseCase;
+        this.updateUserUseCase = updateUserUseCase;
+        this.userRepositoryGateway = userRepositoryGateway;
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO userRequestDTO) {
-        try {
-            User createdUser = createUserUseCase.execute(USER_MAPPER.mapToCreateUser(userRequestDTO));
-            UserResponseDTO responseDTO = USER_MAPPER.mapToUserResponseDTO(createdUser);
+    @Override
+    public ResponseEntity<UserResponse> createUser(CreateUserRequest createUserRequest) {
+        var user = CreateUserRequestMapper.toEntity(createUserRequest);
+        var createdUser = createUserUseCase.execute(user);
+        var responseDTO = UserResponseMapper.toDTO(createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    }
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+    @Override
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+        userRepositoryGateway.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<UserResponse> getUser(UUID id) {
+        return userRepositoryGateway.findById(id)
+                .map(UserResponseMapper::toDTO)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Override
+    public ResponseEntity<List<UserResponse>> getUsers() {
+        var users = userRepositoryGateway.findAll();
+        var response = users.stream()
+                .map(UserResponseMapper::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<UserResponse> updateUser(UUID id, UpdateUserRequest updateUserRequest) {
+        try {
+            var existingUser = userRepositoryGateway.findById(id).orElse(null);
+            if (existingUser == null) {
+                return ResponseEntity.notFound().build();
+            }
+            var userUpdates = UpdateUserRequestMapper.toEntity(updateUserRequest);
+            User savedUser = updateUserUseCase.execute(id, userUpdates);
+            var responseDTO = UserResponseMapper.toDTO(savedUser);
+            return ResponseEntity.ok(responseDTO);
         } catch (BusinessException ex) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAll() {
-        List<User> userResponse = findUserUseCase.findAll();
-
-        return ResponseEntity.ok(USER_MAPPER.mapToUserResponseListDTO(userResponse));
+    @Override
+    public ResponseEntity<Void> changePassword(ChangePasswordRequest changePasswordRequest) {
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 }
