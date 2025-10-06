@@ -32,18 +32,10 @@ public class UserController implements UsersApi {
 
     @Override
     public ResponseEntity<UserResponse> createUser(CreateUserRequest createUserRequest) {
-        try {
-            var user = CreateUserRequestMapper.toEntity(createUserRequest);
-            var createdUser = createUserUseCase.execute(user);
-            var responseDTO = UserResponseMapper.toDTO(createdUser);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
-        } catch (BusinessException ex) {
-            // Check if the error is due to UserType not found
-            if (ex.getMessage().contains("User type not found")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+        var user = CreateUserRequestMapper.toEntity(createUserRequest);
+        var createdUser = createUserUseCase.execute(user);
+        var responseDTO = UserResponseMapper.toDTO(createdUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @Override

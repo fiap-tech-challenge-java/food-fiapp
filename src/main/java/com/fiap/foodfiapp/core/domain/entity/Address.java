@@ -2,7 +2,7 @@ package com.fiap.foodfiapp.core.domain.entity;
 
 import java.util.UUID;
 
-public class Address {
+public class Address extends BaseEntity {
 
     private UUID id;
 

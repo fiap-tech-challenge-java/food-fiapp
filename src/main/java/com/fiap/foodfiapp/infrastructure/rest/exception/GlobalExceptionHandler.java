@@ -99,6 +99,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
+    @ExceptionHandler(CpfAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleCpfAlreadyExistsException(CpfAlreadyExistsException ex,
+                                                                         HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "CPF_ALREADY_EXISTS",
+                HttpStatus.CONFLICT,
+                request.getRequestURI()
+        );
+        logger.warn("CPF already exists: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
     @ExceptionHandler(InvalidEmailException.class)
     public ResponseEntity<ErrorResponse> handleInvalidEmailException(InvalidEmailException ex,
                                                                      HttpServletRequest request) {
@@ -385,6 +398,45 @@ public class GlobalExceptionHandler {
         );
         logger.error("Unhandled internal error", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserTypeNameAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserTypeNameAlreadyExistsException(UserTypeNameAlreadyExistsException ex,
+                                                                                  HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "USER_TYPE_NAME_ALREADY_EXISTS",
+                HttpStatus.CONFLICT,
+                request.getRequestURI()
+        );
+        logger.warn("UserType name already exists: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserTypeInUseException.class)
+    public ResponseEntity<ErrorResponse> handleUserTypeInUseException(UserTypeInUseException ex,
+                                                                      HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "USER_TYPE_IN_USE",
+                HttpStatus.CONFLICT,
+                request.getRequestURI()
+        );
+        logger.warn("UserType in use: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(CoreUserTypeModificationException.class)
+    public ResponseEntity<ErrorResponse> handleCoreUserTypeModificationException(CoreUserTypeModificationException ex,
+                                                                                   HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "CORE_USER_TYPE_MODIFICATION_NOT_ALLOWED",
+                HttpStatus.CONFLICT,
+                request.getRequestURI()
+        );
+        logger.warn("Attempt to modify or delete a core user type: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     private ErrorResponse createErrorResponse(String message, String code, HttpStatus status, String path) {

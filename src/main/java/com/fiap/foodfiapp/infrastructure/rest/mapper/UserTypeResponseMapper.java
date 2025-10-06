@@ -10,6 +10,9 @@ public class UserTypeResponseMapper {
     public static UserTypeResponse toDTO(UserType userType) {
         return new UserTypeResponse()
                 .uuid(userType.getUuid())
-                .name(userType.getName());
+                .name(userType.getName())
+                .isActive(userType.isActive())
+                .createdAt(userType.getCreatedAt())
+                .updatedAt(userType.getUpdatedAt());
     }
 }

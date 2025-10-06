@@ -24,7 +24,6 @@ class UserEntityTest {
         entity.setLogin("test_login");
         entity.setPassword("password123");
         entity.setUserType(userType);
-        entity.setActive(true);
         entity.setAddressesList(addresses);
 
         assertEquals(userId, entity.getId());
@@ -34,7 +33,6 @@ class UserEntityTest {
         assertEquals("test_login", entity.getLogin());
         assertEquals("password123", entity.getPassword());
         assertEquals(userType, entity.getUserType());
-        assertTrue(entity.isActive());
         assertEquals(addresses, entity.getAddressesList());
     }
 
@@ -52,7 +50,6 @@ class UserEntityTest {
                 "other_login",
                 "other_password",
                 userType,
-                false,
                 addresses
         );
 
@@ -63,7 +60,6 @@ class UserEntityTest {
         assertEquals("other_login", entity.getLogin());
         assertEquals("other_password", entity.getPassword());
         assertEquals(userType, entity.getUserType());
-        assertFalse(entity.isActive());
         assertEquals(addresses, entity.getAddressesList());
     }
 
@@ -81,7 +77,6 @@ class UserEntityTest {
                 .login("builder_login")
                 .password("builder_pass")
                 .userType(userType)
-                .active(true)
                 .addressesList(addresses)
                 .build();
 
@@ -92,7 +87,6 @@ class UserEntityTest {
         assertEquals("builder_login", entity.getLogin());
         assertEquals("builder_pass", entity.getPassword());
         assertEquals(userType, entity.getUserType());
-        assertTrue(entity.isActive());
         assertEquals(addresses, entity.getAddressesList());
     }
 
@@ -106,9 +100,7 @@ class UserEntityTest {
         assertNull(entity.getLogin());
         assertNull(entity.getPassword());
         assertNull(entity.getUserType());
-        assertFalse(entity.isActive());
         assertNotNull(entity.getAddressesList());
         assertTrue(entity.getAddressesList().isEmpty());
     }
 }
-

@@ -35,6 +35,16 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByCpf(String cpf) {
+        return springDataRepository.findByCpf(cpf).map(this::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByLogin(String login) {
+        return springDataRepository.findByLogin(login).map(this::toDomain);
+    }
+
+    @Override
     public List<User> findAll() {
         return springDataRepository.findAll().stream().map(this::toDomain).collect(Collectors.toList());
     }
@@ -58,7 +68,6 @@ public class UserRepositoryAdapter implements UserRepository {
                 .login(user.getLogin())
                 .password(user.getPassword())
                 .userType(null)
-                .active(user.isActive())
                 .build();
     }
 
@@ -71,7 +80,7 @@ public class UserRepositoryAdapter implements UserRepository {
                 entity.getCpf(),
                 null,
                 null,
-                entity.isActive(),
+                entity.getIsActive(),
                 null,
                 null,
                 entity.getPassword()
