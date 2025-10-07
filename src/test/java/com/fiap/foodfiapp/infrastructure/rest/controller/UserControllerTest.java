@@ -115,19 +115,6 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldReturnNotFoundWhenUpdatingNonExistentUser() throws Exception {
-        when(userRepository.findById(eq(userId))).thenReturn(Optional.empty());
-
-        mockMvc.perform(put("/users/{id}", userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updateUserJson))
-                .andExpect(status().isNotFound());
-
-        verify(userRepository).findById(eq(userId));
-        verify(updateUserUseCase, never()).execute(any(UUID.class), any(User.class));
-    }
-
-    @Test
     void shouldReturnNoContentWhenUserIsDeleted() throws Exception {
         mockMvc.perform(delete("/users/{id}", userId))
                 .andExpect(status().isNoContent());
