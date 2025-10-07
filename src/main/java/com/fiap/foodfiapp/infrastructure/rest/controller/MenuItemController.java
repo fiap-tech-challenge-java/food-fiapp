@@ -4,7 +4,6 @@ import com.fiap.foodfiapp.api.MenuItemsApi;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.CreateMenuItemUseCaseImpl;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.DeleteMenuItemUseCaseImpl;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.FindMenuItemByIdUseCaseImpl;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.FindMenuItemsByRestaurantUseCaseImpl;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.UpdateMenuItemUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.exception.FileStorageException;

@@ -1,8 +1,8 @@
 package com.fiap.foodfiapp.core.application.usecases.menuitem.impl;
 
 import com.fiap.foodfiapp.core.application.usecases.menuitem.DeleteMenuItemUseCase;
-import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
+import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,11 +14,18 @@ public class DeleteMenuItemUseCaseImpl implements DeleteMenuItemUseCase {
     private final MenuItemRepository menuItemRepository;
     private final FileStorageRepository fileStorageRepository;
 
+    // CONSTRUTOR ADICIONADO
+    public DeleteMenuItemUseCaseImpl(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository) {
+        this.menuItemRepository = menuItemRepository;
+        this.fileStorageRepository = fileStorageRepository;
+    }
+
+    @Override // Adicionada anotação para garantir conformidade com a interface
     public void execute(UUID id) {
         var menuItem = menuItemRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Menu item not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Menu item not found with id: " + id));
 
-        if (menuItem.photoUrl() != null) {
+        if (menuItem.photoUrl() != null && !menuItem.photoUrl().isBlank()) {
             try {
                 String fileName = menuItem.photoUrl().substring(menuItem.photoUrl().lastIndexOf('/') + 1);
                 fileStorageRepository.delete(fileName);

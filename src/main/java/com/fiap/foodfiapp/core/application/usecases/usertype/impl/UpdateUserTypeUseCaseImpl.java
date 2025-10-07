@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.core.application.usecases.usertype.impl;
 
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.CoreUserTypeModificationException;
@@ -15,16 +15,16 @@ import java.util.UUID;
 
 public class UpdateUserTypeUseCaseImpl implements UpdateUserTypeUseCase {
     private static final List<String> CORE_USER_TYPES = Arrays.asList("OWNER", "CUSTOMER", "ADMIN");
-    private final UserTypeRepositoryGateway userTypeRepositoryGateway;
-    private final UserRepositoryGateway userRepositoryGateway;
+    private final UserTypeRepository userTypeRepository;
+    private final UserRepository userRepository;
 
-    public UpdateUserTypeUseCaseImpl(UserTypeRepositoryGateway userTypeRepositoryGateway, UserRepositoryGateway userRepositoryGateway) {
-        this.userTypeRepositoryGateway = userTypeRepositoryGateway;
-        this.userRepositoryGateway = userRepositoryGateway;
+    public UpdateUserTypeUseCaseImpl(UserTypeRepository userTypeRepository, UserRepository userRepository) {
+        this.userTypeRepository = userTypeRepository;
+        this.userRepository = userRepository;
     }
 
     public UserType execute(UUID uuid, UserType userTypeUpdates) {
-        UserType existingUserType = userTypeRepositoryGateway.findById(uuid)
+        UserType existingUserType = userTypeRepository.findById(uuid)
                 .orElseThrow(() -> new UserTypeNotFoundException("User type not found."));
 
         if (CORE_USER_TYPES.contains(existingUserType.getName().toUpperCase())) {
@@ -32,13 +32,13 @@ public class UpdateUserTypeUseCaseImpl implements UpdateUserTypeUseCase {
         }
 
         // Verificar se o UserType está em uso
-        if (userRepositoryGateway.existsByUserTypeUuid(uuid)) {
+        if (userRepository.existsByUserTypeUuid(uuid)) {
             throw new UserTypeInUseException();
         }
 
         // Verificar se o nome já existe para outro UserType
         if (userTypeUpdates.getName() != null && !userTypeUpdates.getName().equals(existingUserType.getName())) {
-            userTypeRepositoryGateway.findByName(userTypeUpdates.getName()).ifPresent(userType -> {
+            userTypeRepository.findByName(userTypeUpdates.getName()).ifPresent(userType -> {
                 if (!userType.getUuid().equals(uuid)) {
                     throw new UserTypeNameAlreadyExistsException(userTypeUpdates.getName());
                 }
@@ -51,6 +51,6 @@ public class UpdateUserTypeUseCaseImpl implements UpdateUserTypeUseCase {
             userTypeUpdates.setName(existingUserType.getName());
         }
 
-        return userTypeRepositoryGateway.save(userTypeUpdates);
+        return userTypeRepository.save(userTypeUpdates);
     }
 }

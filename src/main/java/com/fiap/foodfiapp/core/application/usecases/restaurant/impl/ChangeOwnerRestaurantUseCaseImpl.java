@@ -1,19 +1,19 @@
 package com.fiap.foodfiapp.core.application.usecases.restaurant.impl;
 
-import com.fiap.foodfiapp.core.domain.port.RestaurantRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.ChangeOwnerRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 
 import java.util.UUID;
 
 public class ChangeOwnerRestaurantUseCaseImpl implements ChangeOwnerRestaurantUseCase {
-    private final RestaurantRepositoryGateway restaurantRepositoryGateway;
+    private final RestaurantRepository restaurantRepository;
 
-    public ChangeOwnerRestaurantUseCaseImpl(RestaurantRepositoryGateway restaurantRepositoryGateway) {
-        this.restaurantRepositoryGateway = restaurantRepositoryGateway;
+    public ChangeOwnerRestaurantUseCaseImpl(RestaurantRepository restaurantRepository) {
+        this.restaurantRepository = restaurantRepository;
     }
     @Override
     public Restaurant execute(UUID restaurantId, UUID newOwnerId) {
-        return this.restaurantRepositoryGateway.changeOwner(restaurantId, newOwnerId);
+        return this.restaurantRepository.changeOwner(restaurantId, newOwnerId);
     }
 }
