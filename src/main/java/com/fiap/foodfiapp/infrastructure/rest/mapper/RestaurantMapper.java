@@ -19,7 +19,7 @@ public interface RestaurantMapper {
     RestaurantMapper INSTANCE = Mappers.getMapper(RestaurantMapper.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "address", ignore = true)
+    @Mapping(target = "address", source = "address")
     @Mapping(target = "active", ignore = true)
     Restaurant toRestaurant(CreateRestaurantRequest createRestaurantRequest);
 

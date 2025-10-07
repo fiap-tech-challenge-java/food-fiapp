@@ -6,18 +6,22 @@ import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.core.domain.exception.UserNotFoundException;
+import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressOwnerTypeEnum;
 
 import java.util.UUID;
 
 public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository; // Repositório de endereço injetado
 
-    public CreateRestaurantUseCaseImpl(RestaurantRepository restaurantRepository, UserRepository userRepository) {
+    public CreateRestaurantUseCaseImpl(RestaurantRepository restaurantRepository, UserRepository userRepository, AddressRepository addressRepository) {
         this.restaurantRepository = restaurantRepository;
         this.userRepository = userRepository;
+        this.addressRepository = addressRepository;
     }
 
     @Override
@@ -42,6 +46,16 @@ public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
             throw new BusinessException("A restaurant with name '" + createRestaurant.getName() + "' already exists for this owner");
         }
 
-        return this.restaurantRepository.save(createRestaurant);
+        Restaurant savedRestaurant = this.restaurantRepository.save(createRestaurant);
+
+        // Salva o endereço associado ao restaurante
+        if (createRestaurant.getAddress() != null) {
+            var address = createRestaurant.getAddress();
+            var savedAddress = addressRepository.save(address, savedRestaurant.getId(), AddressOwnerTypeEnum.RESTAURANT.getDescription());
+            savedRestaurant.setAddress(savedAddress);
+        }
+
+        return savedRestaurant;
+
     }
 }
