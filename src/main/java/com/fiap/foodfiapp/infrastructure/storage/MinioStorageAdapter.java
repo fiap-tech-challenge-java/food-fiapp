@@ -5,7 +5,6 @@ import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -24,7 +23,7 @@ public class MinioStorageAdapter implements FileStorageRepository {
     private String minioPublicEndpoint;
 
     @Override
-    public String store(MultipartFile file, String fileName) throws IOException {
+    public String store(String file, String fileName) throws IOException {
         try {
             createBucketIfNotExists();
 

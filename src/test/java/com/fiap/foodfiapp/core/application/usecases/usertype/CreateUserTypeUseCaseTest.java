@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.core.application.usecases.usertype;
 
-import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 class CreateUserTypeUseCaseTest {
 
     @Mock
-    private UserTypeRepositoryGateway userTypeRepositoryGateway;
+    private UserTypeRepository userTypeRepository;
 
     private CreateUserTypeUseCase createUserTypeUseCase;
 
@@ -27,7 +27,7 @@ class CreateUserTypeUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        createUserTypeUseCase = new CreateUserTypeUseCase(userTypeRepositoryGateway);
+        createUserTypeUseCase = new CreateUserTypeUseCase(userTypeRepository);
 
         userType = new UserType();
         userType.setName("Customer");
@@ -36,8 +36,8 @@ class CreateUserTypeUseCaseTest {
     @Test
     void shouldCreateUserTypeWhenNameDoesNotExist() {
         // Arrange
-        when(userTypeRepositoryGateway.findByName("Customer")).thenReturn(Optional.empty());
-        when(userTypeRepositoryGateway.save(any(UserType.class))).thenReturn(userType);
+        when(userTypeRepository.findByName("Customer")).thenReturn(Optional.empty());
+        when(userTypeRepository.save(any(UserType.class))).thenReturn(userType);
 
         // Act
         UserType result = createUserTypeUseCase.execute(userType);
@@ -45,8 +45,8 @@ class CreateUserTypeUseCaseTest {
         // Assert
         assertNotNull(result);
         assertNotNull(userType.getUuid()); // UUID should be generated
-        verify(userTypeRepositoryGateway).findByName("Customer");
-        verify(userTypeRepositoryGateway).save(userType);
+        verify(userTypeRepository).findByName("Customer");
+        verify(userTypeRepository).save(userType);
     }
 
     @Test
@@ -56,15 +56,15 @@ class CreateUserTypeUseCaseTest {
         existingUserType.setUuid(UUID.randomUUID());
         existingUserType.setName("Customer");
 
-        when(userTypeRepositoryGateway.findByName("Customer")).thenReturn(Optional.of(existingUserType));
+        when(userTypeRepository.findByName("Customer")).thenReturn(Optional.of(existingUserType));
 
         // Act & Assert
         UserTypeNameAlreadyExistsException exception = assertThrows(UserTypeNameAlreadyExistsException.class,
             () -> createUserTypeUseCase.execute(userType));
 
         assertEquals("User type with name 'Customer' already exists.", exception.getMessage());
-        verify(userTypeRepositoryGateway).findByName("Customer");
-        verify(userTypeRepositoryGateway, never()).save(any(UserType.class));
+        verify(userTypeRepository).findByName("Customer");
+        verify(userTypeRepository, never()).save(any(UserType.class));
     }
 
     @Test
@@ -73,8 +73,8 @@ class CreateUserTypeUseCaseTest {
         UUID providedUuid = UUID.randomUUID();
         userType.setUuid(providedUuid);
 
-        when(userTypeRepositoryGateway.findByName("Customer")).thenReturn(Optional.empty());
-        when(userTypeRepositoryGateway.save(any(UserType.class))).thenReturn(userType);
+        when(userTypeRepository.findByName("Customer")).thenReturn(Optional.empty());
+        when(userTypeRepository.save(any(UserType.class))).thenReturn(userType);
 
         // Act
         UserType result = createUserTypeUseCase.execute(userType);
@@ -82,6 +82,6 @@ class CreateUserTypeUseCaseTest {
         // Assert
         assertNotNull(result);
         assertEquals(providedUuid, userType.getUuid());
-        verify(userTypeRepositoryGateway).save(userType);
+        verify(userTypeRepository).save(userType);
     }
 }

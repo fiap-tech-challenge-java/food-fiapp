@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.core.application.usecases.usertype;
 
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.core.application.usecases.usertype.impl.UpdateUserTypeUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsException;
@@ -23,10 +23,10 @@ import static org.mockito.Mockito.*;
 class UpdateUserTypeUseCaseTest {
 
     @Mock
-    private UserTypeRepositoryGateway userTypeRepositoryGateway;
+    private UserTypeRepository userTypeRepository;
 
     @Mock
-    private UserRepositoryGateway userRepositoryGateway;
+    private UserRepository userRepository;
 
     private UpdateUserTypeUseCaseImpl updateUserTypeUseCase;
 
@@ -37,7 +37,7 @@ class UpdateUserTypeUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        updateUserTypeUseCase = new UpdateUserTypeUseCaseImpl(userTypeRepositoryGateway, userRepositoryGateway);
+        updateUserTypeUseCase = new UpdateUserTypeUseCaseImpl(userTypeRepository, userRepository);
 
         userTypeUuid = UUID.randomUUID();
 
@@ -52,10 +52,10 @@ class UpdateUserTypeUseCaseTest {
     @Test
     void shouldUpdateUserTypeSuccessfully() {
         // Arrange
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
-        when(userRepositoryGateway.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
-        when(userTypeRepositoryGateway.findByName("Premium Customer")).thenReturn(Optional.empty());
-        when(userTypeRepositoryGateway.save(any(UserType.class))).thenReturn(userTypeUpdates);
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userRepository.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
+        when(userTypeRepository.findByName("Premium Customer")).thenReturn(Optional.empty());
+        when(userTypeRepository.save(any(UserType.class))).thenReturn(userTypeUpdates);
 
         // Act
         UserType result = updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates);
@@ -63,23 +63,23 @@ class UpdateUserTypeUseCaseTest {
         // Assert
         assertNotNull(result);
         assertEquals(userTypeUuid, userTypeUpdates.getUuid());
-        verify(userTypeRepositoryGateway).findById(userTypeUuid);
-        verify(userRepositoryGateway).existsByUserTypeUuid(userTypeUuid);
-        verify(userTypeRepositoryGateway).findByName("Premium Customer");
-        verify(userTypeRepositoryGateway).save(userTypeUpdates);
+        verify(userTypeRepository).findById(userTypeUuid);
+        verify(userRepository).existsByUserTypeUuid(userTypeUuid);
+        verify(userTypeRepository).findByName("Premium Customer");
+        verify(userTypeRepository).save(userTypeUpdates);
     }
 
     @Test
     void shouldThrowExceptionWhenUserTypeNotFound() {
         // Arrange
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.empty());
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(UserTypeNotFoundException.class,
             () -> updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates));
 
-        verify(userTypeRepositoryGateway).findById(userTypeUuid);
-        verify(userTypeRepositoryGateway, never()).save(any());
+        verify(userTypeRepository).findById(userTypeUuid);
+        verify(userTypeRepository, never()).save(any());
     }
 
     @Test
@@ -89,46 +89,46 @@ class UpdateUserTypeUseCaseTest {
         otherUserType.setUuid(UUID.randomUUID());
         otherUserType.setName("Premium Customer");
 
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
-        when(userRepositoryGateway.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
-        when(userTypeRepositoryGateway.findByName("Premium Customer")).thenReturn(Optional.of(otherUserType));
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userRepository.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
+        when(userTypeRepository.findByName("Premium Customer")).thenReturn(Optional.of(otherUserType));
 
         // Act & Assert
         assertThrows(UserTypeNameAlreadyExistsException.class,
             () -> updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates));
 
-        verify(userTypeRepositoryGateway).findById(userTypeUuid);
-        verify(userTypeRepositoryGateway).findByName("Premium Customer");
-        verify(userTypeRepositoryGateway, never()).save(any());
+        verify(userTypeRepository).findById(userTypeUuid);
+        verify(userTypeRepository).findByName("Premium Customer");
+        verify(userTypeRepository, never()).save(any());
     }
 
     @Test
     void shouldThrowExceptionWhenUserTypeInUse() {
         // Arrange
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
-        when(userRepositoryGateway.existsByUserTypeUuid(userTypeUuid)).thenReturn(true);
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userRepository.existsByUserTypeUuid(userTypeUuid)).thenReturn(true);
 
         // Act & Assert
         assertThrows(UserTypeInUseException.class,
             () -> updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates));
 
-        verify(userTypeRepositoryGateway).findById(userTypeUuid);
-        verify(userRepositoryGateway).existsByUserTypeUuid(userTypeUuid);
-        verify(userTypeRepositoryGateway, never()).save(any());
+        verify(userTypeRepository).findById(userTypeUuid);
+        verify(userRepository).existsByUserTypeUuid(userTypeUuid);
+        verify(userTypeRepository, never()).save(any());
     }
 
     @Test
     void shouldThrowExceptionWhenModifyingCoreUserType() {
         // Arrange
         existingUserType.setName("ADMIN");
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
 
         // Act & Assert
         assertThrows(CoreUserTypeModificationException.class,
             () -> updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates));
 
-        verify(userTypeRepositoryGateway).findById(userTypeUuid);
-        verify(userTypeRepositoryGateway, never()).save(any());
+        verify(userTypeRepository).findById(userTypeUuid);
+        verify(userTypeRepository, never()).save(any());
     }
 
     @Test
@@ -136,16 +136,16 @@ class UpdateUserTypeUseCaseTest {
         // Arrange
         userTypeUpdates.setName("BASIC"); // Same name as existing
 
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
-        when(userTypeRepositoryGateway.findByName("BASIC")).thenReturn(Optional.of(existingUserType));
-        when(userTypeRepositoryGateway.save(any(UserType.class))).thenReturn(userTypeUpdates);
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userTypeRepository.findByName("BASIC")).thenReturn(Optional.of(existingUserType));
+        when(userTypeRepository.save(any(UserType.class))).thenReturn(userTypeUpdates);
 
         // Act
         UserType result = updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates);
 
         // Assert
         assertNotNull(result);
-        verify(userTypeRepositoryGateway).save(userTypeUpdates);
+        verify(userTypeRepository).save(userTypeUpdates);
     }
 
     @Test
@@ -153,14 +153,14 @@ class UpdateUserTypeUseCaseTest {
         // Arrange
         userTypeUpdates.setName(null);
 
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
-        when(userTypeRepositoryGateway.save(any(UserType.class))).thenReturn(userTypeUpdates);
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userTypeRepository.save(any(UserType.class))).thenReturn(userTypeUpdates);
 
         // Act
         updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates);
 
         // Assert
         assertEquals("BASIC", userTypeUpdates.getName());
-        verify(userTypeRepositoryGateway).save(userTypeUpdates);
+        verify(userTypeRepository).save(userTypeUpdates);
     }
 }

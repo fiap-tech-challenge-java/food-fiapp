@@ -4,22 +4,15 @@ import com.fiap.foodfiapp.core.application.usecases.menuitem.UpdateMenuItemUseCa
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
 public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
     private final MenuItemRepository menuItemRepository;
     private final FileStorageRepository fileStorageRepository;
 
-    @Transactional
-    public MenuItem execute(UUID id, MenuItem menuItemUpdates, MultipartFile photo) throws IOException {
+    public MenuItem execute(UUID id, MenuItem menuItemUpdates, String photo) throws IOException {
         var existingItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Menu item not found"));
 

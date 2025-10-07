@@ -4,10 +4,8 @@ import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.application.usecases.address.UpdateAddressUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Address;
 import com.fiap.foodfiapp.core.domain.exception.AddressNotFoundException;
-import org.springframework.stereotype.Service;
 import java.util.UUID;
 
-@Service
 public class UpdateAddressUseCaseImpl implements UpdateAddressUseCase {
 
     private final AddressRepository addressRepository;

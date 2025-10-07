@@ -1,35 +1,33 @@
 package com.fiap.foodfiapp.core.application.usecases.user.impl;
 
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.exception.UserNotFoundException;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public class FindUserUseCaseImpl implements FindUserUseCase {
-    private final UserRepositoryGateway userRepositoryGateway;
+    private final UserRepository userRepository;
 
-    public FindUserUseCaseImpl(UserRepositoryGateway userRepositoryGateway) {
-        this.userRepositoryGateway = userRepositoryGateway;
+    public FindUserUseCaseImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public List<User> findAll() {
-        return this.userRepositoryGateway.findAll();
+        return this.userRepository.findAll();
     }
 
     @Override
     public User findUserByEmail(String email) {
-        return userRepositoryGateway.findByEmail(email)
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("email", email));
     }
 
     @Override
     public User findUserByUsername(String username) {
-        return userRepositoryGateway.findByLogin(username)
+        return userRepository.findByLogin(username)
                 .orElseThrow(() -> new UserNotFoundException("login", username));
     }
 }

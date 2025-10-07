@@ -8,6 +8,7 @@ import java.util.UUID;
 public interface RestaurantRepository {
     Restaurant createRestaurant(Restaurant createRestaurant);
     Restaurant findById(UUID id);
+    Boolean findByIdActive(UUID id);
     Restaurant findByName(String name, UUID userId);
     List<Restaurant> findAllByUserId(UUID userId);
     Restaurant updateRestaurant(Restaurant updateRestaurant);

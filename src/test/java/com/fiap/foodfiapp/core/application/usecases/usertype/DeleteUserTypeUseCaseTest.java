@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.core.application.usecases.usertype;
 
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.CoreUserTypeModificationException;
@@ -21,10 +21,10 @@ import static org.mockito.Mockito.*;
 class DeleteUserTypeUseCaseTest {
 
     @Mock
-    private UserTypeRepositoryGateway userTypeRepositoryGateway;
+    private UserTypeRepository userTypeRepository;
 
     @Mock
-    private UserRepositoryGateway userRepositoryGateway;
+    private UserRepository userRepository;
 
     private DeleteUserTypeUseCaseImpl deleteUserTypeUseCase;
 
@@ -33,7 +33,7 @@ class DeleteUserTypeUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        deleteUserTypeUseCase = new DeleteUserTypeUseCaseImpl(userTypeRepositoryGateway, userRepositoryGateway);
+        deleteUserTypeUseCase = new DeleteUserTypeUseCaseImpl(userTypeRepository, userRepository);
         userTypeUuid = UUID.randomUUID();
     }
 
@@ -42,30 +42,30 @@ class DeleteUserTypeUseCaseTest {
         // Arrange
         UserType userType = new UserType();
         userType.setName("BASIC");
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(userType));
-        when(userRepositoryGateway.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(userType));
+        when(userRepository.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
 
         // Act
         deleteUserTypeUseCase.execute(userTypeUuid);
 
         // Assert
-        verify(userTypeRepositoryGateway).findById(userTypeUuid);
-        verify(userRepositoryGateway).existsByUserTypeUuid(userTypeUuid);
-        verify(userTypeRepositoryGateway).deleteById(userTypeUuid);
+        verify(userTypeRepository).findById(userTypeUuid);
+        verify(userRepository).existsByUserTypeUuid(userTypeUuid);
+        verify(userTypeRepository).deleteById(userTypeUuid);
     }
 
     @Test
     void shouldThrowExceptionWhenUserTypeNotFound() {
         // Arrange
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.empty());
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(UserTypeNotFoundException.class,
             () -> deleteUserTypeUseCase.execute(userTypeUuid));
 
-        verify(userTypeRepositoryGateway).findById(userTypeUuid);
-        verify(userRepositoryGateway, never()).existsByUserTypeUuid(any());
-        verify(userTypeRepositoryGateway, never()).deleteById(any());
+        verify(userTypeRepository).findById(userTypeUuid);
+        verify(userRepository, never()).existsByUserTypeUuid(any());
+        verify(userTypeRepository, never()).deleteById(any());
     }
 
     @Test
@@ -73,16 +73,16 @@ class DeleteUserTypeUseCaseTest {
         // Arrange
         UserType userType = new UserType();
         userType.setName("BASIC");
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(userType));
-        when(userRepositoryGateway.existsByUserTypeUuid(userTypeUuid)).thenReturn(true);
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(userType));
+        when(userRepository.existsByUserTypeUuid(userTypeUuid)).thenReturn(true);
 
         // Act & Assert
         assertThrows(UserTypeInUseException.class,
             () -> deleteUserTypeUseCase.execute(userTypeUuid));
 
-        verify(userTypeRepositoryGateway).findById(userTypeUuid);
-        verify(userRepositoryGateway).existsByUserTypeUuid(userTypeUuid);
-        verify(userTypeRepositoryGateway, never()).deleteById(any());
+        verify(userTypeRepository).findById(userTypeUuid);
+        verify(userRepository).existsByUserTypeUuid(userTypeUuid);
+        verify(userTypeRepository, never()).deleteById(any());
     }
 
     @Test
@@ -90,14 +90,14 @@ class DeleteUserTypeUseCaseTest {
         // Arrange
         UserType userType = new UserType();
         userType.setName("ADMIN");
-        when(userTypeRepositoryGateway.findById(userTypeUuid)).thenReturn(Optional.of(userType));
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(userType));
 
         // Act & Assert
         assertThrows(CoreUserTypeModificationException.class,
             () -> deleteUserTypeUseCase.execute(userTypeUuid));
 
-        verify(userTypeRepositoryGateway).findById(userTypeUuid);
-        verify(userRepositoryGateway, never()).existsByUserTypeUuid(any());
-        verify(userTypeRepositoryGateway, never()).deleteById(any());
+        verify(userTypeRepository).findById(userTypeUuid);
+        verify(userRepository, never()).existsByUserTypeUuid(any());
+        verify(userTypeRepository, never()).deleteById(any());
     }
 }

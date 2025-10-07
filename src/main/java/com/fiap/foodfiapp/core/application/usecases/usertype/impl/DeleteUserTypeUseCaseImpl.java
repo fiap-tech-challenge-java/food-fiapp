@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.core.application.usecases.usertype.impl;
 
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.CoreUserTypeModificationException;
@@ -14,16 +14,16 @@ import java.util.UUID;
 
 public class DeleteUserTypeUseCaseImpl implements DeleteUserTypeUseCase {
     private static final List<String> CORE_USER_TYPES = Arrays.asList("OWNER", "CUSTOMER", "ADMIN");
-    private final UserTypeRepositoryGateway userTypeRepositoryGateway;
-    private final UserRepositoryGateway userRepositoryGateway;
+    private final UserTypeRepository userTypeRepository;
+    private final UserRepository userRepository;
 
-    public DeleteUserTypeUseCaseImpl(UserTypeRepositoryGateway userTypeRepositoryGateway, UserRepositoryGateway userRepositoryGateway) {
-        this.userTypeRepositoryGateway = userTypeRepositoryGateway;
-        this.userRepositoryGateway = userRepositoryGateway;
+    public DeleteUserTypeUseCaseImpl(UserTypeRepository userTypeRepository, UserRepository userRepository) {
+        this.userTypeRepository = userTypeRepository;
+        this.userRepository = userRepository;
     }
 
     public void execute(UUID uuid) {
-        UserType userType = userTypeRepositoryGateway.findById(uuid)
+        UserType userType = userTypeRepository.findById(uuid)
                 .orElseThrow(() -> new UserTypeNotFoundException("User type not found."));
 
         if (CORE_USER_TYPES.contains(userType.getName().toUpperCase())) {
@@ -31,10 +31,10 @@ public class DeleteUserTypeUseCaseImpl implements DeleteUserTypeUseCase {
         }
 
         // Verificar se há usuários usando este UserType
-        if (userRepositoryGateway.existsByUserTypeUuid(uuid)) {
+        if (userRepository.existsByUserTypeUuid(uuid)) {
             throw new UserTypeInUseException();
         }
 
-        userTypeRepositoryGateway.deleteById(uuid);
+        userTypeRepository.deleteById(uuid);
     }
 }

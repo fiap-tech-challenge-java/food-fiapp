@@ -3,14 +3,10 @@ package com.fiap.foodfiapp.core.application.usecases.menuitem.impl;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.FindMenuItemsByRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
 public class FindMenuItemsByRestaurantUseCaseImpl implements FindMenuItemsByRestaurantUseCase {
     private final MenuItemRepository menuItemRepository;
 

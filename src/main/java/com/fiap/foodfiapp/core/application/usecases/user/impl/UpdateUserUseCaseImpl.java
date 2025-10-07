@@ -1,31 +1,29 @@
 package com.fiap.foodfiapp.core.application.usecases.user.impl;
 
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
-import org.springframework.stereotype.Service;
 import java.util.UUID;
 
-@Service
 public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
-    private final UserRepositoryGateway userRepositoryGateway;
-    private final UserTypeRepositoryGateway userTypeRepositoryGateway;
+    private final UserRepository userRepository;
+    private final UserTypeRepository userTypeRepository;
 
-    public UpdateUserUseCaseImpl(UserRepositoryGateway userRepositoryGateway, UserTypeRepositoryGateway userTypeRepositoryGateway) {
-        this.userRepositoryGateway = userRepositoryGateway;
-        this.userTypeRepositoryGateway = userTypeRepositoryGateway;
+    public UpdateUserUseCaseImpl(UserRepository userRepository, UserTypeRepository userTypeRepository) {
+        this.userRepository = userRepository;
+        this.userTypeRepository = userTypeRepository;
     }
 
     @Override
     public User execute(UUID userId, User userUpdates) {
-        User existingUser = userRepositoryGateway.findById(userId)
+        User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException("User not found."));
 
         if (userUpdates.getUserType() != null && userUpdates.getUserType().getUuid() != null) {
-            UserType userType = userTypeRepositoryGateway.findById(userUpdates.getUserType().getUuid())
+            UserType userType = userTypeRepository.findById(userUpdates.getUserType().getUuid())
                     .orElseThrow(() -> new BusinessException("User type not found."));
             userUpdates.setUserType(userType);
         } else {
@@ -33,7 +31,7 @@ public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
         }
 
         if (userUpdates.getEmail() != null && !userUpdates.getEmail().equals(existingUser.getEmail())) {
-            userRepositoryGateway.findByEmail(userUpdates.getEmail()).ifPresent(user -> {
+            userRepository.findByEmail(userUpdates.getEmail()).ifPresent(user -> {
                 if (!user.getId().equals(userId)) {
                     throw new BusinessException("User with this email already exists.");
                 }
@@ -43,6 +41,6 @@ public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
         userUpdates.setId(userId);
         userUpdates.setCreatedAt(existingUser.getCreatedAt());
 
-        return userRepositoryGateway.save(userUpdates);
+        return userRepository.save(userUpdates);
     }
 }
