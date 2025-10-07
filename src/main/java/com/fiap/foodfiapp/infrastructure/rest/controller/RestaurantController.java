@@ -5,6 +5,7 @@ import com.fiap.foodfiapp.core.application.usecases.restaurant.CreateRestaurantU
 import com.fiap.foodfiapp.core.application.usecases.restaurant.DeleteRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantByIdUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.FindAllPublicRestaurantsUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
@@ -15,6 +16,7 @@ import com.fiap.foodfiapp.model.UpdateRestaurantRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
@@ -30,7 +32,7 @@ public class RestaurantController implements RestaurantsApi {
     private final FindRestaurantByIdUseCase findRestaurantByIdUseCase;
     private final UpdateRestaurantUseCase updateRestaurantUseCase;
     private final DeleteRestaurantUseCase deleteRestaurantUseCase;
-    // Se no futuro houver "FindAllRestaurantsUseCase", injete-o aqui.
+    private final FindAllPublicRestaurantsUseCase findAllPublicRestaurantsUseCase;
     private final UserRepository userRepository;
 
     private final RestaurantMapper restaurantMapper = RestaurantMapper.INSTANCE;
@@ -70,9 +72,16 @@ public class RestaurantController implements RestaurantsApi {
     @Override
     public ResponseEntity<RestaurantResponse> restaurantsPost(CreateRestaurantRequest createRestaurantRequest) {
         Restaurant restaurant = restaurantMapper.toRestaurant(createRestaurantRequest);
-        restaurant.setUserOwnerId(createRestaurantRequest.getOwnerId());
-        Restaurant created = createRestaurantUseCase.execute(restaurant);
+        // Pegamos o ID do usuário "autenticado" a partir do request (ownerId) até termos integração com Security
+        UUID authenticatedUserId = createRestaurantRequest.getOwnerId();
+        Restaurant created = createRestaurantUseCase.execute(authenticatedUserId, restaurant);
         return ResponseEntity.status(HttpStatus.CREATED).body(enrichResponseWithOwner(created));
+    }
+
+    @GetMapping("/restaurants/public")
+    public ResponseEntity<List<RestaurantResponse>> getPublicRestaurants() {
+        List<Restaurant> restaurants = findAllPublicRestaurantsUseCase.execute();
+        return ResponseEntity.ok(restaurantMapper.toRestaurantResponseListWithoutOwner(restaurants));
     }
 
     // ===== Auxiliar =====

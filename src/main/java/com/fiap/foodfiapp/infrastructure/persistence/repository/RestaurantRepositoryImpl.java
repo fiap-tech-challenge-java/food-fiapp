@@ -7,7 +7,6 @@ import com.fiap.foodfiapp.infrastructure.persistence.springdata.RestaurantSpring
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -71,5 +70,14 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
         var entity = restaurantMapper.toEntity(restaurant);
         var savedEntity = restaurantSpringDataRepository.save(entity);
         return restaurantMapper.toDomain(savedEntity);
+    }
+
+    @Override
+    public List<Restaurant> findAllActive() {
+        return restaurantSpringDataRepository.findAll()
+                .stream()
+                .filter(entity -> Boolean.TRUE.equals(entity.getIsActive()))
+                .map(restaurantMapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

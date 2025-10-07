@@ -1,9 +1,7 @@
-target
 .git
-.gitignore
-Dockerfile
-docker-compose.yml
-README.md
-*/.iml
-.idea
-.vscode
+target
+**/target
+**/.idea
+**/.mvn/wrapper
+**/.DS_Store
+**/node_modules

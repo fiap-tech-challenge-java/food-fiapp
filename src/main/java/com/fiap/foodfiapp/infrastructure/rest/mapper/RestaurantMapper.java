@@ -35,6 +35,13 @@ public interface RestaurantMapper {
 
     List<RestaurantResponse> toRestaurantResponseList(List<Restaurant> restaurants);
 
+    @Mapping(source = "address", target = "address", qualifiedByName = "addressToString")
+    @Mapping(source = "active", target = "isActive")
+    @Mapping(target = "owner", ignore = true)
+    RestaurantResponse toRestaurantResponseWithoutOwner(Restaurant restaurant);
+
+    List<RestaurantResponse> toRestaurantResponseListWithoutOwner(List<Restaurant> restaurants);
+
     @Named("addressToString")
     default String addressToString(Address address) {
         if (address == null) {

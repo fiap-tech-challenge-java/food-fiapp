@@ -61,6 +61,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: final
+      args:
+        OPENAPI_SHA: ${OPENAPI_SHA}
     ports:
       - "8080:8080"
     env_file:

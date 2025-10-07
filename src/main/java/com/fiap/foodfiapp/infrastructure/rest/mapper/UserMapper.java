@@ -31,7 +31,6 @@ public interface UserMapper {
     User toUser(UpdateUserRequest updateUserRequest);
 
     @Mapping(source = "userType", target = "userType", qualifiedByName = "userTypeToName")
-    @Mapping(target = "addresses", ignore = true) // Ignora na resposta, pois será populado separadamente
     UserResponse toUserResponse(User user);
 
     List<UserResponse> toUserResponseList(List<User> users);

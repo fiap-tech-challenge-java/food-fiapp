@@ -22,8 +22,8 @@ public class MenuItemUseCaseConfig {
     }
 
     @Bean
-    public UpdateMenuItemUseCase updateMenuItemUseCase(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository) {
-        return new UpdateMenuItemUseCaseImpl(menuItemRepository, fileStorageRepository);
+    public UpdateMenuItemUseCase updateMenuItemUseCase(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository, RestaurantRepository restaurantRepository) {
+        return new UpdateMenuItemUseCaseImpl(menuItemRepository, fileStorageRepository, restaurantRepository);
     }
 
     @Bean

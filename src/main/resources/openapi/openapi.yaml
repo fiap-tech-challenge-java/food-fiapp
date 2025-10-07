@@ -390,7 +390,7 @@ paths:
         - address
       security:
         - bearerAuth: []
-      operationId: listAddressesByUserId
+      operationId: listAddressByUserId
       summary: Lista todos os enderecos de um usuario.
       description: Retorna uma lista de todos os enderecos associados a um usuario especifico.
       responses:
@@ -1324,7 +1324,7 @@ components:
           type: string
           description: Nome do restaurante.
           example: Restaurante da Praca
-        addresses:
+        address:
           type: array
           items:
             $ref: '#/components/schemas/AddressResponse'

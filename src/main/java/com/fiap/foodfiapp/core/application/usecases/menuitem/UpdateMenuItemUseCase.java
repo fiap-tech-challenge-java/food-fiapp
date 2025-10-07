@@ -7,5 +7,5 @@ import java.io.IOException;
 import java.util.UUID;
 
 public interface UpdateMenuItemUseCase {
-    MenuItem execute(UUID id, MenuItem menuItemUpdates, FileUploadRequest photo) throws IOException;
+    MenuItem execute(UUID authenticatedUserId, UUID id, MenuItem menuItemUpdates, FileUploadRequest photo) throws IOException;
 }

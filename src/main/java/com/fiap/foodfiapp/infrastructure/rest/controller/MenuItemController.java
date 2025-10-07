@@ -10,11 +10,15 @@ import com.fiap.foodfiapp.model.MenuItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -75,7 +79,7 @@ public class MenuItemController implements MenuItemsApi {
     public ResponseEntity<MenuItemResponse> updateMenuItem(UUID restaurantId, UUID itemId, String name, String description, Double price, Boolean availableForInStoreOnly, MultipartFile photo) {
         try {
             MenuItem menuItemUpdate = new MenuItem(itemId, name, description, price,
-                    availableForInStoreOnly != null && availableForInStoreOnly,
+                    availableForInStoreInOnly(availableForInStoreOnly),
                     null, restaurantId, null, null);
 
             FileUploadRequest fileUploadRequest = null;
@@ -84,10 +88,40 @@ public class MenuItemController implements MenuItemsApi {
                         photo.getContentType(), photo.getOriginalFilename());
             }
 
-            MenuItem updatedItem = updateMenuItemUseCase.execute(itemId, menuItemUpdate, fileUploadRequest);
+            UUID authenticatedUserId = resolveAuthenticatedUserId();
+
+            MenuItem updatedItem = updateMenuItemUseCase.execute(authenticatedUserId, itemId, menuItemUpdate, fileUploadRequest);
             return ResponseEntity.ok(menuItemMapper.toMenuItemResponse(updatedItem));
         } catch (IOException e) {
             throw new FileStorageException("Failed to process menu item photo on update", e);
         }
+    }
+
+    private boolean availableForInStoreInOnly(Boolean availableForInStoreOnly) {
+        return availableForInStoreOnly != null && availableForInStoreOnly;
+    }
+
+    private UUID resolveAuthenticatedUserId() {
+        // Try SecurityContext first
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getName() != null) {
+            try {
+                return UUID.fromString(auth.getName());
+            } catch (IllegalArgumentException ignored) { }
+        }
+        // Fallback to header X-User-Id (useful in tests or when security is not wired)
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attrs != null) {
+            HttpServletRequest request = attrs.getRequest();
+            if (request != null) {
+                String userIdHeader = request.getHeader("X-User-Id");
+                if (userIdHeader != null && !userIdHeader.isBlank()) {
+                    try {
+                        return UUID.fromString(userIdHeader);
+                    } catch (IllegalArgumentException ignored) { }
+                }
+            }
+        }
+        return null;
     }
 }

@@ -14,4 +14,5 @@ public interface RestaurantRepository {
     List<Restaurant> findAllByUserId(UUID userId);
     void delete(UUID id);
     Restaurant update(Restaurant restaurant);
+    List<Restaurant> findAllActive();
 }

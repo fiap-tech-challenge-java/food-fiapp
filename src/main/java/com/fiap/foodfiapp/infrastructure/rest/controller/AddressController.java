@@ -38,8 +38,8 @@ public class AddressController implements AddressesApi {
 
     @Override
     public ResponseEntity<List<AddressResponse>> listAddressesByUserId(UUID userId) {
-        var addresses = findAddressesByOwnerUseCase.execute(userId, AddressesOwnerTypeEnum.USER.getDescription());
-        return ResponseEntity.ok(addressMapper.toAddressResponseList(addresses));
+        var address = findAddressesByOwnerUseCase.execute(userId, AddressesOwnerTypeEnum.USER.getDescription());
+        return ResponseEntity.ok(addressMapper.toAddressResponseList(address));
     }
 
     @Override
@@ -51,9 +51,8 @@ public class AddressController implements AddressesApi {
 
     @Override
     public ResponseEntity<Void> deleteAddressForUser(UUID userId, UUID addressId) {
-        // A lógica do use case já valida se o endereço existe.
-        // Poderíamos adicionar uma validação extra para garantir que o endereço pertence ao userId, se necessário.
-        deleteAddressUseCase.execute(addressId);
+        // RN16 é aplicada no use case: impede remover o último endereço ativo
+        deleteAddressUseCase.execute(userId, addressId, AddressesOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.noContent().build();
     }
 }

@@ -3,6 +3,9 @@ package com.fiap.foodfiapp.infrastructure.config;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.*;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.impl.*;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
+import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,13 +13,15 @@ import org.springframework.context.annotation.Configuration;
 public class RestaurantUseCaseConfig {
 
     @Bean
-    public CreateRestaurantUseCase createRestaurantUseCase(RestaurantRepository restaurantRepository) {
-        return new CreateRestaurantUseCaseImpl(restaurantRepository);
+    public CreateRestaurantUseCase createRestaurantUseCase(RestaurantRepository restaurantRepository, UserRepository userRepository) {
+        return new CreateRestaurantUseCaseImpl(restaurantRepository, userRepository);
     }
 
     @Bean
-    public DeleteRestaurantUseCase deleteRestaurantUseCase(RestaurantRepository restaurantRepository) {
-        return new DeleteRestaurantUseCaseImpl(restaurantRepository);
+    public DeleteRestaurantUseCase deleteRestaurantUseCase(RestaurantRepository restaurantRepository,
+                                                           MenuItemRepository menuItemRepository,
+                                                           AddressRepository addressRepository) {
+        return new DeleteRestaurantUseCaseImpl(restaurantRepository, menuItemRepository, addressRepository);
     }
 
     @Bean
@@ -42,5 +47,10 @@ public class RestaurantUseCaseConfig {
     @Bean
     public ChangeOwnerRestaurantUseCase changeOwnerRestaurantUseCase(RestaurantRepository restaurantRepository) {
         return new ChangeOwnerRestaurantUseCaseImpl(restaurantRepository);
+    }
+
+    @Bean
+    public FindAllPublicRestaurantsUseCase findAllPublicRestaurantsUseCase(RestaurantRepository restaurantRepository) {
+        return new FindAllPublicRestaurantsUseCaseImpl(restaurantRepository);
     }
 }

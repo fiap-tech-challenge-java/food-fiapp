@@ -27,7 +27,51 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
 
     @Override
     public User execute(User user) {
-        // Validações de negócio
+        // RN: Reviver utilizador inativo se houver match por e-mail
+        var existingByEmail = userRepository.findByEmail(user.getEmail());
+        if (existingByEmail.isPresent()) {
+            var existing = existingByEmail.get();
+            if (Boolean.TRUE.equals(existing.getIsActive())) {
+                // Mantém a lógica atual de conflito quando já está ativo
+                throw new BusinessException("User with this email already exists.");
+            }
+            // Revive usuário inativo com os novos dados
+            applyUserUpdates(existing, user);
+            existing.setIsActive(true);
+            var revived = userRepository.save(existing);
+            // Salvar endereços novos, se informados
+            if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
+                var savedAddresses = user.getAddresses().stream()
+                        .map(address -> addressRepository.save(address, revived.getId(), AddressesOwnerTypeEnum.USER.getDescription()))
+                        .collect(Collectors.toList());
+                revived.setAddresses(savedAddresses);
+            }
+            return revived;
+        }
+
+        // RN: Reviver utilizador inativo se houver match por CPF
+        var existingByCpf = userRepository.findByCpf(user.getCpf());
+        if (existingByCpf.isPresent()) {
+            var existing = existingByCpf.get();
+            if (Boolean.TRUE.equals(existing.getIsActive())) {
+                // Mantém a lógica atual de conflito quando já está ativo
+                throw new CpfAlreadyExistsException(user.getCpf());
+            }
+            // Revive usuário inativo com os novos dados
+            applyUserUpdates(existing, user);
+            existing.setIsActive(true);
+            var revived = userRepository.save(existing);
+            // Salvar endereços novos, se informados
+            if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
+                var savedAddresses = user.getAddresses().stream()
+                        .map(address -> addressRepository.save(address, revived.getId(), AddressesOwnerTypeEnum.USER.getDescription()))
+                        .collect(Collectors.toList());
+                revived.setAddresses(savedAddresses);
+            }
+            return revived;
+        }
+
+        // Validações de negócio (permanecem para casos sem revival)
         userRepository.findByCpf(user.getCpf()).ifPresent(existingUser -> {
             throw new CpfAlreadyExistsException(user.getCpf());
         });
@@ -57,5 +101,15 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
         }
 
         return savedUser;
+    }
+
+    private void applyUserUpdates(User target, User source) {
+        target.setName(source.getName());
+        target.setEmail(source.getEmail());
+        target.setCpf(source.getCpf());
+        target.setLogin(source.getLogin());
+        target.setPassword(source.getPassword());
+        target.setUserType(source.getUserType());
+        // Endereços são tratados após salvar o usuário (vinculados por ownerId)
     }
 }

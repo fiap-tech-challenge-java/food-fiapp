@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -182,7 +181,7 @@ public class GlobalExceptionHandler {
                                                                            HttpServletRequest request) {
         ErrorResponse errorResponse = createErrorResponse(
                 ex.getMessage(),
-                "UNAUTHORIZED_ACCESS",
+                "ACCESS_DENIED",
                 HttpStatus.FORBIDDEN,
                 request.getRequestURI()
         );
@@ -371,7 +370,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED,
                 request.getRequestURI()
         );
-        logger.warn("Invalid credentials for {}", request.getRequestURI());
+        logger.warn("Invalid credentials for {}: {}", request.getRequestURI(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
