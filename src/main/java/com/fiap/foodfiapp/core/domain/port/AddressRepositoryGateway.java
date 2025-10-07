@@ -1,4 +1,4 @@
-package com.fiap.foodfiapp.core.application.gateways;
+package com.fiap.foodfiapp.core.domain.port;
 
 import com.fiap.foodfiapp.core.domain.entity.Address;
 

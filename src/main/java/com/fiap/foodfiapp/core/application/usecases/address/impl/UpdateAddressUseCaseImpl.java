@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.core.application.usecases.address.impl;
 
-import com.fiap.foodfiapp.core.application.gateways.AddressRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.AddressRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.address.UpdateAddressUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Address;
 import com.fiap.foodfiapp.core.domain.exception.AddressNotFoundException;

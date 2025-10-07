@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.persistence.repository;
 
-import com.fiap.foodfiapp.core.application.gateways.RestaurantRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.RestaurantRepositoryGateway;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.CreateRestaurant;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.CreatedRestaurant;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.Restaurant;

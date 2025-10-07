@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.core.application.usecases.address.impl;
 
-import com.fiap.foodfiapp.core.application.gateways.AddressRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.AddressRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.address.CreateAddressUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Address;
 import org.springframework.stereotype.Service;

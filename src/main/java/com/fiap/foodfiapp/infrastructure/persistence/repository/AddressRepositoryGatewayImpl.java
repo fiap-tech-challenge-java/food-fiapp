@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.persistence.repository;
 
-import com.fiap.foodfiapp.core.application.gateways.AddressRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.AddressRepositoryGateway;
 import com.fiap.foodfiapp.core.domain.entity.Address;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.mapper.AddressPersistenceMapper;

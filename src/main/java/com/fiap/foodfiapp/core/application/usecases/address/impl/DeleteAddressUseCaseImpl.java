@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.core.application.usecases.address.impl;
 
-import com.fiap.foodfiapp.core.application.gateways.AddressRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.AddressRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.address.DeleteAddressUseCase;
 import com.fiap.foodfiapp.core.domain.exception.AddressNotFoundException;
 import org.springframework.stereotype.Service;
