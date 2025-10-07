@@ -31,8 +31,7 @@ public class MenuItemController implements MenuItemsApi {
     private final MenuItemMapper menuItemMapper = MenuItemMapper.INSTANCE;
 
     @Override
-    public ResponseEntity<MenuItemResponse> createMenuItem(UUID restaurantId, String name, String description,
-                                                           BigDecimal price, Boolean availableForInStoreOnly, MultipartFile photo) {
+    public ResponseEntity<MenuItemResponse> createMenuItem(UUID restaurantId, String name, String description, Double price, Boolean availableForInStoreOnly, MultipartFile photo) {
         try {
             MenuItem menuItem = new MenuItem(null, name, description, price,
                     availableForInStoreOnly != null && availableForInStoreOnly,
@@ -73,8 +72,7 @@ public class MenuItemController implements MenuItemsApi {
     }
 
     @Override
-    public ResponseEntity<MenuItemResponse> updateMenuItem(UUID restaurantId, UUID itemId, String name, String description,
-                                                           BigDecimal price, Boolean availableForInStoreOnly, MultipartFile photo) {
+    public ResponseEntity<MenuItemResponse> updateMenuItem(UUID restaurantId, UUID itemId, String name, String description, Double price, Boolean availableForInStoreOnly, MultipartFile photo) {
         try {
             MenuItem menuItemUpdate = new MenuItem(itemId, name, description, price,
                     availableForInStoreOnly != null && availableForInStoreOnly,

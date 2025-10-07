@@ -46,6 +46,11 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
     }
 
     @Override
+    public Restaurant changeOwner(UUID restaurantId, UUID newOwnerId) {
+        return null;
+    }
+
+    @Override
     public List<Restaurant> findAllByUserId(UUID userId) {
         return restaurantSpringDataRepository.findAllByUserOwnerIdAndActiveTrue(userId)
                 .orElse(Collections.emptyList())
@@ -60,5 +65,12 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
             entity.setIsActive(false);
             restaurantSpringDataRepository.save(entity);
         });
+    }
+
+    @Override
+    public Restaurant update(Restaurant restaurant) {
+        var entity = restaurantMapper.toEntity(restaurant);
+        var savedEntity = restaurantSpringDataRepository.save(entity);
+        return restaurantMapper.toDomain(savedEntity);
     }
 }

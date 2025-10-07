@@ -1,7 +1,10 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.RestaurantsApi;
-import com.fiap.foodfiapp.core.application.usecases.restaurant.*;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.CreateRestaurantUseCase;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.DeleteRestaurantUseCase;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantByIdUseCase;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
@@ -18,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,32 +30,29 @@ public class RestaurantController implements RestaurantsApi {
     private final FindRestaurantByIdUseCase findRestaurantByIdUseCase;
     private final UpdateRestaurantUseCase updateRestaurantUseCase;
     private final DeleteRestaurantUseCase deleteRestaurantUseCase;
-    private final FindAllRestaurantsByUserIdUseCase findAllRestaurantsByUserIdUseCase;
-
-    private final UserRepository userRepository; // Para buscar os dados do dono
+    // Se no futuro houver "FindAllRestaurantsUseCase", injete-o aqui.
+    private final UserRepository userRepository;
 
     private final RestaurantMapper restaurantMapper = RestaurantMapper.INSTANCE;
     private final UserMapper userMapper = UserMapper.INSTANCE;
 
-    @Override
-    public ResponseEntity<RestaurantResponse> createRestaurant(CreateRestaurantRequest createRestaurantRequest) {
-        Restaurant restaurant = restaurantMapper.toRestaurant(createRestaurantRequest);
-        // O ownerId vem no DTO, precisamos passá-lo para a entidade de domínio
-        restaurant.setUserOwnerId(createRestaurantRequest.getOwnerId());
+    // ===== Implementações geradas pelo OpenAPI =====
 
-        Restaurant createdRestaurant = createRestaurantUseCase.execute(restaurant);
-        RestaurantResponse response = enrichResponseWithOwner(createdRestaurant);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    @Override
+    public ResponseEntity<List<RestaurantResponse>> restaurantsGet() {
+        // Sem UC para "listar todos", retornamos lista vazia para cumprir contrato.
+        // TODO: criar FindAllRestaurantsUseCase e mapear aqui.
+        return ResponseEntity.ok(Collections.emptyList());
     }
 
     @Override
-    public ResponseEntity<Void> deleteRestaurant(UUID id) {
+    public ResponseEntity<Void> restaurantsIdDelete(UUID id) {
         deleteRestaurantUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<RestaurantResponse> getRestaurant(UUID id) {
+    public ResponseEntity<RestaurantResponse> restaurantsIdGet(UUID id) {
         return Optional.ofNullable(findRestaurantByIdUseCase.execute(id))
                 .map(this::enrichResponseWithOwner)
                 .map(ResponseEntity::ok)
@@ -61,34 +60,29 @@ public class RestaurantController implements RestaurantsApi {
     }
 
     @Override
-    public ResponseEntity<List<RestaurantResponse>> listRestaurants() {
-        // A API define um endpoint para listar TODOS os restaurantes.
-        // Se a regra de negócio for listar apenas por usuário, o openapi.yaml precisaria ser ajustado.
-        // Por enquanto, vamos retornar uma lista vazia para cumprir o contrato.
-        // Se houver um use case para buscar todos, ele seria usado aqui.
-        List<RestaurantResponse> response = Collections.emptyList();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<RestaurantResponse> restaurantsIdPut(UUID id, UpdateRestaurantRequest updateRestaurantRequest) {
+        Restaurant updates = restaurantMapper.toRestaurant(updateRestaurantRequest);
+        updates.setId(id);
+        Restaurant updated = updateRestaurantUseCase.execute(updates);
+        return ResponseEntity.ok(enrichResponseWithOwner(updated));
     }
 
     @Override
-    public ResponseEntity<RestaurantResponse> updateRestaurant(UUID id, UpdateRestaurantRequest updateRestaurantRequest) {
-        Restaurant restaurantUpdates = restaurantMapper.toRestaurant(updateRestaurantRequest);
-        restaurantUpdates.setId(id); // O ID vem do path da URL
-
-        Restaurant updatedRestaurant = updateRestaurantUseCase.execute(restaurantUpdates);
-        return ResponseEntity.ok(enrichResponseWithOwner(updatedRestaurant));
+    public ResponseEntity<RestaurantResponse> restaurantsPost(CreateRestaurantRequest createRestaurantRequest) {
+        Restaurant restaurant = restaurantMapper.toRestaurant(createRestaurantRequest);
+        restaurant.setUserOwnerId(createRestaurantRequest.getOwnerId());
+        Restaurant created = createRestaurantUseCase.execute(restaurant);
+        return ResponseEntity.status(HttpStatus.CREATED).body(enrichResponseWithOwner(created));
     }
 
-    /**
-     * Método auxiliar para popular os dados do proprietário (owner) na resposta.
-     */
+    // ===== Auxiliar =====
+
     private RestaurantResponse enrichResponseWithOwner(Restaurant restaurant) {
-        RestaurantResponse response = restaurantMapper.toRestaurantResponse(restaurant);
+        RestaurantResponse resp = restaurantMapper.toRestaurantResponse(restaurant);
         if (restaurant.getUserOwnerId() != null) {
-            userRepository.findById(restaurant.getUserOwnerId()).ifPresent(owner -> {
-                response.setOwner(userMapper.toUserResponse(owner));
-            });
+            userRepository.findById(restaurant.getUserOwnerId())
+                    .ifPresent(owner -> resp.setOwner(userMapper.toUserResponse(owner)));
         }
-        return response;
+        return resp;
     }
 }

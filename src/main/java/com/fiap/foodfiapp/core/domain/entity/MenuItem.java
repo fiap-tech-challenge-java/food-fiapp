@@ -9,13 +9,13 @@ public class MenuItem extends BaseEntity {
     private UUID id;
     private String name;
     private String description;
-    private BigDecimal price;
+    private Double price;
     private boolean localOnly;
     private String photoUrl;
     private UUID restaurantId;
 
     // Construtor principal
-    public MenuItem(UUID id, String name, String description, BigDecimal price, boolean localOnly, String photoUrl, UUID restaurantId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
+    public MenuItem(UUID id, String name, String description, Double price, boolean localOnly, String photoUrl, UUID restaurantId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -31,7 +31,7 @@ public class MenuItem extends BaseEntity {
     public UUID getId() { return id; }
     public String getName() { return name; }
     public String getDescription() { return description; }
-    public BigDecimal getPrice() { return price; }
+    public Double getPrice() { return price; }
     public boolean isLocalOnly() { return localOnly; }
     public String getPhotoUrl() { return photoUrl; }
     public UUID getRestaurantId() { return restaurantId; }
@@ -40,7 +40,7 @@ public class MenuItem extends BaseEntity {
     public void setId(UUID id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setDescription(String description) { this.description = description; }
-    public void setPrice(BigDecimal price) { this.price = price; }
+    public void setPrice(Double price) { this.price = price; }
     public void setLocalOnly(boolean localOnly) { this.localOnly = localOnly; }
     public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
     public void setRestaurantId(UUID restaurantId) { this.restaurantId = restaurantId; }
