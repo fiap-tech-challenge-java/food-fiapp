@@ -16,7 +16,6 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
     private final MenuItemRepository menuItemRepository;
     private final FileStorageRepository fileStorageRepository;
 
-    // CONSTRUTOR ADICIONADO
     public UpdateMenuItemUseCaseImpl(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository) {
         this.menuItemRepository = menuItemRepository;
         this.fileStorageRepository = fileStorageRepository;
@@ -27,47 +26,33 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
         var existingItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Menu item not found with id: " + id));
 
-        String photoUrl = existingItem.photoUrl();
+        String photoUrl = existingItem.getPhotoUrl();
         if (photo != null && photo.content() != null) {
-            // Deleta a foto antiga, se existir
-            if (existingItem.photoUrl() != null && !existingItem.photoUrl().isBlank()) {
+            if (existingItem.getPhotoUrl() != null && !existingItem.getPhotoUrl().isBlank()) {
                 try {
-                    String oldFileName = existingItem.photoUrl().substring(existingItem.photoUrl().lastIndexOf('/') + 1);
+                    String oldFileName = existingItem.getPhotoUrl().substring(existingItem.getPhotoUrl().lastIndexOf('/') + 1);
                     fileStorageRepository.delete(oldFileName);
                 } catch (IOException e) {
                     logger.warn("Failed to delete old menu item photo: {}", e.getMessage());
                 }
             }
 
-            // Salva a nova foto
             String originalFilename = photo.originalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
             }
-            String fileName = String.format("%s-%s%s", existingItem.restaurantId(), id, extension);
+            String fileName = String.format("%s-%s%s", existingItem.getRestaurantId(), id, extension);
 
-            photoUrl = fileStorageRepository.store(
-                    photo.content(),
-                    photo.size(),
-                    photo.contentType(),
-                    fileName
-            );
+            photoUrl = fileStorageRepository.store(photo.content(), photo.size(), photo.contentType(), fileName);
         }
 
-        // Cria um novo objeto MenuItem com os valores atualizados
-        var updatedItem = new MenuItem(
-                existingItem.id(),
-                menuItemUpdates.name(),
-                menuItemUpdates.description(),
-                menuItemUpdates.price(),
-                menuItemUpdates.localOnly(),
-                photoUrl,
-                existingItem.restaurantId(),
-                existingItem.createdAt(),
-                null // updatedAt será preenchido pela camada de persistência
-        );
+        existingItem.setName(menuItemUpdates.getName());
+        existingItem.setDescription(menuItemUpdates.getDescription());
+        existingItem.setPrice(menuItemUpdates.getPrice());
+        existingItem.setLocalOnly(menuItemUpdates.isLocalOnly());
+        existingItem.setPhotoUrl(photoUrl);
 
-        return menuItemRepository.save(updatedItem);
+        return menuItemRepository.save(existingItem);
     }
 }

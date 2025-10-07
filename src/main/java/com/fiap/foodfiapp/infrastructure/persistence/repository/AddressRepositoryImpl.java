@@ -19,7 +19,7 @@ public class AddressRepositoryImpl implements AddressRepository {
     private final AddressPersistenceMapper addressMapper = AddressPersistenceMapper.INSTANCE;
 
     @Override
-    public Address save(Address address) {
+    public Address save(Address address, UUID ownerId, String ownerType) {
         var entity = addressMapper.toEntity(address);
         // A lógica de atribuir o 'owner' foi movida para o UseCase,
         // mas a entidade JPA ainda precisa desses campos. O ideal é que o

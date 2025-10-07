@@ -15,6 +15,6 @@ public class FindRestaurantByNameUseCaseImpl implements FindRestaurantByNameUseC
 
     @Override
     public Restaurant execute(String name, UUID userId) {
-        return this.restaurantRepository.findByName(name, userId);
+        return this.restaurantRepository.findByNameAndUser(name, userId);
     }
 }

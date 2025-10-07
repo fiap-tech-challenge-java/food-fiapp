@@ -16,14 +16,11 @@ public class UpdateAddressUseCaseImpl implements UpdateAddressUseCase {
 
     @Override
     public Address execute(UUID addressId, Address addressUpdates, UUID ownerId, String ownerType) {
-        // 1. Garante que o endereço existe antes de tentar atualizar.
         Address existingAddress = addressRepository.findById(addressId)
                 .orElseThrow(() -> new AddressNotFoundException("Address not found."));
 
-        // 2. Garante que o ID do endereço a ser atualizado seja o correto.
         addressUpdates.setId(existingAddress.getId());
 
-        // 3. Persiste as alterações usando o método save polimórfico.
-        return addressRepository.save(addressUpdates);
+        return addressRepository.save(addressUpdates, ownerId, ownerType);
     }
 }

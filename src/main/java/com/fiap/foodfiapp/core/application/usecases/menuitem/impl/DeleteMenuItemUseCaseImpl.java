@@ -14,20 +14,19 @@ public class DeleteMenuItemUseCaseImpl implements DeleteMenuItemUseCase {
     private final MenuItemRepository menuItemRepository;
     private final FileStorageRepository fileStorageRepository;
 
-    // CONSTRUTOR ADICIONADO
     public DeleteMenuItemUseCaseImpl(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository) {
         this.menuItemRepository = menuItemRepository;
         this.fileStorageRepository = fileStorageRepository;
     }
 
-    @Override // Adicionada anotação para garantir conformidade com a interface
+    @Override
     public void execute(UUID id) {
         var menuItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Menu item not found with id: " + id));
 
-        if (menuItem.photoUrl() != null && !menuItem.photoUrl().isBlank()) {
+        if (menuItem.getPhotoUrl() != null && !menuItem.getPhotoUrl().isBlank()) {
             try {
-                String fileName = menuItem.photoUrl().substring(menuItem.photoUrl().lastIndexOf('/') + 1);
+                String fileName = menuItem.getPhotoUrl().substring(menuItem.getPhotoUrl().lastIndexOf('/') + 1);
                 fileStorageRepository.delete(fileName);
             } catch (IOException e) {
                 logger.warn("Failed to delete menu item photo, continuing with menu item deletion: {}", e.getMessage());

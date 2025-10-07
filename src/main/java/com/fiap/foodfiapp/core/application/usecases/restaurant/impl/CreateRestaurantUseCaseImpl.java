@@ -13,6 +13,6 @@ public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
 
     @Override
     public Restaurant execute(Restaurant createRestaurant) {
-        return this.restaurantRepository.createRestaurant(createRestaurant);
+        return this.restaurantRepository.save(createRestaurant);
     }
 }
