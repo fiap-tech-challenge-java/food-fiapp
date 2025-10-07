@@ -2,7 +2,6 @@ package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
-import com.fiap.foodfiapp.model.AddressResponse;
 import com.fiap.foodfiapp.model.CreateUserRequest;
 import com.fiap.foodfiapp.model.UpdateUserRequest;
 import com.fiap.foodfiapp.model.UserResponse;
@@ -20,19 +19,19 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(source = "userTypeUuid", target = "userType", qualifiedByName = "uuidToUserType")
-    @Mapping(target = "id", ignore = true) // Ignora o ID na criação
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     User toUser(CreateUserRequest createUserRequest);
 
     @Mapping(source = "userTypeUuid", target = "userType", qualifiedByName = "uuidToUserType")
-    @Mapping(target = "id", ignore = true) // O ID virá do path da URL, não do corpo
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     User toUser(UpdateUserRequest updateUserRequest);
 
     @Mapping(source = "userType", target = "userType", qualifiedByName = "userTypeToName")
-    @Mapping(source = "active", target = "isActive")
+    @Mapping(target = "addresses", ignore = true) // Ignora na resposta, pois será populado separadamente
     UserResponse toUserResponse(User user);
 
     List<UserResponse> toUserResponseList(List<User> users);
@@ -56,4 +55,3 @@ public interface UserMapper {
         return userType.getName();
     }
 }
-
