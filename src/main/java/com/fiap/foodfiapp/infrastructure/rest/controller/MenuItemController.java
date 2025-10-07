@@ -10,14 +10,8 @@ import com.fiap.foodfiapp.model.MenuItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -37,19 +31,16 @@ public class MenuItemController implements MenuItemsApi {
     @Override
     public ResponseEntity<MenuItemResponse> createMenuItem(UUID restaurantId, String name, String description, Double price, Boolean availableForInStoreOnly, MultipartFile photo) {
         try {
-            MenuItem menuItem = new MenuItem(null, name, description, price,
-                    availableForInStoreOnly != null && availableForInStoreOnly,
-                    null, restaurantId, null, null);
-
             FileUploadRequest fileUploadRequest = null;
             if (photo != null && !photo.isEmpty()) {
                 fileUploadRequest = new FileUploadRequest(photo.getInputStream(), photo.getSize(),
                         photo.getContentType(), photo.getOriginalFilename());
             }
 
-            MenuItem createdItem = createMenuItemUseCase.execute(menuItem, fileUploadRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(menuItemMapper.toMenuItemResponse(createdItem));
+            // O Controller não cria mais a entidade, apenas passa os dados para o UseCase.
+            MenuItem createdItem = createMenuItemUseCase.execute(restaurantId, name, description, price, availableForInStoreOnly, fileUploadRequest);
 
+            return ResponseEntity.status(HttpStatus.CREATED).body(menuItemMapper.toMenuItemResponse(createdItem));
         } catch (IOException e) {
             throw new FileStorageException("Failed to process menu item photo", e);
         }
@@ -78,50 +69,17 @@ public class MenuItemController implements MenuItemsApi {
     @Override
     public ResponseEntity<MenuItemResponse> updateMenuItem(UUID restaurantId, UUID itemId, String name, String description, Double price, Boolean availableForInStoreOnly, MultipartFile photo) {
         try {
-            MenuItem menuItemUpdate = new MenuItem(itemId, name, description, price,
-                    availableForInStoreInOnly(availableForInStoreOnly),
-                    null, restaurantId, null, null);
-
             FileUploadRequest fileUploadRequest = null;
             if (photo != null && !photo.isEmpty()) {
                 fileUploadRequest = new FileUploadRequest(photo.getInputStream(), photo.getSize(),
                         photo.getContentType(), photo.getOriginalFilename());
             }
 
-            UUID authenticatedUserId = resolveAuthenticatedUserId();
-
-            MenuItem updatedItem = updateMenuItemUseCase.execute(authenticatedUserId, itemId, menuItemUpdate, fileUploadRequest);
+            // O Controller não cria mais a entidade, apenas passa os dados para o UseCase.
+            MenuItem updatedItem = updateMenuItemUseCase.execute(restaurantId, itemId, name, description, price, availableForInStoreOnly, fileUploadRequest);
             return ResponseEntity.ok(menuItemMapper.toMenuItemResponse(updatedItem));
         } catch (IOException e) {
             throw new FileStorageException("Failed to process menu item photo on update", e);
         }
-    }
-
-    private boolean availableForInStoreInOnly(Boolean availableForInStoreOnly) {
-        return availableForInStoreOnly != null && availableForInStoreOnly;
-    }
-
-    private UUID resolveAuthenticatedUserId() {
-        // Try SecurityContext first
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getName() != null) {
-            try {
-                return UUID.fromString(auth.getName());
-            } catch (IllegalArgumentException ignored) { }
-        }
-        // Fallback to header X-User-Id (useful in tests or when security is not wired)
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs != null) {
-            HttpServletRequest request = attrs.getRequest();
-            if (request != null) {
-                String userIdHeader = request.getHeader("X-User-Id");
-                if (userIdHeader != null && !userIdHeader.isBlank()) {
-                    try {
-                        return UUID.fromString(userIdHeader);
-                    } catch (IllegalArgumentException ignored) { }
-                }
-            }
-        }
-        return null;
     }
 }

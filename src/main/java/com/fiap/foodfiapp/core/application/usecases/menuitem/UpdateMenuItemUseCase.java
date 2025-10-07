@@ -1,3 +1,4 @@
+// src/main/java/com/fiap/foodfiapp/core/application/usecases/menuitem/UpdateMenuItemUseCase.java
 package com.fiap.foodfiapp.core.application.usecases.menuitem;
 
 import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
@@ -7,5 +8,5 @@ import java.io.IOException;
 import java.util.UUID;
 
 public interface UpdateMenuItemUseCase {
-    MenuItem execute(UUID authenticatedUserId, UUID id, MenuItem menuItemUpdates, FileUploadRequest photo) throws IOException;
+    MenuItem execute(UUID authenticatedUserId, UUID itemId, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException;
 }

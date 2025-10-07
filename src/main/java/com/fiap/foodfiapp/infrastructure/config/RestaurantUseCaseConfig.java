@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 public class RestaurantUseCaseConfig {
 
     @Bean
-    public CreateRestaurantUseCase createRestaurantUseCase(RestaurantRepository restaurantRepository, UserRepository userRepository, AddressRepository addressRepository) {
-        return new CreateRestaurantUseCaseImpl(restaurantRepository, userRepository, addressRepository);
+    public CreateRestaurantUseCase createRestaurantUseCase(RestaurantRepository restaurantRepository, UserRepository userRepository) {
+        return new CreateRestaurantUseCaseImpl(restaurantRepository, userRepository);
     }
 
     @Bean

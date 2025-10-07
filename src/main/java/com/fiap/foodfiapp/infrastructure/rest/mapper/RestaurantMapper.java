@@ -21,6 +21,7 @@ public interface RestaurantMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "address", source = "address")
     @Mapping(target = "active", ignore = true)
+    @Mapping(target = "userOwnerId", source = "ownerId")
     Restaurant toRestaurant(CreateRestaurantRequest createRestaurantRequest);
 
     @Mapping(target = "id", ignore = true)
