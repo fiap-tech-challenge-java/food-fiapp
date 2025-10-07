@@ -8,7 +8,6 @@ import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressOwnerTypeEnum;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +26,6 @@ public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
     }
 
     @Override
-    @Transactional
     public void execute(UUID id) {
         // Busca o restaurante; se não existir, não faz nada (idempotente)
         Restaurant restaurant = restaurantRepository.findById(id);
