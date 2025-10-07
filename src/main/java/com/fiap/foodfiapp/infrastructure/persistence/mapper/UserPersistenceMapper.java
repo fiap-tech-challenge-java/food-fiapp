@@ -1,17 +1,19 @@
 package com.fiap.foodfiapp.infrastructure.persistence.mapper;
 
-import com.fiap.foodfiapp.core.domain.entities.CreateUser;
-import com.fiap.foodfiapp.core.domain.entities.User;
+import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(uses = {AddressPersistenceMapper.class, UserTypePersistenceMapper.class})
 public interface UserPersistenceMapper {
+
     UserPersistenceMapper INSTANCE = Mappers.getMapper(UserPersistenceMapper.class);
 
-    UserEntity mapToEntity(User user);
-    UserEntity mapToEntity(CreateUser user);
-    User mapToUser(UserEntity userEntity);
-}
+    @Mapping(source = "addresses", target = "addressesList")
+    UserEntity toEntity(User user);
 
+    @Mapping(source = "addressesList", target = "addresses")
+    User toDomain(UserEntity userEntity);
+}

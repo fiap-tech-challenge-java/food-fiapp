@@ -2,38 +2,22 @@ package com.fiap.foodfiapp.infrastructure.persistence.mapper;
 
 import com.fiap.foodfiapp.core.domain.entity.Address;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-public class AddressPersistenceMapper {
+import java.util.List;
 
-    public static Address toDomain(AddressEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return new Address(
-                entity.getId(),
-                entity.getPublicPlace(),
-                entity.getNumber(),
-                entity.getComplement(),
-                entity.getNeighborhood(),
-                entity.getCity(),
-                entity.getState(),
-                entity.getPostalCode()
-        );
-    }
+@Mapper
+public interface AddressPersistenceMapper {
 
-    public static AddressEntity toEntity(Address domain) {
-        if (domain == null) {
-            return null;
-        }
-        return AddressEntity.builder()
-                .id(domain.getId())
-                .publicPlace(domain.getPublicPlace())
-                .number(domain.getNumber())
-                .complement(domain.getComplement())
-                .neighborhood(domain.getNeighborhood())
-                .city(domain.getCity())
-                .state(domain.getState())
-                .postalCode(domain.getPostalCode())
-                .build();
-    }
+    AddressPersistenceMapper INSTANCE = Mappers.getMapper(AddressPersistenceMapper.class);
+
+    @Mapping(target = "ownerId", ignore = true)
+    @Mapping(target = "ownerType", ignore = true)
+    AddressEntity toEntity(Address address);
+
+    Address toDomain(AddressEntity addressEntity);
+
+    List<Address> toDomainList(List<AddressEntity> addressEntities);
 }
