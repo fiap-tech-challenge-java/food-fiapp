@@ -22,6 +22,8 @@ public class DeleteUserTypeUseCaseImpl implements DeleteUserTypeUseCase {
         this.userRepository = userRepository;
     }
 
+    // Assinatura corrigida para receber apenas o UUID
+    @Override
     public void execute(UUID uuid) {
         UserType userType = userTypeRepository.findById(uuid)
                 .orElseThrow(() -> new UserTypeNotFoundException("User type not found."));
@@ -30,7 +32,6 @@ public class DeleteUserTypeUseCaseImpl implements DeleteUserTypeUseCase {
             throw new CoreUserTypeModificationException();
         }
 
-        // Verificar se há usuários usando este UserType
         if (userRepository.existsByUserTypeUuid(uuid)) {
             throw new UserTypeInUseException();
         }

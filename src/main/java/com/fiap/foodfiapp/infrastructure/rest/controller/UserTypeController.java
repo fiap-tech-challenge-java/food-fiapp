@@ -2,8 +2,8 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.UserTypesApi;
 import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
-import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
-import com.fiap.foodfiapp.core.application.usecases.usertype.impl.UpdateUserTypeUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
+import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
 import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeMapper;
 import com.fiap.foodfiapp.model.CreateUserTypeRequest;
@@ -22,8 +22,8 @@ import java.util.UUID;
 public class UserTypeController implements UserTypesApi {
 
     private final CreateUserTypeUseCase createUserTypeUseCase;
-    private final UpdateUserTypeUseCaseImpl updateUserTypeUseCase;
-    private final DeleteUserTypeUseCaseImpl deleteUserTypeUseCase;
+    private final UpdateUserTypeUseCase updateUserTypeUseCase;
+    private final DeleteUserTypeUseCase deleteUserTypeUseCase;
     private final UserTypeRepository userTypeRepository;
 
     private final UserTypeMapper userTypeMapper = UserTypeMapper.INSTANCE;

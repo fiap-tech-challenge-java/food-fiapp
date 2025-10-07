@@ -6,8 +6,8 @@ import com.fiap.foodfiapp.core.application.usecases.usertype.impl.CreateUserType
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
-import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
 import com.fiap.foodfiapp.core.application.usecases.usertype.impl.UpdateUserTypeUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

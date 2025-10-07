@@ -1,6 +1,7 @@
 package com.fiap.foodfiapp.core.domain.entity;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public class User extends BaseEntity {
@@ -12,21 +13,24 @@ public class User extends BaseEntity {
     private String login;
     private UserType userType;
     private String password;
+    private List<Address> addresses; // Campo reintroduzido
 
     public User() {
     }
 
-    public User(UUID id, String name, String email, String login, String cpf, UserType userType,
+    // Construtor completo
+    public User(UUID id, String name, String email, String login, String cpf, List<Address> addresses, UserType userType,
                 Boolean isActive, OffsetDateTime updatedAt, OffsetDateTime createdAt, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.cpf = cpf;
         this.login = login;
+        this.addresses = addresses;
+        this.userType = userType;
         this.setIsActive(isActive);
         this.setUpdatedAt(updatedAt);
         this.setCreatedAt(createdAt);
-        this.userType = userType;
         this.password = password;
     }
 
@@ -45,4 +49,6 @@ public class User extends BaseEntity {
     public void setUserType(UserType userType) { this.userType = userType; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    public List<Address> getAddresses() { return addresses; }
+    public void setAddresses(List<Address> addresses) { this.addresses = addresses; }
 }

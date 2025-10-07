@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.config;
 
+import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
@@ -15,9 +16,8 @@ import org.springframework.context.annotation.Configuration;
 public class UserUseCaseConfig {
 
     @Bean
-    public CreateUserUseCase createUserUseCase(UserRepository userRepository, UserTypeRepository userTypeRepository) {
-        // Instanciamos a implementação concreta do caso de uso
-        return new CreateUserUseCaseImpl(userRepository, userTypeRepository);
+    public CreateUserUseCase createUserUseCase(UserRepository userRepository, UserTypeRepository userTypeRepository, AddressRepository addressRepository) {
+        return new CreateUserUseCaseImpl(userRepository, userTypeRepository, addressRepository);
     }
 
     @Bean

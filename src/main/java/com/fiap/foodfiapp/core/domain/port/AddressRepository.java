@@ -9,7 +9,8 @@ import java.util.UUID;
 public interface AddressRepository {
     Optional<Address> findById(UUID id);
 
-    Address save(Address address);
+    // Assinatura corrigida para incluir o contexto do "dono"
+    Address save(Address address, UUID ownerId, String ownerType);
 
     void delete(UUID id);
 
