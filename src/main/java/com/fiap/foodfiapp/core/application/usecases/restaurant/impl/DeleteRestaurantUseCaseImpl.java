@@ -7,7 +7,7 @@ import com.fiap.foodfiapp.core.domain.entity.Address;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
-import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressOwnerTypeEnum;
+import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
 
 import java.util.List;
 import java.util.UUID;

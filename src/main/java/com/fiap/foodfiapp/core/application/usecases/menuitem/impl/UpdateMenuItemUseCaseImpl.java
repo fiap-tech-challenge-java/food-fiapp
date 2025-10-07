@@ -8,14 +8,11 @@ import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.UUID;
 
 public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
-    private static final Logger logger = LoggerFactory.getLogger(UpdateMenuItemUseCaseImpl.class);
     private final MenuItemRepository menuItemRepository;
     private final FileStorageRepository fileStorageRepository;
     private final RestaurantRepository restaurantRepository;
@@ -48,7 +45,7 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
                     String oldFileName = existingItem.getPhotoUrl().substring(existingItem.getPhotoUrl().lastIndexOf('/') + 1);
                     fileStorageRepository.delete(oldFileName);
                 } catch (IOException e) {
-                    logger.warn("Failed to delete old menu item photo: {}", e.getMessage());
+                    throw new RuntimeException("Failed to delete old menu item photo", e);
                 }
             }
 

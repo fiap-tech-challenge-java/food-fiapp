@@ -2,8 +2,9 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.UsersApi;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
-import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserMapper;
 import com.fiap.foodfiapp.model.ChangePasswordRequest;
 import com.fiap.foodfiapp.model.CreateUserRequest;
@@ -21,9 +22,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController implements UsersApi {
 
+    // AGORA SÓ DEPENDE DE CASOS DE USO
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
-    private final UserRepository userRepository; // Usado para operações de busca e exclusão
+    private final FindUserUseCase findUserUseCase;
+    private final DeleteUserUseCase deleteUserUseCase;
 
     private final UserMapper userMapper = UserMapper.INSTANCE;
 
@@ -36,13 +39,15 @@ public class UserController implements UsersApi {
 
     @Override
     public ResponseEntity<Void> deleteUser(UUID id) {
-        userRepository.deleteById(id);
+        // USA O CASO DE USO DE DELEÇÃO
+        deleteUserUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<UserResponse> getUser(UUID id) {
-        return userRepository.findById(id)
+        // A LÓGICA DE BUSCA FOI MOVIDA PARA O FindUserUseCase
+        return findUserUseCase.findById(id) // Supondo que você adicione este método ao FindUserUseCase
                 .map(userMapper::toUserResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -50,7 +55,8 @@ public class UserController implements UsersApi {
 
     @Override
     public ResponseEntity<List<UserResponse>> getUsers() {
-        var users = userRepository.findAll();
+        // USA O CASO DE USO DE BUSCA
+        var users = findUserUseCase.findAll();
         return ResponseEntity.ok(userMapper.toUserResponseList(users));
     }
 

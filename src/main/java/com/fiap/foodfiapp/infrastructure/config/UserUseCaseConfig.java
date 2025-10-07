@@ -1,5 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.config;
 
+import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.impl.DeleteUserUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
@@ -28,5 +30,10 @@ public class UserUseCaseConfig {
     @Bean
     public FindUserUseCase findUserUseCase(UserRepository userRepository) {
         return new FindUserUseCaseImpl(userRepository);
+    }
+
+    @Bean
+    public DeleteUserUseCase deleteUserUseCase(UserRepository userRepository) {
+        return new DeleteUserUseCaseImpl(userRepository);
     }
 }

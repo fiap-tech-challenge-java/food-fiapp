@@ -10,7 +10,7 @@ import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.core.domain.exception.CpfAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.LoginAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
-import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressOwnerTypeEnum;
+import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
 
 import java.util.stream.Collectors;
 

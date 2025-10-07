@@ -6,6 +6,8 @@ import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.exception.UserNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FindUserUseCaseImpl implements FindUserUseCase {
     private final UserRepository userRepository;
@@ -29,5 +31,10 @@ public class FindUserUseCaseImpl implements FindUserUseCase {
     public User findUserByUsername(String username) {
         return userRepository.findByLogin(username)
                 .orElseThrow(() -> new UserNotFoundException("login", username));
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        return userRepository.findById(id);
     }
 }

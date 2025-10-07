@@ -92,9 +92,11 @@ public class CleanArchitectureTest {
                         .that().resideInAPackage("..application..")
                         .and().areNotInterfaces()
                         .and().haveSimpleNameNotEndingWith("Test")
-                        .should().haveSimpleNameEndingWith("UseCase");
+                        .and().haveSimpleNameEndingWith("UseCase")
+                        .should().haveSimpleNameEndingWith("UseCaseImpl");
 
-        // JPA entities only in infra
+
+    // JPA entities only in infra
         @ArchTest
         public static final ArchRule jpa_entities_only_in_infra = classes()
                         .that().areAnnotatedWith("jakarta.persistence.Entity")

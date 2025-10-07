@@ -9,7 +9,7 @@ import com.fiap.foodfiapp.core.domain.exception.UserNotFoundException;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
-import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressOwnerTypeEnum;
+import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
 
 import java.util.UUID;
 

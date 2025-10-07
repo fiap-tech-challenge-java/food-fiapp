@@ -5,7 +5,7 @@ import com.fiap.foodfiapp.core.application.usecases.address.CreateAddressUseCase
 import com.fiap.foodfiapp.core.application.usecases.address.DeleteAddressUseCase;
 import com.fiap.foodfiapp.core.application.usecases.address.FindAddressByOwnerUseCase;
 import com.fiap.foodfiapp.core.application.usecases.address.UpdateAddressUseCase;
-import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressOwnerTypeEnum;
+import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.AddressMapper;
 import com.fiap.foodfiapp.model.AddressResponse;
 import com.fiap.foodfiapp.model.CreateAddressRequest;

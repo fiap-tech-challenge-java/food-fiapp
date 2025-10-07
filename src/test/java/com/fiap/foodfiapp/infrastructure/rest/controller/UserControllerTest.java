@@ -2,6 +2,8 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
@@ -40,7 +42,10 @@ class UserControllerTest {
     private UpdateUserUseCase updateUserUseCase;
 
     @Mock
-    private UserRepository userRepository;
+    private FindUserUseCase findUserUseCase;
+
+    @Mock
+    private DeleteUserUseCase deleteUserUseCase;
 
     private ObjectMapper objectMapper;
     private String createUserJson;
@@ -52,7 +57,8 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        UserController userController = new UserController(createUserUseCase, updateUserUseCase, userRepository);
+
+        UserController userController = new UserController(createUserUseCase, updateUserUseCase, findUserUseCase, deleteUserUseCase);
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -79,6 +85,7 @@ class UserControllerTest {
                 .put("email", "updated@email.com")
                 .toString();
 
+
         user = new User(userId, "Test User", "test@email.com", "login_test", "12345678901",
                 Collections.emptyList(), userType, true, OffsetDateTime.now(), OffsetDateTime.now(), "password123");
     }
@@ -86,32 +93,32 @@ class UserControllerTest {
     @Test
     void shouldReturnAllUsers() throws Exception {
         List<User> userList = List.of(user);
-        when(userRepository.findAll()).thenReturn(userList);
+        when(findUserUseCase.findAll()).thenReturn(userList);
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk());
 
-        verify(userRepository).findAll();
+        verify(findUserUseCase).findAll();
     }
 
     @Test
     void shouldReturnUserWhenFoundById() throws Exception {
-        when(userRepository.findById(eq(userId))).thenReturn(Optional.of(user));
+        when(findUserUseCase.findById(eq(userId))).thenReturn(Optional.of(user));
 
         mockMvc.perform(get("/users/{id}", userId))
                 .andExpect(status().isOk());
 
-        verify(userRepository).findById(eq(userId));
+        verify(findUserUseCase).findById(eq(userId));
     }
 
     @Test
     void shouldReturnNotFoundWhenUserNotFoundById() throws Exception {
-        when(userRepository.findById(eq(userId))).thenReturn(Optional.empty());
+        when(findUserUseCase.findById(eq(userId))).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/users/{id}", userId))
                 .andExpect(status().isNotFound());
 
-        verify(userRepository).findById(eq(userId));
+        verify(findUserUseCase).findById(eq(userId));
     }
 
     @Test
@@ -119,6 +126,6 @@ class UserControllerTest {
         mockMvc.perform(delete("/users/{id}", userId))
                 .andExpect(status().isNoContent());
 
-        verify(userRepository).deleteById(eq(userId));
+        verify(deleteUserUseCase).execute(eq(userId));
     }
 }
