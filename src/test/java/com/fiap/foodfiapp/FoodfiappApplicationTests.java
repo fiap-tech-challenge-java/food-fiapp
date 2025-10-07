@@ -1,6 +1,7 @@
 package com.fiap.foodfiapp;
 
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.infrastructure.persistence.repository.UserRepositoryImpl;
 import com.fiap.foodfiapp.infrastructure.rest.controller.UserController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,12 @@ class FoodfiappApplicationTests {
 	@Autowired
 	private CreateUserUseCase createUserUseCase;
 	@Autowired
-	private UserRepositoryGatewayImpl userRepositoryGatewayImpl;
+	private UserRepositoryImpl userRepositoryImpl;
 
 	@Test
 	void contextLoads() {
 		assertThat(userController).isNotNull();
 		assertThat(createUserUseCase).isNotNull();
-		assertThat(userRepositoryGatewayImpl).isNotNull();
+		assertThat(userRepositoryImpl).isNotNull();
 	}
 }
