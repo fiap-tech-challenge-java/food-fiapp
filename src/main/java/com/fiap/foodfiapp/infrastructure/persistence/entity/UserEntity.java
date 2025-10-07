@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -41,6 +39,8 @@ public class UserEntity extends BaseEntity {
     @JoinColumn(name = "user_type_uuid", referencedColumnName = "uuid")
     private UserTypeEntity userType;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AddressEntity> addressesList = new ArrayList<>();
+    // A lista de endereços foi removida.
+    // O relacionamento agora é gerenciado pela camada de aplicação
+    // através do AddressRepository, usando ownerId e ownerType.
+    // Isso desacopla as entidades e adere melhor à Clean Architecture.
 }
