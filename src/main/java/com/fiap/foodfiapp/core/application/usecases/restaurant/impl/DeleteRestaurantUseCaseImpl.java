@@ -15,7 +15,7 @@ public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
     }
 
     @Override
-    public void deleteRestaurant(UUID id) {
+    public void execute(UUID id) {
         this.restaurantRepositoryGateway.deleteRestaurant(id);
     }
 }

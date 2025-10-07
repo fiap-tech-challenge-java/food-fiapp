@@ -1,22 +1,21 @@
 package com.fiap.foodfiapp.core.application.usecases.restaurant.impl;
 
 import com.fiap.foodfiapp.core.application.gateways.RestaurantRepositoryGateway;
-import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.ChangeOwnerRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
-public class UpdateRestaurantUseCaseImpl implements UpdateRestaurantUseCase {
+public class ChangeOwnerRestaurantUseCaseImpl implements ChangeOwnerRestaurantUseCase {
     private final RestaurantRepositoryGateway restaurantRepositoryGateway;
 
-    public UpdateRestaurantUseCaseImpl(RestaurantRepositoryGateway restaurantRepositoryGateway) {
+    public ChangeOwnerRestaurantUseCaseImpl(RestaurantRepositoryGateway restaurantRepositoryGateway) {
         this.restaurantRepositoryGateway = restaurantRepositoryGateway;
     }
-
     @Override
-    public Restaurant execute(Restaurant updateRestaurant) {
-        return this.restaurantRepositoryGateway.updateRestaurant(updateRestaurant);
+    public Restaurant execute(UUID restaurantId, UUID newOwnerId) {
+        return this.restaurantRepositoryGateway.changeOwner(restaurantId, newOwnerId);
     }
 }

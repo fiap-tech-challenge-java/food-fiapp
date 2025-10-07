@@ -5,6 +5,6 @@ import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import java.util.List;
 import java.util.UUID;
 
-public interface GetAllMenuItemsUseCase {
+public interface FindAllMenuItemsUseCase {
     List<MenuItem> execute(UUID restaurantId);
 }

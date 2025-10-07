@@ -2,7 +2,6 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.core.application.usecases.restaurant.CreateRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.DeleteRestaurantUseCase;
-import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantUseCase;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
 import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.ChangeOwnerRequestDTO;

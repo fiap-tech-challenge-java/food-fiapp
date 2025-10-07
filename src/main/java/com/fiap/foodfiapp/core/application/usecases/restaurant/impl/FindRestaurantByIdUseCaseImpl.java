@@ -1,20 +1,22 @@
 package com.fiap.foodfiapp.core.application.usecases.restaurant.impl;
 
 import com.fiap.foodfiapp.core.application.gateways.RestaurantRepositoryGateway;
-import com.fiap.foodfiapp.core.application.usecases.restaurant.CreateRestaurantUseCase;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.FindRestaurantByIdUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
-public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
+public class FindRestaurantByIdUseCaseImpl implements FindRestaurantByIdUseCase {
     private final RestaurantRepositoryGateway restaurantRepositoryGateway;
 
-    public CreateRestaurantUseCaseImpl(RestaurantRepositoryGateway restaurantRepositoryGateway) {
+    public FindRestaurantByIdUseCaseImpl(RestaurantRepositoryGateway restaurantRepositoryGateway) {
         this.restaurantRepositoryGateway = restaurantRepositoryGateway;
     }
 
     @Override
-    public Restaurant execute(Restaurant createRestaurant) {
-        return this.restaurantRepositoryGateway.createRestaurant(createRestaurant);
+    public Restaurant execute(UUID id) {
+        return this.restaurantRepositoryGateway.findById(id);
     }
 }
