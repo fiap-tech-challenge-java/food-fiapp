@@ -11,11 +11,10 @@ import java.util.UUID;
 
 @Repository
 public interface RestaurantSpringDataRepository extends JpaRepository<RestaurantEntity, UUID> {
-    Optional<RestaurantEntity> findByUserOwnerIdAndNameAndActiveTrue(UUID userId, String name);
+    Optional<RestaurantEntity> findByUserOwnerIdAndNameAndIsActiveTrue(UUID userId, String name);
 
-    Optional<List<RestaurantEntity>> findAllByUserOwnerIdAndActiveTrue(UUID userId);
+    List<RestaurantEntity> findAllByUserOwnerIdAndIsActiveTrue(UUID userId);
 
     @EntityGraph(attributePaths = {"address"})
-    Optional<RestaurantEntity> findByIdAndActiveTrue(UUID id);
+    Optional<RestaurantEntity> findByIdAndIsActiveTrue(UUID id);
 }
-

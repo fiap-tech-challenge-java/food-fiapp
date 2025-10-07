@@ -28,7 +28,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
 
     @Override
     public Restaurant findById(UUID id) {
-        return restaurantSpringDataRepository.findByIdAndActiveTrue(id)
+        return restaurantSpringDataRepository.findByIdAndIsActiveTrue(id)
                 .map(restaurantMapper::toDomain)
                 .orElse(null);
     }
@@ -40,7 +40,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
 
     @Override
     public Restaurant findByNameAndUser(String name, UUID userId) {
-        return restaurantSpringDataRepository.findByUserOwnerIdAndNameAndActiveTrue(userId, name)
+        return restaurantSpringDataRepository.findByUserOwnerIdAndNameAndIsActiveTrue(userId, name)
                 .map(restaurantMapper::toDomain)
                 .orElse(null);
     }
@@ -52,8 +52,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepository {
 
     @Override
     public List<Restaurant> findAllByUserId(UUID userId) {
-        return restaurantSpringDataRepository.findAllByUserOwnerIdAndActiveTrue(userId)
-                .orElse(Collections.emptyList())
+        return restaurantSpringDataRepository.findAllByUserOwnerIdAndIsActiveTrue(userId)
                 .stream()
                 .map(restaurantMapper::toDomain)
                 .collect(Collectors.toList());
