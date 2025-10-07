@@ -13,7 +13,7 @@ spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://foodfiapp_postgres:5432/foodfiapp}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgrespass}
+    password: ${SPRING_DATASOURCE_PASSWORD:pgAdmin}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -26,8 +26,12 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
-  secret: ${JWT_SECRET}
-  expiration-ms: ${JWT_EXPIRATION_MS:604800000}
+  secret: yX56ambwC9AM8QkQzYOpHr0wYviQizzneZBtbeO+IfY=
+  expiration-ms: 604800000
+
+#jwt:
+#  secret: ${JWT_SECRET}
+#  expiration-ms: ${JWT_EXPIRATION_MS:604800000}
 
 minio:
   endpoint: ${MINIO_ENDPOINT:http://localhost:9000}

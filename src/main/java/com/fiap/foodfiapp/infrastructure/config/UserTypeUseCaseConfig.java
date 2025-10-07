@@ -1,10 +1,13 @@
 package com.fiap.foodfiapp.infrastructure.config;
 
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
-import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.CreateUserTypeUseCaseImpl;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
+import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.UpdateUserTypeUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,17 +15,17 @@ import org.springframework.context.annotation.Configuration;
 public class UserTypeUseCaseConfig {
 
     @Bean
-    public CreateUserTypeUseCase createUserTypeUseCase(UserTypeRepositoryGateway userTypeRepositoryGateway) {
-        return new CreateUserTypeUseCase(userTypeRepositoryGateway);
+    public CreateUserTypeUseCase createUserTypeUseCase(UserTypeRepository userTypeRepository) {
+        return new CreateUserTypeUseCaseImpl(userTypeRepository);
     }
 
     @Bean
-    public UpdateUserTypeUseCase updateUserTypeUseCase(UserTypeRepositoryGateway userTypeRepositoryGateway, UserRepositoryGateway userRepositoryGateway) {
-        return new UpdateUserTypeUseCase(userTypeRepositoryGateway, userRepositoryGateway);
+    public UpdateUserTypeUseCase updateUserTypeUseCase(UserTypeRepository userTypeRepository, UserRepository userRepository) {
+        return new UpdateUserTypeUseCaseImpl(userTypeRepository, userRepository);
     }
 
     @Bean
-    public DeleteUserTypeUseCase deleteUserTypeUseCase(UserTypeRepositoryGateway userTypeRepositoryGateway, UserRepositoryGateway userRepositoryGateway) {
-        return new DeleteUserTypeUseCase(userTypeRepositoryGateway, userRepositoryGateway);
+    public DeleteUserTypeUseCase deleteUserTypeUseCase(UserTypeRepository userTypeRepository, UserRepository userRepository) {
+        return new DeleteUserTypeUseCaseImpl(userTypeRepository, userRepository);
     }
 }

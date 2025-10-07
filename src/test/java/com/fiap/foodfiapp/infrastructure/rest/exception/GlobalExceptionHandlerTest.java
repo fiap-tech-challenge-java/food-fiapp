@@ -189,7 +189,7 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getStatus()).isEqualTo(403);
-        assertThat(response.getBody().getCode()).isEqualTo("UNAUTHORIZED_ACCESS");
+        assertThat(response.getBody().getCode()).isEqualTo("ACCESS_DENIED");
         assertThat(response.getBody().getMessage()).isEqualTo("Access denied for this resource");
     }
 

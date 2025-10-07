@@ -1,0 +1,5 @@
+.git
+**/.idea
+**/.mvn/wrapper
+**/.DS_Store
+**/node_modules

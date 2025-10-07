@@ -2,6 +2,7 @@ package com.fiap.foodfiapp.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "restaurants")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RestaurantEntity extends BaseEntity {
@@ -21,6 +23,13 @@ public class RestaurantEntity extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
+
+    private String cuisineType;
+
+    private String openingHours;
+
+    @Column(name = "user_owner_id", nullable = false)
+    private UUID userOwnerId;
 
     private String description;
 

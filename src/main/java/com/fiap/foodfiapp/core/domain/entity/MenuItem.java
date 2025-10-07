@@ -1,29 +1,21 @@
 package com.fiap.foodfiapp.core.domain.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public class MenuItem {
-    private final UUID id;
-    private final String name;
-    private final String description;
-    private final BigDecimal price;
-    private final boolean localOnly;
-    private final String photoUrl;
-    private final UUID restaurantId;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+public class MenuItem extends BaseEntity {
 
-    public MenuItem(UUID id,
-                    String name,
-                    String description,
-                    BigDecimal price,
-                    boolean localOnly,
-                    String photoUrl,
-                    UUID restaurantId,
-                    LocalDateTime createdAt,
-                    LocalDateTime updatedAt) {
+    private UUID id;
+    private String name;
+    private String description;
+    private Double price;
+    private boolean localOnly;
+    private String photoUrl;
+    private UUID restaurantId;
+
+    // Construtor principal
+    public MenuItem(UUID id, String name, String description, Double price, boolean localOnly, String photoUrl, UUID restaurantId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -31,23 +23,25 @@ public class MenuItem {
         this.localOnly = localOnly;
         this.photoUrl = photoUrl;
         this.restaurantId = restaurantId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.setCreatedAt(createdAt);
+        this.setUpdatedAt(updatedAt);
     }
 
-    // Factory/helper para atualizar apenas a foto mantendo os demais campos
-    public MenuItem withPhotoUrl(String photoUrl) {
-        return new MenuItem(id, name, description, price, localOnly, photoUrl, restaurantId, createdAt, updatedAt);
-    }
+    // Getters
+    public UUID getId() { return id; }
+    public String getName() { return name; }
+    public String getDescription() { return description; }
+    public Double getPrice() { return price; }
+    public boolean isLocalOnly() { return localOnly; }
+    public String getPhotoUrl() { return photoUrl; }
+    public UUID getRestaurantId() { return restaurantId; }
 
-    // Métodos estilo record para compatibilidade com os use cases existentes
-    public UUID id() { return id; }
-    public String name() { return name; }
-    public String description() { return description; }
-    public BigDecimal price() { return price; }
-    public boolean localOnly() { return localOnly; }
-    public String photoUrl() { return photoUrl; }
-    public UUID restaurantId() { return restaurantId; }
-    public LocalDateTime createdAt() { return createdAt; }
-    public LocalDateTime updatedAt() { return updatedAt; }
+    // Setters
+    public void setId(UUID id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setDescription(String description) { this.description = description; }
+    public void setPrice(Double price) { this.price = price; }
+    public void setLocalOnly(boolean localOnly) { this.localOnly = localOnly; }
+    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
+    public void setRestaurantId(UUID restaurantId) { this.restaurantId = restaurantId; }
 }

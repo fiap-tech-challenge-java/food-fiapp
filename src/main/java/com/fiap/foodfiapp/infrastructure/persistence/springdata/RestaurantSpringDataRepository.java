@@ -1,0 +1,22 @@
+package com.fiap.foodfiapp.infrastructure.persistence.springdata;
+
+import com.fiap.foodfiapp.infrastructure.persistence.entity.RestaurantEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface RestaurantSpringDataRepository extends JpaRepository<RestaurantEntity, UUID> {
+    Optional<RestaurantEntity> findByUserOwnerIdAndNameAndIsActiveTrue(UUID userId, String name);
+
+    List<RestaurantEntity> findAllByUserOwnerIdAndIsActiveTrue(UUID userId);
+
+    @EntityGraph(attributePaths = {"address"})
+    Optional<RestaurantEntity> findByIdAndIsActiveTrue(UUID id);
+
+    List<RestaurantEntity> findAllByIsActiveTrue();
+}

@@ -1,12 +1,13 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
-import com.fiap.foodfiapp.core.domain.exception.EmailAlreadyExistsException;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.infrastructure.rest.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,10 @@ class UserControllerTest {
     private UpdateUserUseCase updateUserUseCase;
 
     @Mock
-    private UserRepositoryGateway userRepositoryGateway;
+    private FindUserUseCase findUserUseCase;
+
+    @Mock
+    private DeleteUserUseCase deleteUserUseCase;
 
     private ObjectMapper objectMapper;
     private String createUserJson;
@@ -53,7 +57,8 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        UserController userController = new UserController(createUserUseCase, updateUserUseCase, userRepositoryGateway);
+
+        UserController userController = new UserController(createUserUseCase, updateUserUseCase, findUserUseCase, deleteUserUseCase);
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -72,13 +77,14 @@ class UserControllerTest {
                 .put("login", "login_test")
                 .put("userTypeUuid", userType.getUuid().toString())
                 .put("active", true)
-                .putArray("addresses")
+                .putArray("address")
                 .toString();
 
         updateUserJson = objectMapper.createObjectNode()
                 .put("name", "Updated User")
                 .put("email", "updated@email.com")
                 .toString();
+
 
         user = new User(userId, "Test User", "test@email.com", "login_test", "12345678901",
                 Collections.emptyList(), userType, true, OffsetDateTime.now(), OffsetDateTime.now(), "password123");
@@ -87,45 +93,32 @@ class UserControllerTest {
     @Test
     void shouldReturnAllUsers() throws Exception {
         List<User> userList = List.of(user);
-        when(userRepositoryGateway.findAll()).thenReturn(userList);
+        when(findUserUseCase.findAll()).thenReturn(userList);
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk());
 
-        verify(userRepositoryGateway).findAll();
+        verify(findUserUseCase).findAll();
     }
 
     @Test
     void shouldReturnUserWhenFoundById() throws Exception {
-        when(userRepositoryGateway.findById(eq(userId))).thenReturn(Optional.of(user));
+        when(findUserUseCase.findById(eq(userId))).thenReturn(Optional.of(user));
 
         mockMvc.perform(get("/users/{id}", userId))
                 .andExpect(status().isOk());
 
-        verify(userRepositoryGateway).findById(eq(userId));
+        verify(findUserUseCase).findById(eq(userId));
     }
 
     @Test
     void shouldReturnNotFoundWhenUserNotFoundById() throws Exception {
-        when(userRepositoryGateway.findById(eq(userId))).thenReturn(Optional.empty());
+        when(findUserUseCase.findById(eq(userId))).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/users/{id}", userId))
                 .andExpect(status().isNotFound());
 
-        verify(userRepositoryGateway).findById(eq(userId));
-    }
-
-    @Test
-    void shouldReturnNotFoundWhenUpdatingNonExistentUser() throws Exception {
-        when(userRepositoryGateway.findById(eq(userId))).thenReturn(Optional.empty());
-
-        mockMvc.perform(put("/users/{id}", userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(updateUserJson))
-                .andExpect(status().isNotFound());
-
-        verify(userRepositoryGateway).findById(eq(userId));
-        verify(updateUserUseCase, never()).execute(any(UUID.class), any(User.class));
+        verify(findUserUseCase).findById(eq(userId));
     }
 
     @Test
@@ -133,6 +126,6 @@ class UserControllerTest {
         mockMvc.perform(delete("/users/{id}", userId))
                 .andExpect(status().isNoContent());
 
-        verify(userRepositoryGateway).deleteById(eq(userId));
+        verify(deleteUserUseCase).execute(eq(userId));
     }
 }

@@ -2,83 +2,74 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.UsersApi;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
-import com.fiap.foodfiapp.core.domain.entity.User;
-import com.fiap.foodfiapp.core.domain.exception.BusinessException;
-import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
-import com.fiap.foodfiapp.infrastructure.rest.mapper.CreateUserRequestMapper;
-import com.fiap.foodfiapp.infrastructure.rest.mapper.UpdateUserRequestMapper;
-import com.fiap.foodfiapp.infrastructure.rest.mapper.UserResponseMapper;
-import com.fiap.foodfiapp.model.*;
+import com.fiap.foodfiapp.infrastructure.rest.mapper.UserMapper;
+import com.fiap.foodfiapp.model.ChangePasswordRequest;
+import com.fiap.foodfiapp.model.CreateUserRequest;
+import com.fiap.foodfiapp.model.UpdateUserRequest;
+import com.fiap.foodfiapp.model.UserResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class UserController implements UsersApi {
+
+    // AGORA SÓ DEPENDE DE CASOS DE USO
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
-    private final UserRepositoryGateway userRepositoryGateway;
+    private final FindUserUseCase findUserUseCase;
+    private final DeleteUserUseCase deleteUserUseCase;
 
-    public UserController(CreateUserUseCase createUserUseCase, UpdateUserUseCase updateUserUseCase, UserRepositoryGateway userRepositoryGateway) {
-        this.createUserUseCase = createUserUseCase;
-        this.updateUserUseCase = updateUserUseCase;
-        this.userRepositoryGateway = userRepositoryGateway;
-    }
+    private final UserMapper userMapper = UserMapper.INSTANCE;
 
     @Override
     public ResponseEntity<UserResponse> createUser(CreateUserRequest createUserRequest) {
-        var user = CreateUserRequestMapper.toEntity(createUserRequest);
+        var user = userMapper.toUser(createUserRequest);
         var createdUser = createUserUseCase.execute(user);
-        var responseDTO = UserResponseMapper.toDTO(createdUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toUserResponse(createdUser));
     }
 
     @Override
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
-        userRepositoryGateway.deleteById(id);
+    public ResponseEntity<Void> deleteUser(UUID id) {
+        // USA O CASO DE USO DE DELEÇÃO
+        deleteUserUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<UserResponse> getUser(UUID id) {
-        return userRepositoryGateway.findById(id)
-                .map(UserResponseMapper::toDTO)
+        // A LÓGICA DE BUSCA FOI MOVIDA PARA O FindUserUseCase
+        return findUserUseCase.findById(id) // Supondo que você adicione este método ao FindUserUseCase
+                .map(userMapper::toUserResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @Override
     public ResponseEntity<List<UserResponse>> getUsers() {
-        var users = userRepositoryGateway.findAll();
-        var response = users.stream()
-                .map(UserResponseMapper::toDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        // USA O CASO DE USO DE BUSCA
+        var users = findUserUseCase.findAll();
+        return ResponseEntity.ok(userMapper.toUserResponseList(users));
     }
 
     @Override
     public ResponseEntity<UserResponse> updateUser(UUID id, UpdateUserRequest updateUserRequest) {
-        try {
-            var existingUser = userRepositoryGateway.findById(id).orElse(null);
-            if (existingUser == null) {
-                return ResponseEntity.notFound().build();
-            }
-            var userUpdates = UpdateUserRequestMapper.toEntity(updateUserRequest);
-            User savedUser = updateUserUseCase.execute(id, userUpdates);
-            var responseDTO = UserResponseMapper.toDTO(savedUser);
-            return ResponseEntity.ok(responseDTO);
-        } catch (BusinessException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+        var userUpdates = userMapper.toUser(updateUserRequest);
+        var updatedUser = updateUserUseCase.execute(id, userUpdates);
+        return ResponseEntity.ok(userMapper.toUserResponse(updatedUser));
     }
 
     @Override
     public ResponseEntity<Void> changePassword(ChangePasswordRequest changePasswordRequest) {
+        // Lógica para mudança de senha a ser implementada
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 }

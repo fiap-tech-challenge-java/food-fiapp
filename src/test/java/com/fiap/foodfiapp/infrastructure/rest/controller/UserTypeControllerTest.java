@@ -1,14 +1,14 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
-import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
-import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.UpdateUserTypeUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeInUseException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
+import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.infrastructure.rest.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,13 +36,13 @@ class UserTypeControllerTest {
     private CreateUserTypeUseCase createUserTypeUseCase;
 
     @Mock
-    private UpdateUserTypeUseCase updateUserTypeUseCase;
+    private UpdateUserTypeUseCaseImpl updateUserTypeUseCase;
 
     @Mock
-    private DeleteUserTypeUseCase deleteUserTypeUseCase;
+    private DeleteUserTypeUseCaseImpl deleteUserTypeUseCase;
 
     @Mock
-    private UserTypeRepositoryGateway userTypeRepositoryGateway;
+    private UserTypeRepository userTypeRepository;
 
     private UserTypeController userTypeController;
 
@@ -56,7 +56,7 @@ class UserTypeControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         userTypeController = new UserTypeController(createUserTypeUseCase, updateUserTypeUseCase,
-                deleteUserTypeUseCase, userTypeRepositoryGateway);
+                deleteUserTypeUseCase, userTypeRepository);
         mockMvc = MockMvcBuilders.standaloneSetup(userTypeController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -108,36 +108,36 @@ class UserTypeControllerTest {
     @Test
     void shouldReturnAllUserTypes() throws Exception {
         List<UserType> userTypes = List.of(userType);
-        when(userTypeRepositoryGateway.findAll()).thenReturn(userTypes);
+        when(userTypeRepository.findAll()).thenReturn(userTypes);
 
         mockMvc.perform(get("/user-types"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].uuid").value(userType.getUuid().toString()))
                 .andExpect(jsonPath("$[0].name").value(userType.getName()));
 
-        verify(userTypeRepositoryGateway).findAll();
+        verify(userTypeRepository).findAll();
     }
 
     @Test
     void shouldReturnUserTypeWhenFoundById() throws Exception {
-        when(userTypeRepositoryGateway.findById(eq(userTypeUuid))).thenReturn(Optional.of(userType));
+        when(userTypeRepository.findById(eq(userTypeUuid))).thenReturn(Optional.of(userType));
 
         mockMvc.perform(get("/user-types/{uuid}", userTypeUuid))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uuid").value(userTypeUuid.toString()))
                 .andExpect(jsonPath("$.name").value(userType.getName()));
 
-        verify(userTypeRepositoryGateway).findById(eq(userTypeUuid));
+        verify(userTypeRepository).findById(eq(userTypeUuid));
     }
 
     @Test
     void shouldReturnNotFoundWhenUserTypeNotFoundById() throws Exception {
-        when(userTypeRepositoryGateway.findById(eq(userTypeUuid))).thenReturn(Optional.empty());
+        when(userTypeRepository.findById(eq(userTypeUuid))).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/user-types/{uuid}", userTypeUuid))
                 .andExpect(status().isNotFound());
 
-        verify(userTypeRepositoryGateway).findById(eq(userTypeUuid));
+        verify(userTypeRepository).findById(eq(userTypeUuid));
     }
 
     @Test

@@ -1,58 +1,12 @@
+// src/main/java/com/fiap/foodfiapp/core/application/usecases/menuitem/UpdateMenuItemUseCase.java
 package com.fiap.foodfiapp.core.application.usecases.menuitem;
 
+import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
-import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
-import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
-public class UpdateMenuItemUseCase {
-    private final MenuItemRepository menuItemRepository;
-    private final FileStorageRepository fileStorageRepository;
-
-    @Transactional
-    public MenuItem execute(UUID id, MenuItem menuItemUpdates, MultipartFile photo) throws IOException {
-        var existingItem = menuItemRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Menu item not found"));
-
-        String photoUrl = existingItem.photoUrl();
-        if (photo != null && !photo.isEmpty()) {
-            // Delete old photo if exists
-            if (existingItem.photoUrl() != null) {
-                try {
-                    String oldFileName = existingItem.photoUrl().substring(existingItem.photoUrl().lastIndexOf('/') + 1);
-                    fileStorageRepository.delete(oldFileName);
-                } catch (IOException e) {
-                    // Log error but continue with update
-                    System.err.println("Failed to delete old menu item photo: " + e.getMessage());
-                }
-            }
-
-            // Store new photo
-            String fileName = String.format("%s-%s-%s", existingItem.restaurantId(), id, photo.getOriginalFilename());
-            photoUrl = fileStorageRepository.store(photo, fileName);
-        }
-
-        // Create new MenuItem with updated values but preserve creation date
-        var updatedItem = new MenuItem(
-                existingItem.id(),
-                menuItemUpdates.name(),
-                menuItemUpdates.description(),
-                menuItemUpdates.price(),
-                menuItemUpdates.localOnly(),
-                photoUrl,
-                existingItem.restaurantId(),
-                existingItem.createdAt(),
-                existingItem.updatedAt()
-        );
-
-        return menuItemRepository.save(updatedItem);
-    }
+public interface UpdateMenuItemUseCase {
+    MenuItem execute(UUID authenticatedUserId, UUID itemId, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException;
 }

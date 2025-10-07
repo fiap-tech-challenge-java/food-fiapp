@@ -13,7 +13,7 @@ tags:
     description: Operacoes relacionadas a usuarios
   - name: user-types
     description: Operacoes relacionadas a tipos de usuarios
-  - name: addresses
+  - name: address
     description: Operacoes relacionadas a enderecos de usuarios
   - name: restaurants
     description: Operacoes relacionadas a restaurantes
@@ -374,7 +374,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Nao e possivel deletar o tipo de usuario pois esta sendo usado por usuarios ativos.
-  /users/{userId}/addresses:
+  /users/{userId}/address:
     parameters:
       - name: userId
         schema:
@@ -387,10 +387,10 @@ paths:
 
     get:
       tags:
-        - addresses
+        - address
       security:
         - bearerAuth: []
-      operationId: listAddressesByUserId
+      operationId: listAddressByUserId
       summary: Lista todos os enderecos de um usuario.
       description: Retorna uma lista de todos os enderecos associados a um usuario especifico.
       responses:
@@ -405,7 +405,7 @@ paths:
 
     post:
       tags:
-        - addresses
+        - address
       security:
         - bearerAuth: []
       operationId: createAddressForUser
@@ -425,7 +425,7 @@ paths:
                 $ref: '#/components/schemas/AddressResponse'
           description: Cria com sucesso um endereco para o usuario. Retorna os detalhes do endereco recem-criado.
 
-  /users/{userId}/addresses/{addressId}:
+  /users/{userId}/address/{addressId}:
     parameters:
       - name: userId
         schema:
@@ -445,7 +445,7 @@ paths:
 
     put:
       tags:
-        - addresses
+        - address
       security:
         - bearerAuth: []
       operationId: updateAddressForUser
@@ -469,7 +469,7 @@ paths:
 
     delete:
       tags:
-        - addresses
+        - address
       security:
         - bearerAuth: []
       operationId: deleteAddressForUser
@@ -1051,6 +1051,7 @@ components:
         - login
         - password
         - userTypeUuid
+        - address
       type: object
       properties:
         name:
@@ -1088,11 +1089,7 @@ components:
           format: uuid
           description: UUID do tipo de usuario (OWNER, CUSTOMER, etc.).
           example: 123e4567-e89b-12d3-a456-426614174000
-        active:
-          type: boolean
-          description: Status de ativacao do usuario.
-          example: true
-        addresses:
+        address:
           type: array
           items:
             $ref: '#/components/schemas/AddressRequest'
@@ -1132,7 +1129,7 @@ components:
           type: boolean
           description: Novo status de ativacao do usuario.
           example: true
-        addresses:
+        address:
           type: array
           items:
             $ref: '#/components/schemas/AddressRequest'
@@ -1172,7 +1169,7 @@ components:
           description: Indica se o usuario esta ativo no sistema (alias de 'active').
           type: boolean
           example: true
-        addresses:
+        address:
           type: array
           items:
             $ref: '#/components/schemas/AddressResponse'
@@ -1264,11 +1261,7 @@ components:
           minLength: 3
           maxLength: 100
         address:
-          type: string
-          description: Endereco completo do restaurante.
-          example: Rua Principal, 123, Centro, Sao Paulo - SP
-          minLength: 10
-          maxLength: 255
+          $ref: '#/components/schemas/AddressRequest'
         cuisineType:
           type: string
           description: Tipo de cozinha servida no restaurante.
@@ -1332,9 +1325,10 @@ components:
           description: Nome do restaurante.
           example: Restaurante da Praca
         address:
-          type: string
-          description: Endereco completo do restaurante.
-          example: Rua Principal, 123, Centro, Sao Paulo - SP
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressResponse'
+          description: Lista de enderecos do restaurante.
         cuisineType:
           type: string
           description: Tipo de cozinha servida no restaurante.
@@ -1515,7 +1509,7 @@ components:
           type: string
           description: Senha do usuario.
           example: MyStrongPassword123!
-        addresses:
+        address:
           type: array
           items:
             $ref: '#/components/schemas/AddressRequest'
@@ -1535,11 +1529,6 @@ components:
       type: object
       description: Representa os dados de um endereco para requisicoes.
       properties:
-        id:
-          type: string
-          format: uuid
-          description: ID do endereco (opcional para criacao, obrigatorio para atualizacao).
-          example: b1a7d7a3-2f18-4c91-a10d-9e4a5c0f3b99
         publicPlace:
           type: string
           description: Nome da rua, avenida, praca, etc.
