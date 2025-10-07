@@ -22,7 +22,7 @@ public class UpdateUserRequestMapper {
                 dto.getEmail(),
                 dto.getLogin(),
                 dto.getCpf(),
-                AddressRequestMapper.toEntity(dto.getAddresses()),
+                AddressMapper.toEntity(dto.getAddresses()),
                 userType,
                 isActive,
                 OffsetDateTime.now(),

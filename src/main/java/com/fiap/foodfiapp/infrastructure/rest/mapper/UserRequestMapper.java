@@ -6,8 +6,6 @@ import com.fiap.foodfiapp.model.UserRequest;
 
 import java.time.OffsetDateTime;
 
-import java.util.UUID;
-
 public class UserRequestMapper {
     private static final boolean DEFAULT_ACTIVE = true;
 
@@ -24,7 +22,7 @@ public class UserRequestMapper {
                 dto.getEmail(),
                 dto.getLogin(),
                 dto.getCpf(),
-                AddressRequestMapper.toEntity(dto.getAddresses()),
+                AddressMapper.toEntity(dto.getAddresses()),
                 userType,
                 isActive,
                 OffsetDateTime.now(),
