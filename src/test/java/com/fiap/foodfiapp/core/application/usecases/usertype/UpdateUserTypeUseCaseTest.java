@@ -2,6 +2,7 @@ package com.fiap.foodfiapp.core.application.usecases.usertype;
 
 import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.UpdateUserTypeUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
@@ -27,7 +28,7 @@ class UpdateUserTypeUseCaseTest {
     @Mock
     private UserRepositoryGateway userRepositoryGateway;
 
-    private UpdateUserTypeUseCase updateUserTypeUseCase;
+    private UpdateUserTypeUseCaseImpl updateUserTypeUseCase;
 
     private UUID userTypeUuid;
     private UserType existingUserType;
@@ -36,7 +37,7 @@ class UpdateUserTypeUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        updateUserTypeUseCase = new UpdateUserTypeUseCase(userTypeRepositoryGateway, userRepositoryGateway);
+        updateUserTypeUseCase = new UpdateUserTypeUseCaseImpl(userTypeRepositoryGateway, userRepositoryGateway);
 
         userTypeUuid = UUID.randomUUID();
 

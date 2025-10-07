@@ -2,6 +2,7 @@ package com.fiap.foodfiapp.core.application.usecases.usertype;
 
 import com.fiap.foodfiapp.core.application.gateways.UserRepositoryGateway;
 import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.CoreUserTypeModificationException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeInUseException;
@@ -25,14 +26,14 @@ class DeleteUserTypeUseCaseTest {
     @Mock
     private UserRepositoryGateway userRepositoryGateway;
 
-    private DeleteUserTypeUseCase deleteUserTypeUseCase;
+    private DeleteUserTypeUseCaseImpl deleteUserTypeUseCase;
 
     private UUID userTypeUuid;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        deleteUserTypeUseCase = new DeleteUserTypeUseCase(userTypeRepositoryGateway, userRepositoryGateway);
+        deleteUserTypeUseCase = new DeleteUserTypeUseCaseImpl(userTypeRepositoryGateway, userRepositoryGateway);
         userTypeUuid = UUID.randomUUID();
     }
 

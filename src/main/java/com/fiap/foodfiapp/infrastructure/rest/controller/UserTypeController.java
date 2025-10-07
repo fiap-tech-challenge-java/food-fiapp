@@ -3,8 +3,8 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 import com.fiap.foodfiapp.api.UserTypesApi;
 import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
-import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
-import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.UpdateUserTypeUseCaseImpl;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeRequestMapper;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeResponseMapper;
 import com.fiap.foodfiapp.model.CreateUserTypeRequest;
@@ -21,13 +21,13 @@ import java.util.stream.Collectors;
 @RestController
 public class UserTypeController implements UserTypesApi {
     private final CreateUserTypeUseCase createUserTypeUseCase;
-    private final UpdateUserTypeUseCase updateUserTypeUseCase;
-    private final DeleteUserTypeUseCase deleteUserTypeUseCase;
+    private final UpdateUserTypeUseCaseImpl updateUserTypeUseCase;
+    private final DeleteUserTypeUseCaseImpl deleteUserTypeUseCase;
     private final UserTypeRepositoryGateway userTypeRepositoryGateway;
 
     public UserTypeController(CreateUserTypeUseCase createUserTypeUseCase,
-                             UpdateUserTypeUseCase updateUserTypeUseCase,
-                             DeleteUserTypeUseCase deleteUserTypeUseCase,
+                             UpdateUserTypeUseCaseImpl updateUserTypeUseCase,
+                             DeleteUserTypeUseCaseImpl deleteUserTypeUseCase,
                              UserTypeRepositoryGateway userTypeRepositoryGateway) {
         this.createUserTypeUseCase = createUserTypeUseCase;
         this.updateUserTypeUseCase = updateUserTypeUseCase;

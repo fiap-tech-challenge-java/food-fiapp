@@ -3,8 +3,8 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
-import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
-import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.usertype.impl.UpdateUserTypeUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeInUseException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsException;
@@ -36,10 +36,10 @@ class UserTypeControllerTest {
     private CreateUserTypeUseCase createUserTypeUseCase;
 
     @Mock
-    private UpdateUserTypeUseCase updateUserTypeUseCase;
+    private UpdateUserTypeUseCaseImpl updateUserTypeUseCase;
 
     @Mock
-    private DeleteUserTypeUseCase deleteUserTypeUseCase;
+    private DeleteUserTypeUseCaseImpl deleteUserTypeUseCase;
 
     @Mock
     private UserTypeRepositoryGateway userTypeRepositoryGateway;

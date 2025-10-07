@@ -1,11 +1,11 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.MenuItemsApi;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.CreateMenuItemUseCase;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.DeleteMenuItemUseCase;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.GetMenuItemByIdUseCase;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.GetMenuItemsByRestaurantUseCase;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.UpdateMenuItemUseCase;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.CreateMenuItemUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.DeleteMenuItemUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.GetMenuItemByIdUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.GetMenuItemsByRestaurantUseCaseImpl;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.UpdateMenuItemUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.exception.FileStorageException;
 import com.fiap.foodfiapp.model.MenuItemResponse;
@@ -23,11 +23,11 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 public class MenuItemController implements MenuItemsApi {
-    private final CreateMenuItemUseCase createMenuItemUseCase;
-    private final GetMenuItemsByRestaurantUseCase getMenuItemsByRestaurantUseCase;
-    private final GetMenuItemByIdUseCase getMenuItemByIdUseCase;
-    private final UpdateMenuItemUseCase updateMenuItemUseCase;
-    private final DeleteMenuItemUseCase deleteMenuItemUseCase;
+    private final CreateMenuItemUseCaseImpl createMenuItemUseCase;
+    private final GetMenuItemsByRestaurantUseCaseImpl getMenuItemsByRestaurantUseCase;
+    private final GetMenuItemByIdUseCaseImpl getMenuItemByIdUseCase;
+    private final UpdateMenuItemUseCaseImpl updateMenuItemUseCase;
+    private final DeleteMenuItemUseCaseImpl deleteMenuItemUseCase;
 
     @Override
     public ResponseEntity<List<MenuItemResponse>> listMenuItems(UUID restaurantId) {
