@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -27,9 +28,9 @@ public class RestaurantController implements RestaurantsApi {
     private final FindRestaurantByIdUseCase findRestaurantByIdUseCase;
     private final UpdateRestaurantUseCase updateRestaurantUseCase;
     private final DeleteRestaurantUseCase deleteRestaurantUseCase;
-    private final FindAllRestaurantsByUserIdUseCase findAllRestaurantsByUserIdUseCase; // Para a busca customizada
+    private final FindAllRestaurantsByUserIdUseCase findAllRestaurantsByUserIdUseCase;
 
-    private final UserRepository userRepository; // Para enriquecer a resposta com dados do dono
+    private final UserRepository userRepository; // Para buscar os dados do dono
 
     private final RestaurantMapper restaurantMapper = RestaurantMapper.INSTANCE;
     private final UserMapper userMapper = UserMapper.INSTANCE;
@@ -37,8 +38,11 @@ public class RestaurantController implements RestaurantsApi {
     @Override
     public ResponseEntity<RestaurantResponse> createRestaurant(CreateRestaurantRequest createRestaurantRequest) {
         Restaurant restaurant = restaurantMapper.toRestaurant(createRestaurantRequest);
+        // O ownerId vem no DTO, precisamos passá-lo para a entidade de domínio
+        restaurant.setUserOwnerId(createRestaurantRequest.getOwnerId());
+
         Restaurant createdRestaurant = createRestaurantUseCase.execute(restaurant);
-        RestaurantResponse response = toRestaurantResponse(createdRestaurant);
+        RestaurantResponse response = enrichResponseWithOwner(createdRestaurant);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -50,19 +54,18 @@ public class RestaurantController implements RestaurantsApi {
 
     @Override
     public ResponseEntity<RestaurantResponse> getRestaurant(UUID id) {
-        Restaurant restaurant = findRestaurantByIdUseCase.execute(id);
-        if (restaurant == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(toRestaurantResponse(restaurant));
+        return Optional.ofNullable(findRestaurantByIdUseCase.execute(id))
+                .map(this::enrichResponseWithOwner)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @Override
     public ResponseEntity<List<RestaurantResponse>> listRestaurants() {
-        // Nota: A listagem de todos os restaurantes não foi definida nos seus UseCases.
-        // Adicionando uma busca por todos os restaurantes de um usuário como exemplo.
-        // Se precisar de uma busca global, teríamos que adicionar um novo UseCase.
-        // Por enquanto, retornaremos uma lista vazia para cumprir o contrato da API.
+        // A API define um endpoint para listar TODOS os restaurantes.
+        // Se a regra de negócio for listar apenas por usuário, o openapi.yaml precisaria ser ajustado.
+        // Por enquanto, vamos retornar uma lista vazia para cumprir o contrato.
+        // Se houver um use case para buscar todos, ele seria usado aqui.
         List<RestaurantResponse> response = Collections.emptyList();
         return ResponseEntity.ok(response);
     }
@@ -70,20 +73,22 @@ public class RestaurantController implements RestaurantsApi {
     @Override
     public ResponseEntity<RestaurantResponse> updateRestaurant(UUID id, UpdateRestaurantRequest updateRestaurantRequest) {
         Restaurant restaurantUpdates = restaurantMapper.toRestaurant(updateRestaurantRequest);
-        restaurantUpdates.setId(id); // Define o ID a partir do path
+        restaurantUpdates.setId(id); // O ID vem do path da URL
 
         Restaurant updatedRestaurant = updateRestaurantUseCase.execute(restaurantUpdates);
-        return ResponseEntity.ok(toRestaurantResponse(updatedRestaurant));
+        return ResponseEntity.ok(enrichResponseWithOwner(updatedRestaurant));
     }
 
     /**
-     * Método auxiliar para enriquecer a resposta do restaurante com os dados do proprietário.
+     * Método auxiliar para popular os dados do proprietário (owner) na resposta.
      */
-    private RestaurantResponse toRestaurantResponse(Restaurant restaurant) {
+    private RestaurantResponse enrichResponseWithOwner(Restaurant restaurant) {
         RestaurantResponse response = restaurantMapper.toRestaurantResponse(restaurant);
-        userRepository.findById(restaurant.getUserOwnerId()).ifPresent(owner -> {
-            response.setOwner(userMapper.toUserResponse(owner));
-        });
+        if (restaurant.getUserOwnerId() != null) {
+            userRepository.findById(restaurant.getUserOwnerId()).ifPresent(owner -> {
+                response.setOwner(userMapper.toUserResponse(owner));
+            });
+        }
         return response;
     }
 }

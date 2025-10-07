@@ -2,16 +2,13 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.MenuItemsApi;
 import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.CreateMenuItemUseCase;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.DeleteMenuItemUseCase;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.FindAllMenuItemsUseCase;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.FindMenuItemByIdUseCase;
-import com.fiap.foodfiapp.core.application.usecases.menuitem.UpdateMenuItemUseCase;
+import com.fiap.foodfiapp.core.application.usecases.menuitem.*;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.exception.FileStorageException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.MenuItemMapper;
 import com.fiap.foodfiapp.model.MenuItemResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,10 +45,10 @@ public class MenuItemController implements MenuItemsApi {
             }
 
             MenuItem createdItem = createMenuItemUseCase.execute(menuItem, fileUploadRequest);
-            return ResponseEntity.ok(menuItemMapper.toMenuItemResponse(createdItem));
+            return ResponseEntity.status(HttpStatus.CREATED).body(menuItemMapper.toMenuItemResponse(createdItem));
 
         } catch (IOException e) {
-            throw new FileStorageException("Failed to store menu item photo", e);
+            throw new FileStorageException("Failed to process menu item photo", e);
         }
     }
 
@@ -92,7 +89,7 @@ public class MenuItemController implements MenuItemsApi {
             MenuItem updatedItem = updateMenuItemUseCase.execute(itemId, menuItemUpdate, fileUploadRequest);
             return ResponseEntity.ok(menuItemMapper.toMenuItemResponse(updatedItem));
         } catch (IOException e) {
-            throw new FileStorageException("Failed to update menu item photo", e);
+            throw new FileStorageException("Failed to process menu item photo on update", e);
         }
     }
 }
