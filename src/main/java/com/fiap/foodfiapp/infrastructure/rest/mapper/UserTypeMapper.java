@@ -16,7 +16,7 @@ public interface UserTypeMapper {
     UserTypeMapper INSTANCE = Mappers.getMapper(UserTypeMapper.class);
 
     @Mapping(target = "uuid", ignore = true)
-    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "active", constant = "true")
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     UserType toUserType(CreateUserTypeRequest createUserTypeRequest);

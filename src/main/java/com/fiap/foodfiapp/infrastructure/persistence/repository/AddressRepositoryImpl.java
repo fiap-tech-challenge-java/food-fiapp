@@ -21,10 +21,8 @@ public class AddressRepositoryImpl implements AddressRepository {
     @Override
     public Address save(Address address, UUID ownerId, String ownerType) {
         var entity = addressMapper.toEntity(address);
-        // A lógica de atribuir o 'owner' foi movida para o UseCase,
-        // mas a entidade JPA ainda precisa desses campos. O ideal é que o
-        // UseCase prepare a entidade de domínio completa, ou que o save
-        // receba os dados do owner. Vamos assumir que o UseCase enriquece o objeto.
+        entity.setOwnerId(ownerId);
+        entity.setOwnerType(ownerType);
         var savedEntity = repository.save(entity);
         return addressMapper.toDomain(savedEntity);
     }

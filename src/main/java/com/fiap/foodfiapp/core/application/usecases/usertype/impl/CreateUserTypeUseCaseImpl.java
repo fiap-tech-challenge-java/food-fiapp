@@ -28,6 +28,9 @@ public class CreateUserTypeUseCaseImpl implements CreateUserTypeUseCase {
             });
         }
 
+        // Garantir que novos UserTypes sejam criados como ativos por padrão
+        userType.setActive(true);
+
         return userTypeRepository.save(userType);
     }
 }

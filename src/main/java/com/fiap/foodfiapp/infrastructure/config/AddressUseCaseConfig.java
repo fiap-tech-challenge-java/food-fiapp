@@ -45,7 +45,7 @@ public class AddressUseCaseConfig {
      * Define o bean para o caso de uso de busca de endereços por proprietário.
      */
     @Bean
-    public FindAddressByOwnerUseCase findAddressesByOwnerUseCase(AddressRepository addressRepository) {
+    public FindAddressByOwnerUseCase findAddressByOwnerUseCase(AddressRepository addressRepository) {
         return new FindAddressByOwnerUseCaseImpl(addressRepository);
     }
 }

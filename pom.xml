@@ -250,7 +250,7 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.7.0</version>
+                <version>${openapi-generator.version}</version>
                 <executions>
                     <execution>
                         <id>generate-openapi</id>
