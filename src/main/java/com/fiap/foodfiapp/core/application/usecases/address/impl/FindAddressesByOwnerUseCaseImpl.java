@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.core.application.usecases.address.impl;
 
-import com.fiap.foodfiapp.core.domain.port.AddressRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.application.usecases.address.FindAddressesByOwnerUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Address;
 import org.springframework.stereotype.Service;
@@ -10,14 +10,14 @@ import java.util.UUID;
 @Service
 public class FindAddressesByOwnerUseCaseImpl implements FindAddressesByOwnerUseCase {
 
-    private final AddressRepositoryGateway addressRepositoryGateway;
+    private final AddressRepository addressRepository;
 
-    public FindAddressesByOwnerUseCaseImpl(AddressRepositoryGateway addressRepositoryGateway) {
-        this.addressRepositoryGateway = addressRepositoryGateway;
+    public FindAddressesByOwnerUseCaseImpl(AddressRepository addressRepository) {
+        this.addressRepository = addressRepository;
     }
 
     @Override
     public List<Address> execute(UUID ownerId, String ownerType) {
-        return addressRepositoryGateway.findByOwner(ownerId, ownerType);
+        return addressRepository.findByOwner(ownerId, ownerType);
     }
 }

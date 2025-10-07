@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.persistence.repository;
 
-import com.fiap.foodfiapp.core.domain.port.AddressRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.entity.Address;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.mapper.AddressPersistenceMapper;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class AddressRepositoryGatewayImpl implements AddressRepositoryGateway {
+public class AddressRepositoryImpl implements AddressRepository {
 
     private final AddressSpringDataRepository repository;
 

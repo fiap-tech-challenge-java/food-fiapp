@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.core.application.usecases.address.impl;
 
-import com.fiap.foodfiapp.core.domain.port.AddressRepositoryGateway;
+import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.application.usecases.address.UpdateAddressUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Address;
 import com.fiap.foodfiapp.core.domain.exception.AddressNotFoundException;
@@ -10,15 +10,15 @@ import java.util.UUID;
 @Service
 public class UpdateAddressUseCaseImpl implements UpdateAddressUseCase {
 
-    private final AddressRepositoryGateway addressRepositoryGateway;
+    private final AddressRepository addressRepository;
 
-    public UpdateAddressUseCaseImpl(AddressRepositoryGateway addressRepositoryGateway) {
-        this.addressRepositoryGateway = addressRepositoryGateway;
+    public UpdateAddressUseCaseImpl(AddressRepository addressRepository) {
+        this.addressRepository = addressRepository;
     }
 
     @Override
     public Address execute(UUID addressId, Address addressUpdates) {
-        Address existingAddress = addressRepositoryGateway.findById(addressId)
+        Address existingAddress = addressRepository.findById(addressId)
                 .orElseThrow(() -> new AddressNotFoundException("Address not found."));
 
         // A lógica de save no gateway polimórfico precisa ser ajustada para suportar atualização
