@@ -9,7 +9,6 @@ import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.core.domain.exception.CpfAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.LoginAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
-import org.springframework.stereotype.Service;
 
 public class CreateUserUseCaseImpl implements CreateUserUseCase {
     private final UserRepository userRepository;
