@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
-import com.fiap.foodfiapp.core.application.usecases.addressesrestaurant.CreateAddressesRestaurantUseCase;
-import com.fiap.foodfiapp.core.application.usecases.addressesrestaurant.DeleteAddressesRestaurantUseCase;
+import com.fiap.foodfiapp.core.application.usecases.address.CreateAddressUseCase;
+import com.fiap.foodfiapp.core.application.usecases.address.DeleteAddressUseCase;
 import com.fiap.foodfiapp.core.domain.entities.addressesrestaurant.CreateAddressesRestaurant;
 import com.fiap.foodfiapp.core.domain.entities.addressesrestaurant.CreatedAddressesRestaurant;
 import com.fiap.foodfiapp.infrastructure.rest.dto.addressesrestaurant.CreateAddressesRestaurantRequestDTO;
@@ -17,20 +17,20 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/restaurants/addresses")
 public class AddressesRestaurantController {
-    private final CreateAddressesRestaurantUseCase createAddressesRestaurantUseCase;
-    private final DeleteAddressesRestaurantUseCase deleteAddressesRestaurantUseCase;
+    private final CreateAddressUseCase createAddressUseCase;
+    private final DeleteAddressUseCase deleteAddressUseCase;
     private static final AddressesRestaurantMapper ADDRESSES_RESTAURANT_MAPPER = AddressesRestaurantMapper.INSTANCE;
 
-    public AddressesRestaurantController(CreateAddressesRestaurantUseCase createAddressesRestaurantUseCase,
-                                         DeleteAddressesRestaurantUseCase deleteAddressesRestaurantUseCase) {
-        this.createAddressesRestaurantUseCase = createAddressesRestaurantUseCase;
-        this.deleteAddressesRestaurantUseCase = deleteAddressesRestaurantUseCase;
+    public AddressesRestaurantController(CreateAddressUseCase createAddressUseCase,
+                                         DeleteAddressUseCase deleteAddressUseCase) {
+        this.createAddressUseCase = createAddressUseCase;
+        this.deleteAddressUseCase = deleteAddressUseCase;
     }
 
     @PostMapping
     public ResponseEntity<CreateAddressesRestaurantResponseDTO> create(@RequestBody @Valid CreateAddressesRestaurantRequestDTO createAddressesRestaurantRequestDTO) {
         CreateAddressesRestaurant createAddressesRestaurant = ADDRESSES_RESTAURANT_MAPPER.mapToCreateAddressesRestaurant(createAddressesRestaurantRequestDTO);
-        CreatedAddressesRestaurant createdAddressesRestaurant = this.createAddressesRestaurantUseCase.execute(createAddressesRestaurant);
+        CreatedAddressesRestaurant createdAddressesRestaurant = this.createAddressUseCase.execute(createAddressesRestaurant);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -39,7 +39,7 @@ public class AddressesRestaurantController {
 
     @DeleteMapping("/{restaurantId}")
     public ResponseEntity<?> delete(@PathVariable UUID restaurantId) {
-        this.deleteAddressesRestaurantUseCase.deleteAddressesRestaurant(restaurantId);
+        this.deleteAddressUseCase.deleteAddressesRestaurant(restaurantId);
 
         return ResponseEntity.noContent().build();
     }

@@ -2,7 +2,6 @@ package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
 import com.fiap.foodfiapp.core.domain.entities.Address;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
-import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressesEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.RestaurantEntity;
 import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.CreateRestaurantRequestDTO;
 import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.CreateRestaurantResponseDTO;

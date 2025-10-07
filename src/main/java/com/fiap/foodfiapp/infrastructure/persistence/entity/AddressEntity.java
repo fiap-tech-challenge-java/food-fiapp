@@ -20,10 +20,6 @@ public class AddressEntity extends BaseEntity {
     @Column(name = "id")
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
-
     @Column(name = "public_place", nullable = false)
     private String publicPlace;
 
@@ -43,4 +39,10 @@ public class AddressEntity extends BaseEntity {
 
     @Column(name = "postal_code", nullable = false)
     private String postalCode;
+
+    @Column(name = "owner_id", nullable = false)
+    private UUID ownerId;
+
+    @Column(name = "owner_type", nullable = false)
+    private String ownerType; // Ex: "USER" ou "RESTAURANT"
 }

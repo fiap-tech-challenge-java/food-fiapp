@@ -7,10 +7,9 @@ import com.fiap.foodfiapp.core.domain.entities.restaurant.Restaurant;
 import com.fiap.foodfiapp.core.domain.entities.restaurant.UpdateRestaurant;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.core.domain.exception.NotFoundException;
-import com.fiap.foodfiapp.infrastructure.persistence.entity.AddressesEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.RestaurantEntity;
 import com.fiap.foodfiapp.infrastructure.persistence.entity.UserEntity;
-import com.fiap.foodfiapp.infrastructure.persistence.springdata.AddressesRestaurantSpringDataRepository;
+import com.fiap.foodfiapp.infrastructure.persistence.springdata.AddressSpringDataRepository;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.RestaurantSpringDataRepository;
 import com.fiap.foodfiapp.infrastructure.persistence.springdata.UserSpringDataRepository;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
@@ -25,16 +24,16 @@ import java.util.UUID;
 public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGateway {
     private final UserSpringDataRepository userSpringDataRepository;
     private final RestaurantSpringDataRepository restaurantSpringDataRepository;
-    private final AddressesRestaurantSpringDataRepository addressesRestaurantSpringDataRepository;
+    private final AddressSpringDataRepository addressSpringDataRepository;
 
     private static final RestaurantMapper RESTAURANT_MAPPER = RestaurantMapper.INSTANCE;
 
     public RestaurantRepositoryGatewayImpl(UserSpringDataRepository userSpringDataRepository,
                                            RestaurantSpringDataRepository restaurantSpringDataRepository,
-                                           AddressesRestaurantSpringDataRepository addressesRestaurantSpringDataRepository) {
+                                           AddressSpringDataRepository addressSpringDataRepository) {
         this.userSpringDataRepository = userSpringDataRepository;
         this.restaurantSpringDataRepository = restaurantSpringDataRepository;
-        this.addressesRestaurantSpringDataRepository = addressesRestaurantSpringDataRepository;
+        this.addressSpringDataRepository = addressSpringDataRepository;
     }
 
     @Override
@@ -127,7 +126,7 @@ public class RestaurantRepositoryGatewayImpl implements RestaurantRepositoryGate
             restaurantEntity.setAddress(null);
             restaurantSpringDataRepository.save(restaurantEntity);
 
-            addressesRestaurantSpringDataRepository.delete(address);
+            addressSpringDataRepository.delete(address);
         }
 
         restaurantEntity.setActive(false);
