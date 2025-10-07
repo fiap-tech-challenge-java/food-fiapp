@@ -1,30 +1,43 @@
 package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
-import com.fiap.foodfiapp.core.domain.entities.Address;
-import com.fiap.foodfiapp.core.domain.entities.restaurant.*;
-import com.fiap.foodfiapp.infrastructure.persistence.entity.RestaurantEntity;
-import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.CreateRestaurantRequestDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.CreateRestaurantResponseDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.restaurant.UpdateRestaurantRequestDTO;
+import com.fiap.foodfiapp.core.domain.entity.Restaurant;
+import com.fiap.foodfiapp.core.domain.entity.User;
+import com.fiap.foodfiapp.model.CreateRestaurantRequest;
+import com.fiap.foodfiapp.model.RestaurantResponse;
+import com.fiap.foodfiapp.model.UpdateRestaurantRequest;
+import com.fiap.foodfiapp.model.UserResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(uses = {AddressMapper.class, UserMapper.class})
 public interface RestaurantMapper {
+
     RestaurantMapper INSTANCE = Mappers.getMapper(RestaurantMapper.class);
 
-    CreateRestaurant mapToCreateRestaurant(CreateRestaurantRequestDTO createRestaurantRequestDTO);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "address", ignore = true) // Endereço será tratado separadamente
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
+    Restaurant toRestaurant(CreateRestaurantRequest createRestaurantRequest);
 
-    Restaurant mapToRestaurant(RestaurantEntity restaurantEntity);
-    Address mapToAddress(AddressesEntity addressesEntity);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "address", ignore = true)
+    @Mapping(target = "userOwnerId", ignore = true) // O dono não deve ser alterado nesta operação
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
+    Restaurant toRestaurant(UpdateRestaurantRequest updateRestaurantRequest);
 
-    List<Restaurant> mapToListRestaurant(List<RestaurantEntity> restaurantEntities);
+    // O campo 'owner' do tipo UserResponse será populado no controller
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(source = "active", target = "isActive")
+    RestaurantResponse toRestaurantResponse(Restaurant restaurant);
 
-    CreatedRestaurant mapToCreatedRestaurant(RestaurantEntity restaurantEntity);
-
-    CreateRestaurantResponseDTO mapToCreateRestaurantResponseDTO(CreatedRestaurant createdRestaurant);
-
-    UpdateRestaurant mapToUpdateRestaurant(UpdateRestaurantRequestDTO updateRestaurantRequestDTO);
+    List<RestaurantResponse> toRestaurantResponseList(List<Restaurant> restaurants);
 }

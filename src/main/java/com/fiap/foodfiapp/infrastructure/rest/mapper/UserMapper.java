@@ -1,22 +1,59 @@
 package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
-import com.fiap.foodfiapp.core.domain.entities.CreateUser;
-import com.fiap.foodfiapp.core.domain.entities.User;
-import com.fiap.foodfiapp.infrastructure.rest.dto.user.UserRequestDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.user.UserResponseDTO;
+import com.fiap.foodfiapp.core.domain.entity.User;
+import com.fiap.foodfiapp.core.domain.entity.UserType;
+import com.fiap.foodfiapp.model.AddressResponse;
+import com.fiap.foodfiapp.model.CreateUserRequest;
+import com.fiap.foodfiapp.model.UpdateUserRequest;
+import com.fiap.foodfiapp.model.UserResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.UUID;
 
-@Mapper
+@Mapper(uses = {AddressMapper.class})
 public interface UserMapper {
+
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    CreateUser mapToCreateUser(UserRequestDTO dto);
-    UserRequestDTO mapToUserRequestDTO(User user);
+    @Mapping(source = "userTypeUuid", target = "userType", qualifiedByName = "uuidToUserType")
+    @Mapping(target = "id", ignore = true) // Ignora o ID na criação
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    User toUser(CreateUserRequest createUserRequest);
 
-    UserResponseDTO mapToUserResponseDTO(User dto);
-    List<UserResponseDTO> mapToUserResponseListDTO(List<User> users);
+    @Mapping(source = "userTypeUuid", target = "userType", qualifiedByName = "uuidToUserType")
+    @Mapping(target = "id", ignore = true) // O ID virá do path da URL, não do corpo
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    User toUser(UpdateUserRequest updateUserRequest);
+
+    @Mapping(source = "userType", target = "userType", qualifiedByName = "userTypeToName")
+    @Mapping(source = "active", target = "isActive")
+    UserResponse toUserResponse(User user);
+
+    List<UserResponse> toUserResponseList(List<User> users);
+
+    // Métodos auxiliares para conversões específicas
+    @Named("uuidToUserType")
+    default UserType uuidToUserType(UUID uuid) {
+        if (uuid == null) {
+            return null;
+        }
+        UserType userType = new UserType();
+        userType.setUuid(uuid);
+        return userType;
+    }
+
+    @Named("userTypeToName")
+    default String userTypeToName(UserType userType) {
+        if (userType == null || userType.getName() == null) {
+            return null;
+        }
+        return userType.getName();
+    }
 }
 

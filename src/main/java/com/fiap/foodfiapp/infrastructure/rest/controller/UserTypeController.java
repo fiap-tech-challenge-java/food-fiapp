@@ -1,46 +1,38 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.UserTypesApi;
-import com.fiap.foodfiapp.core.application.gateways.UserTypeRepositoryGateway;
 import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.impl.DeleteUserTypeUseCaseImpl;
 import com.fiap.foodfiapp.core.application.usecases.usertype.impl.UpdateUserTypeUseCaseImpl;
-import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeRequestMapper;
-import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeResponseMapper;
+import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
+import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeMapper;
 import com.fiap.foodfiapp.model.CreateUserTypeRequest;
 import com.fiap.foodfiapp.model.UpdateUserTypeRequest;
 import com.fiap.foodfiapp.model.UserTypeResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class UserTypeController implements UserTypesApi {
+
     private final CreateUserTypeUseCase createUserTypeUseCase;
     private final UpdateUserTypeUseCaseImpl updateUserTypeUseCase;
     private final DeleteUserTypeUseCaseImpl deleteUserTypeUseCase;
-    private final UserTypeRepositoryGateway userTypeRepositoryGateway;
+    private final UserTypeRepository userTypeRepository;
 
-    public UserTypeController(CreateUserTypeUseCase createUserTypeUseCase,
-                             UpdateUserTypeUseCaseImpl updateUserTypeUseCase,
-                             DeleteUserTypeUseCaseImpl deleteUserTypeUseCase,
-                             UserTypeRepositoryGateway userTypeRepositoryGateway) {
-        this.createUserTypeUseCase = createUserTypeUseCase;
-        this.updateUserTypeUseCase = updateUserTypeUseCase;
-        this.deleteUserTypeUseCase = deleteUserTypeUseCase;
-        this.userTypeRepositoryGateway = userTypeRepositoryGateway;
-    }
+    private final UserTypeMapper userTypeMapper = UserTypeMapper.INSTANCE;
 
     @Override
     public ResponseEntity<UserTypeResponse> createUserType(CreateUserTypeRequest createUserTypeRequest) {
-        var userType = UserTypeRequestMapper.toEntity(createUserTypeRequest);
+        var userType = userTypeMapper.toUserType(createUserTypeRequest);
         var createdUserType = createUserTypeUseCase.execute(userType);
-        var responseDTO = UserTypeResponseMapper.toDTO(createdUserType);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userTypeMapper.toUserTypeResponse(createdUserType));
     }
 
     @Override
@@ -51,26 +43,22 @@ public class UserTypeController implements UserTypesApi {
 
     @Override
     public ResponseEntity<UserTypeResponse> getUserType(UUID uuid) {
-        return userTypeRepositoryGateway.findById(uuid)
-                .map(UserTypeResponseMapper::toDTO)
+        return userTypeRepository.findById(uuid)
+                .map(userTypeMapper::toUserTypeResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @Override
     public ResponseEntity<List<UserTypeResponse>> getUserTypes() {
-        var userTypes = userTypeRepositoryGateway.findAll();
-        var response = userTypes.stream()
-                .map(UserTypeResponseMapper::toDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        var userTypes = userTypeRepository.findAll();
+        return ResponseEntity.ok(userTypeMapper.toUserTypeResponseList(userTypes));
     }
 
     @Override
     public ResponseEntity<UserTypeResponse> updateUserType(UUID uuid, UpdateUserTypeRequest updateUserTypeRequest) {
-        var userTypeUpdates = UserTypeRequestMapper.toEntity(updateUserTypeRequest);
+        var userTypeUpdates = userTypeMapper.toUserType(updateUserTypeRequest);
         var updatedUserType = updateUserTypeUseCase.execute(uuid, userTypeUpdates);
-        var responseDTO = UserTypeResponseMapper.toDTO(updatedUserType);
-        return ResponseEntity.ok(responseDTO);
+        return ResponseEntity.ok(userTypeMapper.toUserTypeResponse(updatedUserType));
     }
 }

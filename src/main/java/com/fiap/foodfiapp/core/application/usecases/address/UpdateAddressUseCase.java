@@ -4,5 +4,6 @@ import com.fiap.foodfiapp.core.domain.entity.Address;
 import java.util.UUID;
 
 public interface UpdateAddressUseCase {
-    Address execute(UUID addressId, Address address);
+    // A assinatura foi ajustada para receber o contexto do proprietário (owner)
+    Address execute(UUID addressId, Address addressUpdates, UUID ownerId, String ownerType);
 }

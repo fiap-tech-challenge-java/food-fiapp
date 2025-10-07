@@ -1,10 +1,11 @@
 package com.fiap.foodfiapp.infrastructure.rest.mapper;
 
 import com.fiap.foodfiapp.core.domain.entity.Address;
-import com.fiap.foodfiapp.infrastructure.rest.dto.address.AddressResponseDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.address.CreateAddressRequestDTO;
-import com.fiap.foodfiapp.infrastructure.rest.dto.address.UpdateAddressRequestDTO;
+import com.fiap.foodfiapp.model.AddressResponse;
+import com.fiap.foodfiapp.model.CreateAddressRequest;
+import com.fiap.foodfiapp.model.UpdateAddressRequest;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
@@ -13,8 +14,19 @@ import java.util.List;
 public interface AddressMapper {
     AddressMapper INSTANCE = Mappers.getMapper(AddressMapper.class);
 
-    Address toAddress(CreateAddressRequestDTO dto);
-    Address toAddress(UpdateAddressRequestDTO dto);
-    AddressResponseDTO toAddressResponseDTO(Address address);
-    List<AddressResponseDTO> toAddressResponseDTOList(List<Address> addresses);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
+    Address toAddress(CreateAddressRequest dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
+    Address toAddress(UpdateAddressRequest dto);
+
+    AddressResponse toAddressResponse(Address address);
+
+    List<AddressResponse> toAddressResponseList(List<Address> addresses);
 }
