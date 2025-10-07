@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum AddressesOwnerTypeEnum {
+public enum AddressOwnerTypeEnum {
     USER("USER"),
     RESTAURANT("RESTAURANT");
 

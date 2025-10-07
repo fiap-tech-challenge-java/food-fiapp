@@ -7,7 +7,7 @@ import com.fiap.foodfiapp.core.domain.entity.Address;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
-import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressesOwnerTypeEnum;
+import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressOwnerTypeEnum;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -46,10 +46,10 @@ public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
         }
 
         // Exclusão lógica dos endereços associados ao restaurante
-        List<Address> addresses = addressRepository.findByOwner(id, AddressesOwnerTypeEnum.RESTAURANT.getDescription());
+        List<Address> addresses = addressRepository.findByOwner(id, AddressOwnerTypeEnum.RESTAURANT.getDescription());
         for (Address address : addresses) {
             address.setIsActive(false);
-            addressRepository.save(address, id, AddressesOwnerTypeEnum.RESTAURANT.getDescription());
+            addressRepository.save(address, id, AddressOwnerTypeEnum.RESTAURANT.getDescription());
         }
     }
 }

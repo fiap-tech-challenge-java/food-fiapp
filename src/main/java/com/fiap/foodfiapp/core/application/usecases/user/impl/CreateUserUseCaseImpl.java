@@ -10,7 +10,7 @@ import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 import com.fiap.foodfiapp.core.domain.exception.CpfAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.LoginAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
-import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressesOwnerTypeEnum;
+import com.fiap.foodfiapp.infrastructure.persistence.enums.AddressOwnerTypeEnum;
 
 import java.util.stream.Collectors;
 
@@ -42,7 +42,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             // Salvar endereços novos, se informados
             if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
                 var savedAddresses = user.getAddresses().stream()
-                        .map(address -> addressRepository.save(address, revived.getId(), AddressesOwnerTypeEnum.USER.getDescription()))
+                        .map(address -> addressRepository.save(address, revived.getId(), AddressOwnerTypeEnum.USER.getDescription()))
                         .collect(Collectors.toList());
                 revived.setAddresses(savedAddresses);
             }
@@ -64,7 +64,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             // Salvar endereços novos, se informados
             if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
                 var savedAddresses = user.getAddresses().stream()
-                        .map(address -> addressRepository.save(address, revived.getId(), AddressesOwnerTypeEnum.USER.getDescription()))
+                        .map(address -> addressRepository.save(address, revived.getId(), AddressOwnerTypeEnum.USER.getDescription()))
                         .collect(Collectors.toList());
                 revived.setAddresses(savedAddresses);
             }
@@ -95,7 +95,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
         // Salva os endereços associados ao usuário
         if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
             var savedAddresses = user.getAddresses().stream()
-                    .map(address -> addressRepository.save(address, savedUser.getId(), AddressesOwnerTypeEnum.USER.getDescription()))
+                    .map(address -> addressRepository.save(address, savedUser.getId(), AddressOwnerTypeEnum.USER.getDescription()))
                     .collect(Collectors.toList());
             savedUser.setAddresses(savedAddresses);
         }

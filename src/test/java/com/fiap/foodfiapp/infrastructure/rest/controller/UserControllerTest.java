@@ -71,7 +71,7 @@ class UserControllerTest {
                 .put("login", "login_test")
                 .put("userTypeUuid", userType.getUuid().toString())
                 .put("active", true)
-                .putArray("addresses")
+                .putArray("address")
                 .toString();
 
         updateUserJson = objectMapper.createObjectNode()

@@ -1,16 +1,16 @@
 package com.fiap.foodfiapp.core.application.usecases.address.impl;
 
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
-import com.fiap.foodfiapp.core.application.usecases.address.FindAddressesByOwnerUseCase;
+import com.fiap.foodfiapp.core.application.usecases.address.FindAddressByOwnerUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Address;
 import java.util.List;
 import java.util.UUID;
 
-public class FindAddressesByOwnerUseCaseImpl implements FindAddressesByOwnerUseCase {
+public class FindAddressByOwnerUseCaseImpl implements FindAddressByOwnerUseCase {
 
     private final AddressRepository addressRepository;
 
-    public FindAddressesByOwnerUseCaseImpl(AddressRepository addressRepository) {
+    public FindAddressByOwnerUseCaseImpl(AddressRepository addressRepository) {
         this.addressRepository = addressRepository;
     }
 
