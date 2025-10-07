@@ -37,7 +37,7 @@ public class AddressController implements AddressApi {
     }
 
     @Override
-    public ResponseEntity<List<AddressResponse>> listAddressesByUserId(UUID userId) {
+    public ResponseEntity<List<AddressResponse>> listAddressByUserId(UUID userId) {
         var address = findAddressByOwnerUseCase.execute(userId, AddressOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.ok(addressMapper.toAddressResponseList(address));
     }

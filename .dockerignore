@@ -1,6 +1,4 @@
 .git
-target
-**/target
 **/.idea
 **/.mvn/wrapper
 **/.DS_Store

@@ -156,6 +156,12 @@
             <artifactId>minio</artifactId>
             <version>8.5.6</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -249,32 +255,26 @@
                     <execution>
                         <id>generate-openapi</id>
                         <phase>generate-sources</phase>
-                        <goals><goal>generate</goal></goals>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/openapi/openapi.yaml</inputSpec>
                             <generatorName>spring</generatorName>
-
-                            <!-- ONDE GERAR (dentro de target/) -->
                             <output>${project.build.directory}/generated-sources/openapi</output>
-
-                            <!-- Pacotes -->
                             <apiPackage>com.fiap.foodfiapp.api</apiPackage>
                             <modelPackage>com.fiap.foodfiapp.model</modelPackage>
                             <invokerPackage>com.fiap.foodfiapp.invoker</invokerPackage>
-
-                            <!-- Geração das interfaces pelo TAG: 'address' => AddressApi -->
                             <configOptions>
                                 <useTags>true</useTags>
                                 <interfaceOnly>true</interfaceOnly>
                                 <skipDefaultInterface>true</skipDefaultInterface>
                                 <dateLibrary>java8</dateLibrary>
                                 <library>spring-boot</library>
+                                <useJakartaEe>true</useJakartaEe>
                             </configOptions>
-
-                            <!-- Desliga geração de testes de api/model -->
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
-                            <openApiNullable>false</openApiNullable>
                         </configuration>
                     </execution>
                 </executions>
