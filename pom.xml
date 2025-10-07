@@ -226,37 +226,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
-                <groupId>org.openapitools</groupId>
-                <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>${openapi-generator.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-user-api</id>
-                        <phase>generate-sources</phase>
-                        <goals><goal>generate</goal></goals>
-                        <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/openapi/openapi.yaml</inputSpec>
-                            <generatorName>spring</generatorName>
-                            <output>${project.build.directory}/generated-sources/openapi</output>
-                            <apiPackage>${default.package}.api</apiPackage>
-                            <modelPackage>${default.package}.model</modelPackage>
-                            <configOptions>
-                                <interfaceOnly>true</interfaceOnly>
-                                <useJakartaEe>true</useJakartaEe>
-                                <skipDefaultInterface>true</skipDefaultInterface>
-                                <useBeanValidation>true</useBeanValidation>
-                                <performBeanValidation>true</performBeanValidation>
-                                <openApiNullable>false</openApiNullable>
-                                <useTags>true</useTags>
-                            </configOptions>
-                            <generateApiTests>false</generateApiTests>
-                            <generateModelTests>false</generateModelTests>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
+            <!-- LIMPA arquivos gerados antigos -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -264,29 +234,71 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>${project.basedir}/src/generated</directory>
+                            <directory>${project.build.directory}/generated-sources/openapi</directory>
                         </fileset>
                     </filesets>
                 </configuration>
             </plugin>
 
+            <!-- GERA as APIs/modelos do OpenAPI SEMPRE em target/ (sumirão no clean) -->
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.7.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-openapi</id>
+                        <phase>generate-sources</phase>
+                        <goals><goal>generate</goal></goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/openapi.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+
+                            <!-- ONDE GERAR (dentro de target/) -->
+                            <output>${project.build.directory}/generated-sources/openapi</output>
+
+                            <!-- Pacotes -->
+                            <apiPackage>com.fiap.foodfiapp.api</apiPackage>
+                            <modelPackage>com.fiap.foodfiapp.model</modelPackage>
+                            <invokerPackage>com.fiap.foodfiapp.invoker</invokerPackage>
+
+                            <!-- Geração das interfaces pelo TAG: 'address' => AddressApi -->
+                            <configOptions>
+                                <useTags>true</useTags>
+                                <interfaceOnly>true</interfaceOnly>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <dateLibrary>java8</dateLibrary>
+                                <library>spring-boot</library>
+                            </configOptions>
+
+                            <!-- Desliga geração de testes de api/model -->
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <openApiNullable>false</openApiNullable>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- ADICIONA os fontes gerados ao compile -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.6.0</version>
                 <executions>
                     <execution>
-                        <id>add-generated</id>
+                        <id>add-openapi-sources</id>
                         <phase>generate-sources</phase>
                         <goals><goal>add-source</goal></goals>
                         <configuration>
                             <sources>
-                                <source>${project.basedir}/src/generated/src/main/java</source>
+                                <source>${project.build.directory}/generated-sources/openapi/src/main/java</source>
                             </sources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 

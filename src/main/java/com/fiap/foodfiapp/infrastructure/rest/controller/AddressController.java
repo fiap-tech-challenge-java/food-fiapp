@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.infrastructure.rest.controller;
 
-import com.fiap.foodfiapp.api.AddressesApi;
+import com.fiap.foodfiapp.api.AddressApi;
 import com.fiap.foodfiapp.core.application.usecases.address.CreateAddressUseCase;
 import com.fiap.foodfiapp.core.application.usecases.address.DeleteAddressUseCase;
 import com.fiap.foodfiapp.core.application.usecases.address.FindAddressByOwnerUseCase;
@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-public class AddressController implements AddressesApi {
+public class AddressController implements AddressApi {
 
     private final CreateAddressUseCase createAddressUseCase;
     private final UpdateAddressUseCase updateAddressUseCase;

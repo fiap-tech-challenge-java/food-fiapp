@@ -11,8 +11,9 @@ import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.Collections;
 
-@Mapper(uses = {UserMapper.class})
+@Mapper(uses = {UserMapper.class, AddressMapper.class})
 public interface RestaurantMapper {
 
     RestaurantMapper INSTANCE = Mappers.getMapper(RestaurantMapper.class);
@@ -28,28 +29,24 @@ public interface RestaurantMapper {
     @Mapping(target = "userOwnerId", ignore = true)
     Restaurant toRestaurant(UpdateRestaurantRequest updateRestaurantRequest);
 
-    @Mapping(source = "address", target = "address", qualifiedByName = "addressToString")
+    @Mapping(source = "address", target = "address", qualifiedByName = "addressToAddressResponseList")
     @Mapping(source = "active", target = "isActive")
-    @Mapping(target = "owner", ignore = true)
     RestaurantResponse toRestaurantResponse(Restaurant restaurant);
 
-    List<RestaurantResponse> toRestaurantResponseList(List<Restaurant> restaurants);
-
-    @Mapping(source = "address", target = "address", qualifiedByName = "addressToString")
+    @Mapping(source = "address", target = "address", qualifiedByName = "addressToAddressResponseList")
     @Mapping(source = "active", target = "isActive")
     @Mapping(target = "owner", ignore = true)
+    @Named("toRestaurantResponseWithoutOwner")
     RestaurantResponse toRestaurantResponseWithoutOwner(Restaurant restaurant);
 
+    @Mapping(target = ".", qualifiedByName = "toRestaurantResponseWithoutOwner")
     List<RestaurantResponse> toRestaurantResponseListWithoutOwner(List<Restaurant> restaurants);
 
-    @Named("addressToString")
-    default String addressToString(Address address) {
+    @Named("addressToAddressResponseList")
+    default List<com.fiap.foodfiapp.model.AddressResponse> addressToAddressResponseList(Address address) {
         if (address == null) {
-            return null;
+            return Collections.emptyList();
         }
-        // Formata o endereço em uma única string
-        return String.format("%s, %s - %s, %s - %s, %s",
-                address.getPublicPlace(), address.getNumber(), address.getNeighborhood(),
-                address.getCity(), address.getState(), address.getPostalCode());
+        return Collections.singletonList(AddressMapper.INSTANCE.toAddressResponse(address));
     }
 }
