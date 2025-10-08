@@ -6,5 +6,5 @@ import java.io.IOException;
 import java.util.UUID;
 
 public interface CreateMenuItemUseCase {
-    MenuItem execute(UUID restaurantId, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException;
+    MenuItem execute(UUID userId, UUID restaurantId, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException;
 }

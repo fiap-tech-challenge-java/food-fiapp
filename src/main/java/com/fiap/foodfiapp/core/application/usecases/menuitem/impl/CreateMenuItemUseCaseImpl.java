@@ -3,6 +3,7 @@ package com.fiap.foodfiapp.core.application.usecases.menuitem.impl;
 
 import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.CreateMenuItemUseCase;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.ValidateRestaurantOwnershipUseCase;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
@@ -15,15 +16,22 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
     private final MenuItemRepository menuItemRepository;
     private final RestaurantRepository restaurantRepository;
     private final FileStorageRepository fileStorageRepository;
+    private final ValidateRestaurantOwnershipUseCase validateRestaurantOwnershipUseCase;
 
-    public CreateMenuItemUseCaseImpl(MenuItemRepository menuItemRepository, RestaurantRepository restaurantRepository, FileStorageRepository fileStorageRepository) {
+    public CreateMenuItemUseCaseImpl(MenuItemRepository menuItemRepository, RestaurantRepository restaurantRepository, FileStorageRepository fileStorageRepository, ValidateRestaurantOwnershipUseCase validateRestaurantOwnershipUseCase) {
         this.menuItemRepository = menuItemRepository;
         this.restaurantRepository = restaurantRepository;
         this.fileStorageRepository = fileStorageRepository;
+        this.validateRestaurantOwnershipUseCase = validateRestaurantOwnershipUseCase;
     }
 
     @Override
-    public MenuItem execute(UUID restaurantId, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException {
+    public MenuItem execute(UUID userId, UUID restaurantId, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException {
+        // Valida se o usuário é o proprietário do restaurante
+        if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
+            throw new IllegalArgumentException("Usuário não possui permissão para criar itens de menu neste restaurante. Apenas o proprietário pode adicionar itens ao menu.");
+        }
+
         if (!restaurantRepository.existsById(restaurantId)) {
             throw new IllegalArgumentException("Restaurant not found or is inactive.");
         }

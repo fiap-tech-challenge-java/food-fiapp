@@ -29,8 +29,7 @@ public class MenuItemController implements MenuItemsApi {
     private final FindAllMenuItemsUseCase findAllMenuItemsUseCase;
     private final ValidateMenuItemOwnershipUseCase validateMenuItemOwnershipUseCase;
     private final AuthenticationService authenticationService;
-
-    private final MenuItemMapper menuItemMapper = MenuItemMapper.INSTANCE;
+    private final MenuItemMapper menuItemMapper;
 
     @Override
     public ResponseEntity<MenuItemResponse> createMenuItem(
@@ -60,6 +59,7 @@ public class MenuItemController implements MenuItemsApi {
             }
 
             var createdMenuItem = createMenuItemUseCase.execute(
+                userId,
                 restaurantId,
                 name,
                 description,

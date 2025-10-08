@@ -3,7 +3,6 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 import com.fiap.foodfiapp.api.RestaurantsApi;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.*;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
-import com.fiap.foodfiapp.core.domain.exception.RestaurantNotFoundException;
 import com.fiap.foodfiapp.core.domain.exception.UnauthorizedException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
 import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
@@ -89,22 +88,13 @@ public class RestaurantController implements RestaurantsApi {
 
     @Override
     public ResponseEntity<RestaurantResponse> usersUserIdRestaurantsRestaurantIdGet(UUID userId, UUID restaurantId) {
-        // Busca o restaurante APENAS UMA VEZ.
-        Restaurant restaurant = findRestaurantByIdUseCase.execute(restaurantId);
-
-        // Se o restaurante não for encontrado, o próprio caso de uso de validação
-        // (ValidateRestaurantOwnershipUseCase) já lançaria uma exceção que resultaria em 404,
-        // mas adicionamos uma verificação explícita para robustez.
-        if (restaurant == null) {
-            throw new RestaurantNotFoundException("id", restaurantId.toString());
-        }
-
-        // Valida se o usuário é o dono do restaurante.
-        // O getUserOwnerId() é chamado no objeto que já temos em memória.
-        if (!restaurant.getUserOwnerId().equals(userId)) {
-            // Lança uma exceção para retornar 403 Forbidden.
+        // Use the validation use case instead of directly accessing domain entity
+        if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
             throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
         }
+
+        // Now get the restaurant after validation
+        Restaurant restaurant = findRestaurantByIdUseCase.execute(restaurantId);
 
         var response = restaurantMapper.toRestaurantResponse(restaurant);
         return ResponseEntity.ok(response);

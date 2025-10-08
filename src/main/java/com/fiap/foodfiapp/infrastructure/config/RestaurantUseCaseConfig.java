@@ -25,8 +25,8 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public UpdateRestaurantUseCase updateRestaurantUseCase(RestaurantRepository restaurantRepository) {
-        return new UpdateRestaurantUseCaseImpl(restaurantRepository);
+    public UpdateRestaurantUseCase updateRestaurantUseCase(RestaurantRepository restaurantRepository, AddressRepository addressRepository) { // ADICIONE AddressRepository
+        return new UpdateRestaurantUseCaseImpl(restaurantRepository, addressRepository); // ATUALIZE AQUI
     }
 
     @Bean

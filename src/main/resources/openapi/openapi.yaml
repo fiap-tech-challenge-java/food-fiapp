@@ -1350,11 +1350,7 @@ components:
           minLength: 3
           maxLength: 100
         addresses:
-          type: string
-          description: Novo endereco do restaurante.
-          example: Avenida Central, 456, Centro, Sao Paulo - SP
-          minLength: 10
-          maxLength: 255
+          $ref: '#/components/schemas/AddressesRequest'
         cuisineType:
           type: string
           description: Novo tipo de cozinha servida.
@@ -1395,6 +1391,11 @@ components:
           type: string
           description: Horario de funcionamento formatado.
           example: 'Segunda a Sexta: 11:00 - 15:00, 18:00 - 23:00 | Sabado e Domingo: 12:00 - 23:00'
+        menuItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItemResponse'
+          description: Lista de itens do cardapio do restaurante.
         owner:
           type: object
           properties:

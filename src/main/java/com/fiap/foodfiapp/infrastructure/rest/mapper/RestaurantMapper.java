@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-@Mapper(uses = {UserMapper.class, AddressesMapper.class}, componentModel = "spring")
+@Mapper(uses = {UserMapper.class, AddressesMapper.class, MenuItemMapper.class}, componentModel = "spring")
 public abstract class RestaurantMapper {
 
     @Autowired
@@ -31,14 +31,16 @@ public abstract class RestaurantMapper {
     public abstract Restaurant toRestaurant(CreateRestaurantRequest createRestaurantRequest);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "address", ignore = true)
+    @Mapping(target = "address", source = "addresses") // ALTERE ESTA LINHA (de ignore=true para source="addresses")
     @Mapping(target = "userOwnerId", ignore = true)
-    @Mapping(target = "description", ignore = true) // Ignoramos na atualização, pode ser adicionado se necessário
+    @Mapping(target = "description", ignore = true)
     public abstract Restaurant toRestaurant(UpdateRestaurantRequest updateRestaurantRequest);
+
 
     @Mapping(source = "address", target = "addresses", qualifiedByName = "addressToAddressResponseList")
     @Mapping(source = "isActive", target = "isActive") // CORRIGIDO de "active" para "isActive"
     @Mapping(source = "userOwnerId", target = "owner", qualifiedByName = "mapOwner")
+    @Mapping(source = "menuItems", target = "menuItems")
     public abstract RestaurantResponse toRestaurantResponse(Restaurant restaurant);
 
     public abstract List<RestaurantResponse> toRestaurantResponseList(List<Restaurant> restaurants);
