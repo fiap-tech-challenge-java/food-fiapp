@@ -13,13 +13,13 @@ public class User extends BaseEntity {
     private String login;
     private UserType userType;
     private String password;
-    private List<Address> addresses; // Campo reintroduzido
+    private List<Addresses> addresses;
 
     public User() {
     }
 
     // Construtor completo
-    public User(UUID id, String name, String email, String login, String cpf, List<Address> addresses, UserType userType,
+    public User(UUID id, String name, String email, String login, String cpf, List<Addresses> addresses, UserType userType,
                 Boolean isActive, OffsetDateTime updatedAt, OffsetDateTime createdAt, String password) {
         this.id = id;
         this.name = name;
@@ -49,6 +49,6 @@ public class User extends BaseEntity {
     public void setUserType(UserType userType) { this.userType = userType; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-    public List<Address> getAddresses() { return addresses; }
-    public void setAddresses(List<Address> addresses) { this.addresses = addresses; }
+    public List<Addresses> getAddress() { return addresses; }
+    public void setAddress(List<Addresses> addresses) { this.addresses = addresses; }
 }

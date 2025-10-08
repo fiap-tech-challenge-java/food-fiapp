@@ -28,12 +28,12 @@ public class UserUseCaseConfig {
     }
 
     @Bean
-    public FindUserUseCase findUserUseCase(UserRepository userRepository) {
-        return new FindUserUseCaseImpl(userRepository);
+    public FindUserUseCase findUserUseCase(UserRepository userRepository, AddressRepository addressRepository) {
+        return new FindUserUseCaseImpl(userRepository, addressRepository);
     }
 
     @Bean
-    public DeleteUserUseCase deleteUserUseCase(UserRepository userRepository) {
-        return new DeleteUserUseCaseImpl(userRepository);
+    public DeleteUserUseCase deleteUserUseCase(UserRepository userRepository, AddressRepository addressRepository) {
+        return new DeleteUserUseCaseImpl(userRepository, addressRepository);
     }
 }

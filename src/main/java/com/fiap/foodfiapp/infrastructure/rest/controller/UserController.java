@@ -5,7 +5,9 @@ import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
+import com.fiap.foodfiapp.core.domain.exception.UnauthorizedException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserMapper;
+import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
 import com.fiap.foodfiapp.model.ChangePasswordRequest;
 import com.fiap.foodfiapp.model.CreateUserRequest;
 import com.fiap.foodfiapp.model.UpdateUserRequest;
@@ -22,11 +24,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController implements UsersApi {
 
-    // AGORA SÓ DEPENDE DE CASOS DE USO
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
     private final FindUserUseCase findUserUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
+    private final AuthenticationService authenticationService;
 
     private final UserMapper userMapper = UserMapper.INSTANCE;
 
@@ -39,15 +41,23 @@ public class UserController implements UsersApi {
 
     @Override
     public ResponseEntity<Void> deleteUser(UUID id) {
-        // USA O CASO DE USO DE DELEÇÃO
+        // RN: Apenas administradores podem deletar usuários
+        if (!authenticationService.canDeleteUserProfile(id)) {
+            throw new UnauthorizedException("Only administrators can delete users");
+        }
+
         deleteUserUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<UserResponse> getUser(UUID id) {
-        // A LÓGICA DE BUSCA FOI MOVIDA PARA O FindUserUseCase
-        return findUserUseCase.findById(id) // Supondo que você adicione este método ao FindUserUseCase
+        // RN: Apenas o próprio usuário ou administrador pode visualizar o perfil
+        if (!authenticationService.canAccessUserProfile(id)) {
+            throw new UnauthorizedException("You can only view your own profile or you need administrator privileges");
+        }
+
+        return findUserUseCase.findById(id)
                 .map(userMapper::toUserResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -55,13 +65,22 @@ public class UserController implements UsersApi {
 
     @Override
     public ResponseEntity<List<UserResponse>> getUsers() {
-        // USA O CASO DE USO DE BUSCA
+        // RN: Apenas administradores podem listar todos os usuários
+        if (!authenticationService.isCurrentUserAdmin()) {
+            throw new UnauthorizedException("Only administrators can view all users");
+        }
+
         var users = findUserUseCase.findAll();
         return ResponseEntity.ok(userMapper.toUserResponseList(users));
     }
 
     @Override
     public ResponseEntity<UserResponse> updateUser(UUID id, UpdateUserRequest updateUserRequest) {
+        // RN: Apenas o próprio usuário ou administrador pode atualizar o perfil
+        if (!authenticationService.canModifyUserProfile(id)) {
+            throw new UnauthorizedException("You can only update your own profile or you need administrator privileges");
+        }
+
         var userUpdates = userMapper.toUser(updateUserRequest);
         var updatedUser = updateUserUseCase.execute(id, userUpdates);
         return ResponseEntity.ok(userMapper.toUserResponse(updatedUser));

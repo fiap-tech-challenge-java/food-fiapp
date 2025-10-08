@@ -9,20 +9,20 @@ public class Restaurant extends BaseEntity {
     private String openingHours;
     private UUID userOwnerId;
     private Boolean active;
-    private Address address;
+    private Addresses addresses;
 
     public Restaurant() {
     }
 
     public Restaurant(UUID id, String name, String cuisineType, String openingHours,
-                      UUID userOwnerId, Boolean active, Address address) {
+                      UUID userOwnerId, Boolean active, Addresses addresses) {
         this.id = id;
         this.name = name;
         this.cuisineType = cuisineType;
         this.openingHours = openingHours;
         this.userOwnerId = userOwnerId;
         this.active = active;
-        this.address = address;
+        this.addresses = addresses;
     }
 
     public UUID getId() {
@@ -73,11 +73,11 @@ public class Restaurant extends BaseEntity {
         this.active = active;
     }
 
-    public Address getAddress() {
-        return address;
+    public Addresses getAddress() {
+        return addresses;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setAddress(Addresses addresses) {
+        this.addresses = addresses;
     }
 }

@@ -1,7 +1,7 @@
 package com.fiap.foodfiapp.infrastructure.config;
 
-import com.fiap.foodfiapp.core.application.usecases.address.*;
-import com.fiap.foodfiapp.core.application.usecases.address.impl.*;
+import com.fiap.foodfiapp.core.application.usecases.addresses.*;
+import com.fiap.foodfiapp.core.application.usecases.addresses.impl.*;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * como nos Controllers.
  */
 @Configuration
-public class AddressUseCaseConfig {
+public class AddressesUseCaseConfig {
 
     /**
      * Define o bean para o caso de uso de criação de endereço.
@@ -21,31 +21,31 @@ public class AddressUseCaseConfig {
      * porque a implementação 'AddressRepositoryImpl' está anotada com @Component.
      */
     @Bean
-    public CreateAddressUseCase createAddressUseCase(AddressRepository addressRepository) {
-        return new CreateAddressUseCaseImpl(addressRepository);
+    public CreateAddressesUseCase createAddressUseCase(AddressRepository addressRepository) {
+        return new CreateAddressesUseCaseImpl(addressRepository);
     }
 
     /**
      * Define o bean para o caso de uso de atualização de endereço.
      */
     @Bean
-    public UpdateAddressUseCase updateAddressUseCase(AddressRepository addressRepository) {
-        return new UpdateAddressUseCaseImpl(addressRepository);
+    public UpdateAddressesUseCase updateAddressUseCase(AddressRepository addressRepository) {
+        return new UpdateAddressesUseCaseImpl(addressRepository);
     }
 
     /**
      * Define o bean para o caso de uso de exclusão de endereço.
      */
     @Bean
-    public DeleteAddressUseCase deleteAddressUseCase(AddressRepository addressRepository) {
-        return new DeleteAddressUseCaseImpl(addressRepository);
+    public DeleteAddressesUseCase deleteAddressUseCase(AddressRepository addressRepository) {
+        return new DeleteAddressesUseCaseImpl(addressRepository);
     }
 
     /**
      * Define o bean para o caso de uso de busca de endereços por proprietário.
      */
     @Bean
-    public FindAddressByOwnerUseCase findAddressByOwnerUseCase(AddressRepository addressRepository) {
-        return new FindAddressByOwnerUseCaseImpl(addressRepository);
+    public FindAddressesByOwnerUseCase findAddressByOwnerUseCase(AddressRepository addressRepository) {
+        return new FindAddressesByOwnerUseCaseImpl(addressRepository);
     }
 }
