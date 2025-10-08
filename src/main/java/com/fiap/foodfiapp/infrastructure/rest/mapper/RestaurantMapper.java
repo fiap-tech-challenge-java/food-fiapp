@@ -24,6 +24,23 @@ public abstract class RestaurantMapper {
     @Autowired
     protected UserRepository userRepository;
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "address", source = "addresses")
+    @Mapping(target = "userOwnerId", ignore = true)
+    @Mapping(target = "isActive", constant = "true")
+    @Mapping(target = "menuItems", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    public abstract Restaurant toRestaurant(CreateRestaurantRequest request);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "address", source = "addresses")
+    @Mapping(target = "userOwnerId", ignore = true)
+    @Mapping(target = "menuItems", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    public abstract Restaurant toRestaurant(UpdateRestaurantRequest request);
+
     @Mapping(source = "address", target = "addresses", qualifiedByName = "addressToAddressResponseList")
     @Mapping(source = "isActive", target = "isActive")
     @Mapping(source = "userOwnerId", target = "owner", qualifiedByName = "mapOwner")
@@ -31,6 +48,25 @@ public abstract class RestaurantMapper {
     public abstract RestaurantResponse toRestaurantResponse(Restaurant restaurant);
 
     public abstract List<RestaurantResponse> toRestaurantResponseList(List<Restaurant> restaurants);
+
+    // Método para mapear AddressesRequest -> Addresses
+    protected Addresses map(com.fiap.foodfiapp.model.AddressesRequest addressesRequest) {
+        if (addressesRequest == null) {
+            return null;
+        }
+
+        Addresses addresses = new Addresses();
+        addresses.setPublicPlace(addressesRequest.getPublicPlace());
+        addresses.setNumber(addressesRequest.getNumber());
+        addresses.setComplement(addressesRequest.getComplement());
+        addresses.setNeighborhood(addressesRequest.getNeighborhood());
+        addresses.setCity(addressesRequest.getCity());
+        addresses.setState(addressesRequest.getState());
+        addresses.setPostalCode(addressesRequest.getPostalCode());
+        addresses.setIsActive(true);
+
+        return addresses;
+    }
 
     @Named("addressToAddressResponseList")
     public List<com.fiap.foodfiapp.model.AddressesResponse> addressToAddressesResponseList(Addresses address) {
