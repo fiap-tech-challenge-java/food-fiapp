@@ -149,6 +149,19 @@ class UserControllerTest {
     }
 
     @Test
+    void shouldReturnUnauthorizedWhenNotAuthorizedToViewProfile() throws Exception {
+        when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(false);
+
+        mockMvc.perform(get("/users/{id}", userId))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+                .andExpect(jsonPath("$.message").value("You can only view your own profile or you need administrator privileges"));
+
+        verify(authenticationService).canAccessUserProfile(eq(userId));
+        verify(findUserUseCase, never()).findById(eq(userId));
+    }
+
+    @Test
     void shouldReturnNotFoundWhenUserNotFoundById() throws Exception {
         when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(true);
         when(findUserUseCase.execute(eq(userId))).thenReturn(Optional.empty());
