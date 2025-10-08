@@ -2,7 +2,7 @@ package com.fiap.foodfiapp.integration;
 
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.impl.CreateUserUseCaseImpl;
-import com.fiap.foodfiapp.core.domain.entity.Address;
+import com.fiap.foodfiapp.core.domain.entity.Addresses;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CreateUserWithAddressIntegrationTest {
+class CreateUserWithAddressesIntegrationTest {
 
     @Mock
     private UserRepository userRepository;
@@ -40,7 +40,7 @@ class CreateUserWithAddressIntegrationTest {
 
     private User user;
     private UserType userType;
-    private Address address;
+    private Addresses addresses;
     private UUID userTypeUuid;
     private UUID userId;
     private UUID addressId;
@@ -57,15 +57,15 @@ class CreateUserWithAddressIntegrationTest {
         userType.setUuid(userTypeUuid);
         userType.setName("CLIENT");
 
-        address = new Address();
-        address.setId(addressId);
-        address.setPublicPlace("Rua Teste");
-        address.setNumber("123");
-        address.setNeighborhood("Centro");
-        address.setCity("São Paulo");
-        address.setState("SP");
-        address.setPostalCode("01001-000");
-        address.setIsActive(true);
+        addresses = new Addresses();
+        addresses.setId(addressId);
+        addresses.setPublicPlace("Rua Teste");
+        addresses.setNumber("123");
+        addresses.setNeighborhood("Centro");
+        addresses.setCity("São Paulo");
+        addresses.setState("SP");
+        addresses.setPostalCode("01001-000");
+        addresses.setIsActive(true);
 
         user = new User();
         user.setId(userId);
@@ -75,7 +75,7 @@ class CreateUserWithAddressIntegrationTest {
         user.setLogin("testuser");
         user.setPassword("password123");
         user.setUserType(userType);
-        user.setAddress(List.of(address));
+        user.setAddress(List.of(addresses));
         user.setIsActive(true);
         user.setCreatedAt(OffsetDateTime.now());
         user.setUpdatedAt(OffsetDateTime.now());
@@ -96,25 +96,25 @@ class CreateUserWithAddressIntegrationTest {
         savedUser.setCreatedAt(OffsetDateTime.now());
         savedUser.setUpdatedAt(OffsetDateTime.now());
 
-        Address savedAddress = new Address();
-        savedAddress.setId(addressId);
-        savedAddress.setPublicPlace(address.getPublicPlace());
-        savedAddress.setNumber(address.getNumber());
-        savedAddress.setNeighborhood(address.getNeighborhood());
-        savedAddress.setCity(address.getCity());
-        savedAddress.setState(address.getState());
-        savedAddress.setPostalCode(address.getPostalCode());
-        savedAddress.setIsActive(true);
-        savedAddress.setCreatedAt(OffsetDateTime.now());
-        savedAddress.setUpdatedAt(OffsetDateTime.now());
+        Addresses savedAddresses = new Addresses();
+        savedAddresses.setId(addressId);
+        savedAddresses.setPublicPlace(addresses.getPublicPlace());
+        savedAddresses.setNumber(addresses.getNumber());
+        savedAddresses.setNeighborhood(addresses.getNeighborhood());
+        savedAddresses.setCity(addresses.getCity());
+        savedAddresses.setState(addresses.getState());
+        savedAddresses.setPostalCode(addresses.getPostalCode());
+        savedAddresses.setIsActive(true);
+        savedAddresses.setCreatedAt(OffsetDateTime.now());
+        savedAddresses.setUpdatedAt(OffsetDateTime.now());
 
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
         when(userRepository.findByCpf(user.getCpf())).thenReturn(Optional.empty());
         when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.empty());
         when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(userType));
         when(userRepository.save(user)).thenReturn(savedUser);
-        when(addressRepository.save(any(Address.class), eq(userId), eq("USER")))
-                .thenReturn(savedAddress);
+        when(addressRepository.save(any(Addresses.class), eq(userId), eq("USER")))
+                .thenReturn(savedAddresses);
 
         // When
         User result = createUserUseCase.execute(user);
@@ -129,31 +129,31 @@ class CreateUserWithAddressIntegrationTest {
         assertFalse(result.getAddress().isEmpty(), "Addresses should not be empty");
         assertEquals(1, result.getAddress().size(), "Should have exactly 1 address");
 
-        Address returnedAddress = result.getAddress().get(0);
-        assertEquals(addressId, returnedAddress.getId());
-        assertEquals("Rua Teste", returnedAddress.getPublicPlace());
-        assertEquals("123", returnedAddress.getNumber());
-        assertEquals("Centro", returnedAddress.getNeighborhood());
-        assertEquals("São Paulo", returnedAddress.getCity());
-        assertEquals("SP", returnedAddress.getState());
-        assertEquals("01001-000", returnedAddress.getPostalCode());
-        assertTrue(returnedAddress.getIsActive());
+        Addresses returnedAddresses = result.getAddress().get(0);
+        assertEquals(addressId, returnedAddresses.getId());
+        assertEquals("Rua Teste", returnedAddresses.getPublicPlace());
+        assertEquals("123", returnedAddresses.getNumber());
+        assertEquals("Centro", returnedAddresses.getNeighborhood());
+        assertEquals("São Paulo", returnedAddresses.getCity());
+        assertEquals("SP", returnedAddresses.getState());
+        assertEquals("01001-000", returnedAddresses.getPostalCode());
+        assertTrue(returnedAddresses.getIsActive());
     }
 
     @Test
     void shouldCreateUserWithMultipleAddressesAndReturnAllInResponse() {
         // Given
-        Address secondAddress = new Address();
-        secondAddress.setId(UUID.randomUUID());
-        secondAddress.setPublicPlace("Avenida Paulista");
-        secondAddress.setNumber("1000");
-        secondAddress.setNeighborhood("Bela Vista");
-        secondAddress.setCity("São Paulo");
-        secondAddress.setState("SP");
-        secondAddress.setPostalCode("01310-100");
-        secondAddress.setIsActive(true);
+        Addresses secondAddresses = new Addresses();
+        secondAddresses.setId(UUID.randomUUID());
+        secondAddresses.setPublicPlace("Avenida Paulista");
+        secondAddresses.setNumber("1000");
+        secondAddresses.setNeighborhood("Bela Vista");
+        secondAddresses.setCity("São Paulo");
+        secondAddresses.setState("SP");
+        secondAddresses.setPostalCode("01310-100");
+        secondAddresses.setIsActive(true);
 
-        user.setAddress(List.of(address, secondAddress));
+        user.setAddress(List.of(addresses, secondAddresses));
 
         User savedUser = new User();
         savedUser.setId(userId);
@@ -172,8 +172,8 @@ class CreateUserWithAddressIntegrationTest {
         when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.empty());
         when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(userType));
         when(userRepository.save(user)).thenReturn(savedUser);
-        when(addressRepository.save(any(Address.class), eq(userId), eq("USER")))
-                .thenReturn(address, secondAddress);
+        when(addressRepository.save(any(Addresses.class), eq(userId), eq("USER")))
+                .thenReturn(addresses, secondAddresses);
 
         // When
         User result = createUserUseCase.execute(user);
@@ -185,7 +185,7 @@ class CreateUserWithAddressIntegrationTest {
 
         // Verifica se ambos os endereços estão na resposta
         List<String> returnedStreets = result.getAddress().stream()
-                .map(Address::getPublicPlace)
+                .map(Addresses::getPublicPlace)
                 .toList();
 
         assertTrue(returnedStreets.contains("Rua Teste"));

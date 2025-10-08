@@ -13,7 +13,7 @@ tags:
     description: Operacoes relacionadas a usuarios
   - name: user-types
     description: Operacoes relacionadas a tipos de usuarios
-  - name: address
+  - name: addresses
     description: Operacoes relacionadas a enderecos de usuarios
   - name: restaurants
     description: Operacoes relacionadas a restaurantes
@@ -374,7 +374,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Nao e possivel deletar o tipo de usuario pois esta sendo usado por usuarios ativos.
-  /users/{userId}/address:
+  /users/{userId}/addresses:
     parameters:
       - name: userId
         schema:
@@ -387,10 +387,10 @@ paths:
 
     get:
       tags:
-        - address
+        - addresses
       security:
         - bearerAuth: []
-      operationId: listAddressByUserId
+      operationId: listAddressesByUserId
       summary: Lista todos os enderecos de um usuario.
       description: Retorna uma lista de todos os enderecos associados a um usuario especifico.
       responses:
@@ -400,32 +400,32 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/AddressResponse'
+                  $ref: '#/components/schemas/AddressesResponse'
           description: Lista com sucesso todos os enderecos do usuario. Pode retornar uma lista vazia.
 
     post:
       tags:
-        - address
+        - addresses
       security:
         - bearerAuth: []
-      operationId: createAddressForUser
+      operationId: createAddressesForUser
       summary: Cria um novo endereco para um usuario.
       description: Adiciona um novo endereco a lista de enderecos de um usuario existente.
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateAddressRequest'
+              $ref: '#/components/schemas/CreateAddressesRequest'
         required: true
       responses:
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddressResponse'
+                $ref: '#/components/schemas/AddressesResponse'
           description: Cria com sucesso um endereco para o usuario. Retorna os detalhes do endereco recem-criado.
 
-  /users/{userId}/address/{addressId}:
+  /users/{userId}/addresses/{addressesId}:
     parameters:
       - name: userId
         schema:
@@ -434,7 +434,7 @@ paths:
         in: path
         required: true
         description: O ID unico do usuario proprietario do endereco.
-      - name: addressId
+      - name: addressesId
         schema:
           format: uuid
           type: string
@@ -445,34 +445,34 @@ paths:
 
     put:
       tags:
-        - address
+        - addresses
       security:
         - bearerAuth: []
-      operationId: updateAddressForUser
+      operationId: updateAddressesForUser
       summary: Atualiza um endereco especifico de um usuario.
       description: Permite a atualizacao dos detalhes de um endereco especifico associado a um usuario.
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateAddressRequest'
+              $ref: '#/components/schemas/UpdateAddressesRequest'
         required: true
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AddressResponse'
+                $ref: '#/components/schemas/AddressesResponse'
           description: Endereco atualizado com sucesso. Retorna os detalhes atualizados do endereco.
         '404':
           description: Usuario ou endereco nao encontrado.
 
     delete:
       tags:
-        - address
+        - addresses
       security:
         - bearerAuth: []
-      operationId: deleteAddressForUser
+      operationId: deleteAddressesForUser
       summary: Deleta logicamente um endereco de um usuario.
       description: Marca um endereco especifico como inativo para um determinado usuario, nao o removendo fisicamente do banco de dados.
       responses:
@@ -919,7 +919,7 @@ components:
       type: string
 
 
-    CreateAddressRequest:
+    CreateAddressesRequest:
       title: Solicitacao de Criacao de Endereco
       description: Estrutura da requisicao para criar um novo endereco para um usuario.
       type: object
@@ -953,7 +953,7 @@ components:
           description: Codigo de Enderecamento Postal (CEP).
           example: 01234-567
 
-    UpdateAddressRequest:
+    UpdateAddressesRequest:
       title: Solicitacao de Atualizacao de Endereco
       description: Estrutura da requisicao para atualizar um endereco existente de um usuario.
       type: object
@@ -987,7 +987,7 @@ components:
           description: Novo Codigo de Enderecamento Postal (CEP).
           example: 98765-432
 
-    AddressResponse:
+    AddressesResponse:
       title: Resposta de Endereco
       description: Estrutura da resposta contendo os detalhes de um endereco.
       type: object
@@ -1044,14 +1044,14 @@ components:
       title: Solicitacao de Criacao de Usuario
       description: Estrutura da requisicao para criar um novo usuario no sistema.
       required:
-        - address
+        - addresses
         - name
         - email
         - cpf
         - login
         - password
         - userTypeUuid
-        - address
+        - addresses
       type: object
       properties:
         name:
@@ -1089,10 +1089,10 @@ components:
           format: uuid
           description: UUID do tipo de usuario (OWNER, CUSTOMER, etc.).
           example: 123e4567-e89b-12d3-a456-426614174000
-        address:
+        addresses:
           type: array
           items:
-            $ref: '#/components/schemas/AddressRequest'
+            $ref: '#/components/schemas/AddressesRequest'
           description: Lista de enderecos do usuario.
 
     UpdateUserRequest:
@@ -1129,10 +1129,10 @@ components:
           type: boolean
           description: Novo status de ativacao do usuario.
           example: true
-        address:
+        addresses:
           type: array
           items:
-            $ref: '#/components/schemas/AddressRequest'
+            $ref: '#/components/schemas/AddressesRequest'
           description: Nova lista de enderecos do usuario.
 
     UserResponse:
@@ -1169,10 +1169,10 @@ components:
           description: Indica se o usuario esta ativo no sistema (alias de 'active').
           type: boolean
           example: true
-        address:
+        addresses:
           type: array
           items:
-            $ref: '#/components/schemas/AddressResponse'
+            $ref: '#/components/schemas/AddressesResponse'
           description: Lista dos enderecos associados ao usuario.
         createdAt:
           type: string
@@ -1249,7 +1249,7 @@ components:
       description: Estrutura da requisicao para criar um novo restaurante.
       required:
         - name
-        - address
+        - addresses
         - cuisineType
         - openingHours
         - ownerId
@@ -1260,8 +1260,8 @@ components:
           example: Restaurante da Praca
           minLength: 3
           maxLength: 100
-        address:
-          $ref: '#/components/schemas/AddressRequest'
+        addresses:
+          $ref: '#/components/schemas/AddressesRequest'
         cuisineType:
           type: string
           description: Tipo de cozinha servida no restaurante.
@@ -1291,7 +1291,7 @@ components:
           example: Restaurante da Praca - Unidade Centro
           minLength: 3
           maxLength: 100
-        address:
+        addresses:
           type: string
           description: Novo endereco do restaurante.
           example: Avenida Central, 456, Centro, Sao Paulo - SP
@@ -1324,10 +1324,10 @@ components:
           type: string
           description: Nome do restaurante.
           example: Restaurante da Praca
-        address:
+        addresses:
           type: array
           items:
-            $ref: '#/components/schemas/AddressResponse'
+            $ref: '#/components/schemas/AddressesResponse'
           description: Lista de enderecos do restaurante.
         cuisineType:
           type: string
@@ -1509,10 +1509,10 @@ components:
           type: string
           description: Senha do usuario.
           example: MyStrongPassword123!
-        address:
+        addresses:
           type: array
           items:
-            $ref: '#/components/schemas/AddressRequest'
+            $ref: '#/components/schemas/AddressesRequest'
           description: Lista de enderecos do usuario.
         userTypeUuid:
           type: string
@@ -1524,7 +1524,7 @@ components:
           description: Status de ativacao do usuario.
           example: true
 
-    AddressRequest:
+    AddressesRequest:
       title: Solicitacao de Endereco
       type: object
       description: Representa os dados de um endereco para requisicoes.

@@ -13,26 +13,27 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 import java.util.UUID;
 
-@Mapper(uses = {AddressMapper.class})
+@Mapper(uses = {AddressesMapper.class})
 public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(source = "userTypeUuid", target = "userType", qualifiedByName = "uuidToUserType")
-    @Mapping(source = "address", target = "address")
+    @Mapping(source = "addresses", target = "address")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     User toUser(CreateUserRequest createUserRequest);
 
     @Mapping(source = "userTypeUuid", target = "userType", qualifiedByName = "uuidToUserType")
-    @Mapping(source = "address", target = "address")
+    @Mapping(source = "addresses", target = "address")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     User toUser(UpdateUserRequest updateUserRequest);
 
     @Mapping(source = "userType", target = "userType", qualifiedByName = "userTypeToName")
+    @Mapping(source = "address", target = "addresses")
     UserResponse toUserResponse(User user);
 
     List<UserResponse> toUserResponseList(List<User> users);

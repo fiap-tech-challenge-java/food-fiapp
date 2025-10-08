@@ -1,6 +1,6 @@
 package com.fiap.foodfiapp.core.application.usecases.user.impl;
 
-import com.fiap.foodfiapp.core.domain.entity.Address;
+import com.fiap.foodfiapp.core.domain.entity.Addresses;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
@@ -44,7 +44,7 @@ class CreateUserUseCaseImplTest {
 
     private User user;
     private UserType userType;
-    private Address address;
+    private Addresses addresses;
     private UUID userTypeUuid;
     private UUID userId;
 
@@ -59,14 +59,14 @@ class CreateUserUseCaseImplTest {
         userType.setUuid(userTypeUuid);
         userType.setName("CLIENT");
 
-        address = new Address();
-        address.setId(UUID.randomUUID());
-        address.setPublicPlace("Rua Teste");
-        address.setNumber("123");
-        address.setNeighborhood("Centro");
-        address.setCity("São Paulo");
-        address.setState("SP");
-        address.setPostalCode("01001-000");
+        addresses = new Addresses();
+        addresses.setId(UUID.randomUUID());
+        addresses.setPublicPlace("Rua Teste");
+        addresses.setNumber("123");
+        addresses.setNeighborhood("Centro");
+        addresses.setCity("São Paulo");
+        addresses.setState("SP");
+        addresses.setPostalCode("01001-000");
 
         user = new User();
         user.setId(userId);
@@ -76,7 +76,7 @@ class CreateUserUseCaseImplTest {
         user.setLogin("testuser");
         user.setPassword("password123");
         user.setUserType(userType);
-        user.setAddress(List.of(address));
+        user.setAddress(List.of(addresses));
         user.setIsActive(true);
         user.setCreatedAt(OffsetDateTime.now());
         user.setUpdatedAt(OffsetDateTime.now());
@@ -90,8 +90,8 @@ class CreateUserUseCaseImplTest {
         when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.empty());
         when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(userType));
         when(userRepository.save(user)).thenReturn(user);
-        when(addressRepository.save(any(Address.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription())))
-                .thenReturn(address);
+        when(addressRepository.save(any(Addresses.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription())))
+                .thenReturn(addresses);
 
         // When
         User result = createUserUseCase.execute(user);
@@ -106,7 +106,7 @@ class CreateUserUseCaseImplTest {
         verify(userRepository).findByLogin(user.getLogin());
         verify(userTypeRepository).findById(userTypeUuid);
         verify(userRepository).save(user);
-        verify(addressRepository).save(any(Address.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription()));
+        verify(addressRepository).save(any(Addresses.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription()));
     }
 
     @Test
@@ -236,8 +236,8 @@ class CreateUserUseCaseImplTest {
 
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(inactiveUser));
         when(userRepository.save(inactiveUser)).thenReturn(inactiveUser);
-        when(addressRepository.save(any(Address.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription())))
-                .thenReturn(address);
+        when(addressRepository.save(any(Addresses.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription())))
+                .thenReturn(addresses);
 
         // When
         User result = createUserUseCase.execute(user);
@@ -250,7 +250,7 @@ class CreateUserUseCaseImplTest {
 
         verify(userRepository).findByEmail(user.getEmail());
         verify(userRepository).save(inactiveUser);
-        verify(addressRepository).save(any(Address.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription()));
+        verify(addressRepository).save(any(Addresses.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription()));
     }
 
     @Test
@@ -264,8 +264,8 @@ class CreateUserUseCaseImplTest {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
         when(userRepository.findByCpf(user.getCpf())).thenReturn(Optional.of(inactiveUser));
         when(userRepository.save(inactiveUser)).thenReturn(inactiveUser);
-        when(addressRepository.save(any(Address.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription())))
-                .thenReturn(address);
+        when(addressRepository.save(any(Addresses.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription())))
+                .thenReturn(addresses);
 
         // When
         User result = createUserUseCase.execute(user);
@@ -279,6 +279,6 @@ class CreateUserUseCaseImplTest {
         verify(userRepository).findByEmail(user.getEmail());
         verify(userRepository).findByCpf(user.getCpf());
         verify(userRepository).save(inactiveUser);
-        verify(addressRepository).save(any(Address.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription()));
+        verify(addressRepository).save(any(Addresses.class), eq(userId), eq(AddressOwnerTypeEnum.USER.getDescription()));
     }
 }

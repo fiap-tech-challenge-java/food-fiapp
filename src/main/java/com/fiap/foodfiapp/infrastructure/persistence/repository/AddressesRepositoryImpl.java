@@ -1,9 +1,9 @@
 package com.fiap.foodfiapp.infrastructure.persistence.repository;
 
+import com.fiap.foodfiapp.core.domain.entity.Addresses;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
-import com.fiap.foodfiapp.core.domain.entity.Address;
-import com.fiap.foodfiapp.infrastructure.persistence.mapper.AddressPersistenceMapper;
-import com.fiap.foodfiapp.infrastructure.persistence.springdata.AddressSpringDataRepository;
+import com.fiap.foodfiapp.infrastructure.persistence.mapper.AddressesPersistenceMapper;
+import com.fiap.foodfiapp.infrastructure.persistence.springdata.AddressesSpringDataRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,14 +13,14 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class AddressRepositoryImpl implements AddressRepository {
+public class AddressesRepositoryImpl implements AddressRepository {
 
-    private final AddressSpringDataRepository repository;
-    private final AddressPersistenceMapper addressMapper = AddressPersistenceMapper.INSTANCE;
+    private final AddressesSpringDataRepository repository;
+    private final AddressesPersistenceMapper addressMapper = AddressesPersistenceMapper.INSTANCE;
 
     @Override
-    public Address save(Address address, UUID ownerId, String ownerType) {
-        var entity = addressMapper.toEntity(address);
+    public Addresses save(Addresses addresses, UUID ownerId, String ownerType) {
+        var entity = addressMapper.toEntity(addresses);
         entity.setOwnerId(ownerId);
         entity.setOwnerType(ownerType);
         var savedEntity = repository.save(entity);
@@ -28,7 +28,7 @@ public class AddressRepositoryImpl implements AddressRepository {
     }
 
     @Override
-    public List<Address> findByOwner(UUID ownerId, String ownerType) {
+    public List<Addresses> findByOwner(UUID ownerId, String ownerType) {
         var entities = repository.findByOwnerIdAndOwnerType(ownerId, ownerType);
         return addressMapper.toDomainList(entities);
     }
@@ -39,7 +39,7 @@ public class AddressRepositoryImpl implements AddressRepository {
     }
 
     @Override
-    public Optional<Address> findById(UUID addressId) {
+    public Optional<Addresses> findById(UUID addressId) {
         return repository.findById(addressId).map(addressMapper::toDomain);
     }
 }

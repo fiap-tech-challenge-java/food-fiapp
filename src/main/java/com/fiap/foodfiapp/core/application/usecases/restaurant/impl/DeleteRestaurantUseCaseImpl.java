@@ -3,7 +3,7 @@ package com.fiap.foodfiapp.core.application.usecases.restaurant.impl;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.DeleteRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
-import com.fiap.foodfiapp.core.domain.entity.Address;
+import com.fiap.foodfiapp.core.domain.entity.Addresses;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
@@ -44,8 +44,8 @@ public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
         }
 
         // Exclusão lógica dos endereços associados ao restaurante
-        List<Address> addresses = addressRepository.findByOwner(id, AddressOwnerTypeEnum.RESTAURANT.getDescription());
-        for (Address address : addresses) {
+        List<Addresses> addresses = addressRepository.findByOwner(id, AddressOwnerTypeEnum.RESTAURANT.getDescription());
+        for (Addresses address : addresses) {
             address.setIsActive(false);
             addressRepository.save(address, id, AddressOwnerTypeEnum.RESTAURANT.getDescription());
         }
