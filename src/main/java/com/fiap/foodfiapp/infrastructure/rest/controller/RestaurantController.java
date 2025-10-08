@@ -31,8 +31,7 @@ public class RestaurantController implements RestaurantsApi {
     private final FindAllRestaurantsByUserIdUseCase findAllRestaurantsByUserIdUseCase;
     private final ValidateRestaurantOwnershipUseCase validateRestaurantOwnershipUseCase;
     private final AuthenticationService authenticationService;
-
-    private final RestaurantMapper restaurantMapper = RestaurantMapper.INSTANCE;
+    private final RestaurantMapper restaurantMapper; // Now using dependency injection
 
     @Override
     public ResponseEntity<List<RestaurantResponse>> usersUserIdRestaurantsGet(UUID userId) {
