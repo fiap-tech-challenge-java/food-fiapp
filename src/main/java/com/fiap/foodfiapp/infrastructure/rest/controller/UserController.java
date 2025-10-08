@@ -4,6 +4,7 @@ import com.fiap.foodfiapp.api.UsersApi;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.FindAllUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
 import com.fiap.foodfiapp.core.domain.exception.UnauthorizedException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserMapper;
@@ -27,6 +28,7 @@ public class UserController implements UsersApi {
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
     private final FindUserUseCase findUserUseCase;
+    private final FindAllUserUseCase findAllUserUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
     private final AuthenticationService authenticationService;
 
@@ -52,12 +54,12 @@ public class UserController implements UsersApi {
 
     @Override
     public ResponseEntity<UserResponse> getUser(UUID id) {
-        // RN: Apenas o próprio usuário ou administrador pode visualizar o perfil
+        // RN: Apenas o próprio usuário ou administrador pode ver o perfil
         if (!authenticationService.canAccessUserProfile(id)) {
             throw new UnauthorizedException("You can only view your own profile or you need administrator privileges");
         }
 
-        return findUserUseCase.findById(id)
+        return findUserUseCase.execute(id)
                 .map(userMapper::toUserResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -70,7 +72,7 @@ public class UserController implements UsersApi {
             throw new UnauthorizedException("Only administrators can view all users");
         }
 
-        var users = findUserUseCase.findAll();
+        var users = findAllUserUseCase.execute();
         return ResponseEntity.ok(userMapper.toUserResponseList(users));
     }
 

@@ -7,6 +7,7 @@ import com.fiap.foodfiapp.core.application.usecases.addresses.FindAddressesByOwn
 import com.fiap.foodfiapp.core.application.usecases.addresses.UpdateAddressesUseCase;
 import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.AddressesMapper;
+import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
 import com.fiap.foodfiapp.model.AddressesResponse;
 import com.fiap.foodfiapp.model.CreateAddressesRequest;
 import com.fiap.foodfiapp.model.UpdateAddressesRequest;
@@ -26,6 +27,7 @@ public class AddressesController implements AddressesApi {
     private final UpdateAddressesUseCase updateAddressesUseCase;
     private final DeleteAddressesUseCase deleteAddressesUseCase;
     private final FindAddressesByOwnerUseCase findAddressesByOwnerUseCase;
+    private final AuthenticationService authenticationService;
 
     private final AddressesMapper addressesMapper = AddressesMapper.INSTANCE;
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.FindAllUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
@@ -46,6 +47,9 @@ class UserControllerTest {
     private FindUserUseCase findUserUseCase;
 
     @Mock
+    private FindAllUserUseCase findAllUserUseCase;
+
+    @Mock
     private DeleteUserUseCase deleteUserUseCase;
 
     @Mock
@@ -63,7 +67,7 @@ class UserControllerTest {
         MockitoAnnotations.openMocks(this);
 
         UserController userController = new UserController(createUserUseCase, updateUserUseCase,
-                findUserUseCase, deleteUserUseCase, authenticationService);
+                findUserUseCase, findAllUserUseCase, deleteUserUseCase, authenticationService);
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
@@ -97,13 +101,13 @@ class UserControllerTest {
     void shouldReturnAllUsersWhenUserIsAdmin() throws Exception {
         List<User> userList = List.of(user);
         when(authenticationService.isCurrentUserAdmin()).thenReturn(true);
-        when(findUserUseCase.findAll()).thenReturn(userList);
+        when(findAllUserUseCase.execute()).thenReturn(userList);
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk());
 
         verify(authenticationService).isCurrentUserAdmin();
-        verify(findUserUseCase).findAll();
+        verify(findAllUserUseCase).execute();
     }
 
     @Test
@@ -116,19 +120,19 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("Only administrators can view all users"));
 
         verify(authenticationService).isCurrentUserAdmin();
-        verify(findUserUseCase, never()).findAll();
+        verify(findAllUserUseCase, never()).execute();
     }
 
     @Test
     void shouldReturnUserWhenAuthorizedToViewProfile() throws Exception {
         when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(true);
-        when(findUserUseCase.findById(eq(userId))).thenReturn(Optional.of(user));
+        when(findUserUseCase.execute(eq(userId))).thenReturn(Optional.of(user));
 
         mockMvc.perform(get("/users/{id}", userId))
                 .andExpect(status().isOk());
 
         verify(authenticationService).canAccessUserProfile(eq(userId));
-        verify(findUserUseCase).findById(eq(userId));
+        verify(findUserUseCase).execute(eq(userId));
     }
 
     @Test
@@ -141,19 +145,19 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.message").value("You can only view your own profile or you need administrator privileges"));
 
         verify(authenticationService).canAccessUserProfile(eq(userId));
-        verify(findUserUseCase, never()).findById(eq(userId));
+        verify(findUserUseCase, never()).execute(eq(userId));
     }
 
     @Test
     void shouldReturnNotFoundWhenUserNotFoundById() throws Exception {
         when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(true);
-        when(findUserUseCase.findById(eq(userId))).thenReturn(Optional.empty());
+        when(findUserUseCase.execute(eq(userId))).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/users/{id}", userId))
                 .andExpect(status().isNotFound());
 
         verify(authenticationService).canAccessUserProfile(eq(userId));
-        verify(findUserUseCase).findById(eq(userId));
+        verify(findUserUseCase).execute(eq(userId));
     }
 
     @Test
