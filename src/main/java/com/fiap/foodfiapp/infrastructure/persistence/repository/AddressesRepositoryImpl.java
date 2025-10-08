@@ -42,4 +42,9 @@ public class AddressesRepositoryImpl implements AddressRepository {
     public Optional<Addresses> findById(UUID addressId) {
         return repository.findById(addressId).map(addressMapper::toDomain);
     }
+
+    @Override
+    public Optional<Addresses> findByIdAndOwnerId(UUID id, UUID ownerId) {
+        return repository.findByIdAndOwnerId(id, ownerId).map(addressMapper::toDomain);
+    }
 }

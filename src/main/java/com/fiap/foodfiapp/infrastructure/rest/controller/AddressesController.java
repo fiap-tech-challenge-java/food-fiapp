@@ -6,7 +6,9 @@ import com.fiap.foodfiapp.core.application.usecases.addresses.DeleteAddressesUse
 import com.fiap.foodfiapp.core.application.usecases.addresses.FindAddressesByOwnerUseCase;
 import com.fiap.foodfiapp.core.application.usecases.addresses.UpdateAddressesUseCase;
 import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
+import com.fiap.foodfiapp.core.domain.exception.UnauthorizedException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.AddressesMapper;
+import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
 import com.fiap.foodfiapp.model.AddressesResponse;
 import com.fiap.foodfiapp.model.CreateAddressesRequest;
 import com.fiap.foodfiapp.model.UpdateAddressesRequest;
@@ -26,11 +28,16 @@ public class AddressesController implements AddressesApi {
     private final UpdateAddressesUseCase updateAddressesUseCase;
     private final DeleteAddressesUseCase deleteAddressesUseCase;
     private final FindAddressesByOwnerUseCase findAddressesByOwnerUseCase;
+    private final AuthenticationService authenticationService;
 
     private final AddressesMapper addressesMapper = AddressesMapper.INSTANCE;
 
     @Override
     public ResponseEntity<AddressesResponse> createAddressesForUser(UUID userId, CreateAddressesRequest createAddressesRequest) {
+       // if (!authenticationService.canAccessUserProfile(userId)) {
+        //    throw new UnauthorizedException("Permissão negada. Você só pode acessar seus próprios endereços.");
+        //}
+
         var address = addressesMapper.toAddress(createAddressesRequest);
         var createdAddress = createAddressesUseCase.execute(address, userId, AddressOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.status(HttpStatus.CREATED).body(addressesMapper.toAddressesResponse(createdAddress));
@@ -38,12 +45,20 @@ public class AddressesController implements AddressesApi {
 
     @Override
     public ResponseEntity<List<AddressesResponse>> listAddressesByUserId(UUID userId) {
+       // if (!authenticationService.canAccessUserProfile(userId)) {
+       //     throw new UnauthorizedException("Permissão negada. Você só pode acessar seus próprios endereços.");
+       // }
+
         var address = findAddressesByOwnerUseCase.execute(userId, AddressOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.ok(addressesMapper.toAddressesResponseList(address));
     }
 
     @Override
     public ResponseEntity<AddressesResponse> updateAddressesForUser(UUID userId, UUID addressesId, UpdateAddressesRequest updateAddressesRequest) {
+       // if (!authenticationService.canAccessUserProfile(userId)) {
+       //     throw new UnauthorizedException("Permissão negada. Você só pode acessar seus próprios endereços.");
+       // }
+
         var addressUpdates = addressesMapper.toAddress(updateAddressesRequest);
         var updatedAddress = updateAddressesUseCase.execute(addressesId, addressUpdates, userId, AddressOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.ok(addressesMapper.toAddressesResponse(updatedAddress));
@@ -51,6 +66,10 @@ public class AddressesController implements AddressesApi {
 
     @Override
     public ResponseEntity<Void> deleteAddressesForUser(UUID userId, UUID addressesId) {
+       // if (!authenticationService.canAccessUserProfile(userId)) {
+       //     throw new UnauthorizedException("Permissão negada. Você só pode acessar seus próprios endereços.");
+      //  }
+
         deleteAddressesUseCase.execute(userId, addressesId, AddressOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.noContent().build();
     }

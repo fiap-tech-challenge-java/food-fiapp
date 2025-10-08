@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.core.domain.entity;
 
+import java.util.List;
 import java.util.UUID;
 
 public class Restaurant extends BaseEntity {
@@ -8,22 +9,27 @@ public class Restaurant extends BaseEntity {
     private String cuisineType;
     private String openingHours;
     private UUID userOwnerId;
-    private Boolean active;
-    private Addresses addresses;
+    // private Boolean active; // REMOVA ESTA LINHA
+    private String description; // ADICIONE ESTA LINHA
+    private Addresses address;
+    private List<MenuItem> menuItems;
 
     public Restaurant() {
     }
 
+    // Construtor atualizado para incluir a descrição
     public Restaurant(UUID id, String name, String cuisineType, String openingHours,
-                      UUID userOwnerId, Boolean active, Addresses addresses) {
+                      UUID userOwnerId, String description, Addresses address) {
         this.id = id;
         this.name = name;
         this.cuisineType = cuisineType;
         this.openingHours = openingHours;
         this.userOwnerId = userOwnerId;
-        this.active = active;
-        this.addresses = addresses;
+        this.description = description; // ADICIONE ESTA LINHA
+        this.address = address;
     }
+
+    // Getters e Setters
 
     public UUID getId() {
         return id;
@@ -65,19 +71,27 @@ public class Restaurant extends BaseEntity {
         this.userOwnerId = userOwnerId;
     }
 
-    public Boolean getActive() {
-        return active;
+    public String getDescription() {
+        return description;
     }
 
-    public void setActive(Boolean active) {
-        this.active = active;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Addresses getAddress() {
-        return addresses;
+        return address;
     }
 
-    public void setAddress(Addresses addresses) {
-        this.addresses = addresses;
+    public void setAddress(Addresses address) {
+        this.address = address;
+    }
+
+    public List<MenuItem> getMenuItems() {
+        return menuItems;
+    }
+
+    public void setMenuItems(List<MenuItem> menuItems) {
+        this.menuItems = menuItems;
     }
 }

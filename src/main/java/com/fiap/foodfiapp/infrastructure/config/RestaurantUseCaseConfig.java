@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 public class RestaurantUseCaseConfig {
 
     @Bean
-    public CreateRestaurantUseCase createRestaurantUseCase(RestaurantRepository restaurantRepository, UserRepository userRepository) {
-        return new CreateRestaurantUseCaseImpl(restaurantRepository, userRepository);
+    public CreateRestaurantUseCase createRestaurantUseCase(RestaurantRepository restaurantRepository, UserRepository userRepository, AddressRepository addressRepository) {
+        return new CreateRestaurantUseCaseImpl(restaurantRepository, userRepository, addressRepository);
     }
 
     @Bean
@@ -25,8 +25,8 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public UpdateRestaurantUseCase updateRestaurantUseCase(RestaurantRepository restaurantRepository) {
-        return new UpdateRestaurantUseCaseImpl(restaurantRepository);
+    public UpdateRestaurantUseCase updateRestaurantUseCase(RestaurantRepository restaurantRepository, AddressRepository addressRepository) { // ADICIONE AddressRepository
+        return new UpdateRestaurantUseCaseImpl(restaurantRepository, addressRepository); // ATUALIZE AQUI
     }
 
     @Bean
@@ -35,8 +35,8 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public FindRestaurantByIdUseCase findRestaurantByIdUseCase(RestaurantRepository restaurantRepository) {
-        return new FindRestaurantByIdUseCaseImpl(restaurantRepository);
+    public FindRestaurantByIdUseCase findRestaurantByIdUseCase(RestaurantRepository restaurantRepository, AddressRepository addressRepository) {
+        return new FindRestaurantByIdUseCaseImpl(restaurantRepository, addressRepository);
     }
 
     @Bean
@@ -50,7 +50,19 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public FindAllPublicRestaurantsUseCase findAllPublicRestaurantsUseCase(RestaurantRepository restaurantRepository) {
-        return new FindAllPublicRestaurantsUseCaseImpl(restaurantRepository);
+    public FindAllPublicRestaurantsUseCase findAllPublicRestaurantsUseCase(RestaurantRepository restaurantRepository,
+                                                                           MenuItemRepository menuItemRepository,
+                                                                           AddressRepository addressRepository) {
+        return new FindAllPublicRestaurantsUseCaseImpl(restaurantRepository, menuItemRepository, addressRepository);
+    }
+
+    @Bean
+    public FindMyRestaurantsUseCase findMyRestaurantsUseCase(RestaurantRepository restaurantRepository) {
+        return new FindMyRestaurantsUseCaseImpl(restaurantRepository);
+    }
+
+    @Bean
+    public ValidateRestaurantOwnershipUseCase validateRestaurantOwnershipUseCase(RestaurantRepository restaurantRepository) {
+        return new ValidateRestaurantOwnershipUseCaseImpl(restaurantRepository);
     }
 }

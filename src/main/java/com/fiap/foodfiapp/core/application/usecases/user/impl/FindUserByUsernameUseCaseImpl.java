@@ -1,30 +1,27 @@
 package com.fiap.foodfiapp.core.application.usecases.user.impl;
 
-import com.fiap.foodfiapp.core.domain.port.AddressRepository;
-import com.fiap.foodfiapp.core.domain.port.UserRepository;
-import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.FindUserByUsernameUseCase;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
 import com.fiap.foodfiapp.core.domain.exception.UserNotFoundException;
+import com.fiap.foodfiapp.core.domain.port.AddressRepository;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-public class FindUserUseCaseImpl implements FindUserUseCase {
+public class FindUserByUsernameUseCaseImpl implements FindUserByUsernameUseCase {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
 
-    public FindUserUseCaseImpl(UserRepository userRepository, AddressRepository addressRepository) {
+    public FindUserByUsernameUseCaseImpl(UserRepository userRepository, AddressRepository addressRepository) {
         this.userRepository = userRepository;
         this.addressRepository = addressRepository;
     }
 
     @Override
-    public Optional<User> execute(UUID id) {
-        var optionalUser = userRepository.findById(id);
-        optionalUser.ifPresent(this::loadUserAddresses);
-        return optionalUser;
+    public User execute(String username) {
+        var user = userRepository.findByLogin(username)
+                .orElseThrow(() -> new UserNotFoundException("login", username));
+        loadUserAddresses(user);
+        return user;
     }
 
     /**
