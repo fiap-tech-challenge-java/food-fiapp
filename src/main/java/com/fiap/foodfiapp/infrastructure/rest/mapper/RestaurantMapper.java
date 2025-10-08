@@ -24,11 +24,8 @@ public abstract class RestaurantMapper {
     @Autowired
     protected UserRepository userRepository;
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "address", source = "addresses")
-
     @Mapping(source = "address", target = "addresses", qualifiedByName = "addressToAddressResponseList")
-    @Mapping(source = "isActive", target = "isActive") // CORRIGIDO de "active" para "isActive"
+    @Mapping(source = "isActive", target = "isActive")
     @Mapping(source = "userOwnerId", target = "owner", qualifiedByName = "mapOwner")
     @Mapping(source = "menuItems", target = "menuItems")
     public abstract RestaurantResponse toRestaurantResponse(Restaurant restaurant);
