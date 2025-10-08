@@ -19,14 +19,14 @@ public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     @Mapping(source = "userTypeUuid", target = "userType", qualifiedByName = "uuidToUserType")
-    @Mapping(source = "address", target = "addresses")
+    @Mapping(source = "address", target = "address")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     User toUser(CreateUserRequest createUserRequest);
 
     @Mapping(source = "userTypeUuid", target = "userType", qualifiedByName = "uuidToUserType")
-    @Mapping(source = "address", target = "addresses")
+    @Mapping(source = "address", target = "address")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

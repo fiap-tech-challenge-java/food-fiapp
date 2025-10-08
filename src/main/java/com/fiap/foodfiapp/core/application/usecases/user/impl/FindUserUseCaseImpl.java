@@ -57,7 +57,7 @@ public class FindUserUseCaseImpl implements FindUserUseCase {
     private void loadUserAddresses(User user) {
         if (user != null && user.getId() != null) {
             var addresses = addressRepository.findByOwner(user.getId(), AddressOwnerTypeEnum.USER.getDescription());
-            user.setAddresses(addresses);
+            user.setAddress(addresses);
         }
     }
 }

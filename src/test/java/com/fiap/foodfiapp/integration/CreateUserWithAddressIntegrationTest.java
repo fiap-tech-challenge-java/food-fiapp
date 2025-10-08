@@ -75,7 +75,7 @@ class CreateUserWithAddressIntegrationTest {
         user.setLogin("testuser");
         user.setPassword("password123");
         user.setUserType(userType);
-        user.setAddresses(List.of(address));
+        user.setAddress(List.of(address));
         user.setIsActive(true);
         user.setCreatedAt(OffsetDateTime.now());
         user.setUpdatedAt(OffsetDateTime.now());
@@ -125,11 +125,11 @@ class CreateUserWithAddressIntegrationTest {
         assertEquals(user.getEmail(), result.getEmail());
 
         // Verifica se os endereços estão presentes na resposta
-        assertNotNull(result.getAddresses(), "Addresses should not be null");
-        assertFalse(result.getAddresses().isEmpty(), "Addresses should not be empty");
-        assertEquals(1, result.getAddresses().size(), "Should have exactly 1 address");
+        assertNotNull(result.getAddress(), "Addresses should not be null");
+        assertFalse(result.getAddress().isEmpty(), "Addresses should not be empty");
+        assertEquals(1, result.getAddress().size(), "Should have exactly 1 address");
 
-        Address returnedAddress = result.getAddresses().get(0);
+        Address returnedAddress = result.getAddress().get(0);
         assertEquals(addressId, returnedAddress.getId());
         assertEquals("Rua Teste", returnedAddress.getPublicPlace());
         assertEquals("123", returnedAddress.getNumber());
@@ -153,7 +153,7 @@ class CreateUserWithAddressIntegrationTest {
         secondAddress.setPostalCode("01310-100");
         secondAddress.setIsActive(true);
 
-        user.setAddresses(List.of(address, secondAddress));
+        user.setAddress(List.of(address, secondAddress));
 
         User savedUser = new User();
         savedUser.setId(userId);
@@ -180,11 +180,11 @@ class CreateUserWithAddressIntegrationTest {
 
         // Then
         assertNotNull(result, "User should not be null");
-        assertNotNull(result.getAddresses(), "Addresses should not be null");
-        assertEquals(2, result.getAddresses().size(), "Should have exactly 2 addresses");
+        assertNotNull(result.getAddress(), "Addresses should not be null");
+        assertEquals(2, result.getAddress().size(), "Should have exactly 2 addresses");
 
         // Verifica se ambos os endereços estão na resposta
-        List<String> returnedStreets = result.getAddresses().stream()
+        List<String> returnedStreets = result.getAddress().stream()
                 .map(Address::getPublicPlace)
                 .toList();
 

@@ -76,7 +76,7 @@ class CreateUserUseCaseImplTest {
         user.setLogin("testuser");
         user.setPassword("password123");
         user.setUserType(userType);
-        user.setAddresses(List.of(address));
+        user.setAddress(List.of(address));
         user.setIsActive(true);
         user.setCreatedAt(OffsetDateTime.now());
         user.setUpdatedAt(OffsetDateTime.now());
@@ -100,7 +100,7 @@ class CreateUserUseCaseImplTest {
         assertNotNull(result);
         assertEquals(user.getName(), result.getName());
         assertEquals(user.getEmail(), result.getEmail());
-        assertEquals(1, result.getAddresses().size());
+        assertEquals(1, result.getAddress().size());
 
         verify(userRepository, times(2)).findByEmail(user.getEmail()); // Called twice: revival check + duplicate validation
         verify(userRepository).findByLogin(user.getLogin());
@@ -112,7 +112,7 @@ class CreateUserUseCaseImplTest {
     @Test
     void shouldThrowExceptionWhenNoAddressProvided() {
         // Given
-        user.setAddresses(null);
+        user.setAddress(null);
 
         // When & Then
         BusinessException exception = assertThrows(BusinessException.class, () -> {
@@ -130,7 +130,7 @@ class CreateUserUseCaseImplTest {
     @Test
     void shouldThrowExceptionWhenEmptyAddressList() {
         // Given
-        user.setAddresses(Collections.emptyList());
+        user.setAddress(Collections.emptyList());
 
         // When & Then
         BusinessException exception = assertThrows(BusinessException.class, () -> {
@@ -246,7 +246,7 @@ class CreateUserUseCaseImplTest {
         assertNotNull(result);
         assertTrue(result.getIsActive());
         assertEquals(user.getName(), result.getName());
-        assertEquals(1, result.getAddresses().size());
+        assertEquals(1, result.getAddress().size());
 
         verify(userRepository).findByEmail(user.getEmail());
         verify(userRepository).save(inactiveUser);
@@ -274,7 +274,7 @@ class CreateUserUseCaseImplTest {
         assertNotNull(result);
         assertTrue(result.getIsActive());
         assertEquals(user.getName(), result.getName());
-        assertEquals(1, result.getAddresses().size());
+        assertEquals(1, result.getAddress().size());
 
         verify(userRepository).findByEmail(user.getEmail());
         verify(userRepository).findByCpf(user.getCpf());
