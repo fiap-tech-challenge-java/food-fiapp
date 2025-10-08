@@ -17,16 +17,21 @@ import java.util.stream.Collectors;
 public class CreateUserUseCaseImpl implements CreateUserUseCase {
     private final UserRepository userRepository;
     private final UserTypeRepository userTypeRepository;
-    private final AddressRepository addressRepository; // Dependência adicionada
+    private final AddressRepository addressRepository;
 
     public CreateUserUseCaseImpl(UserRepository userRepository, UserTypeRepository userTypeRepository, AddressRepository addressRepository) {
         this.userRepository = userRepository;
         this.userTypeRepository = userTypeRepository;
-        this.addressRepository = addressRepository; // Injetada
+        this.addressRepository = addressRepository;
     }
 
     @Override
     public User execute(User user) {
+        // RN: Validação obrigatória de endereço
+        if (user.getAddress() == null || user.getAddress().isEmpty()) {
+            throw new BusinessException("At least one address is required for user creation.");
+        }
+
         // RN: Reviver utilizador inativo se houver match por e-mail
         var existingByEmail = userRepository.findByEmail(user.getEmail());
         if (existingByEmail.isPresent()) {
@@ -39,13 +44,11 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             applyUserUpdates(existing, user);
             existing.setIsActive(true);
             var revived = userRepository.save(existing);
-            // Salvar endereços novos, se informados
-            if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
-                var savedAddresses = user.getAddresses().stream()
-                        .map(address -> addressRepository.save(address, revived.getId(), AddressOwnerTypeEnum.USER.getDescription()))
-                        .collect(Collectors.toList());
-                revived.setAddresses(savedAddresses);
-            }
+            // Salvar endereços novos (agora obrigatórios)
+            var savedAddress = user.getAddress().stream()
+                    .map(address -> addressRepository.save(address, revived.getId(), AddressOwnerTypeEnum.USER.getDescription()))
+                    .collect(Collectors.toList());
+            revived.setAddress(savedAddress);
             return revived;
         }
 
@@ -61,13 +64,11 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             applyUserUpdates(existing, user);
             existing.setIsActive(true);
             var revived = userRepository.save(existing);
-            // Salvar endereços novos, se informados
-            if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
-                var savedAddresses = user.getAddresses().stream()
-                        .map(address -> addressRepository.save(address, revived.getId(), AddressOwnerTypeEnum.USER.getDescription()))
-                        .collect(Collectors.toList());
-                revived.setAddresses(savedAddresses);
-            }
+            // Salvar endereços novos (agora obrigatórios)
+            var savedAddress = user.getAddress().stream()
+                    .map(address -> addressRepository.save(address, revived.getId(), AddressOwnerTypeEnum.USER.getDescription()))
+                    .collect(Collectors.toList());
+            revived.setAddress(savedAddress);
             return revived;
         }
 
@@ -92,13 +93,13 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
         // Salva o usuário primeiro para obter o ID
         User savedUser = userRepository.save(user);
 
-        // Salva os endereços associados ao usuário
-        if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
-            var savedAddresses = user.getAddresses().stream()
-                    .map(address -> addressRepository.save(address, savedUser.getId(), AddressOwnerTypeEnum.USER.getDescription()))
-                    .collect(Collectors.toList());
-            savedUser.setAddresses(savedAddresses);
-        }
+        // Salva os endereços associados ao usuário (agora obrigatórios)
+        var savedAddress = user.getAddress().stream()
+                .map(address -> addressRepository.save(address, savedUser.getId(), AddressOwnerTypeEnum.USER.getDescription()))
+                .collect(Collectors.toList());
+
+        // Define os endereços salvos no usuário para retornar na resposta
+        savedUser.setAddress(savedAddress);
 
         return savedUser;
     }

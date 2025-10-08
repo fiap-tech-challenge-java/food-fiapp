@@ -1,17 +1,17 @@
-package com.fiap.foodfiapp.core.application.usecases.address.impl;
+package com.fiap.foodfiapp.core.application.usecases.addresses.impl;
 
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
-import com.fiap.foodfiapp.core.application.usecases.address.DeleteAddressUseCase;
+import com.fiap.foodfiapp.core.application.usecases.addresses.DeleteAddressesUseCase;
 import com.fiap.foodfiapp.core.domain.exception.AddressNotFoundException;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
 
 import java.util.UUID;
 
-public class DeleteAddressUseCaseImpl implements DeleteAddressUseCase {
+public class DeleteAddressesUseCaseImpl implements DeleteAddressesUseCase {
 
     private final AddressRepository addressRepository;
 
-    public DeleteAddressUseCaseImpl(AddressRepository addressRepository) {
+    public DeleteAddressesUseCaseImpl(AddressRepository addressRepository) {
         this.addressRepository = addressRepository;
     }
 

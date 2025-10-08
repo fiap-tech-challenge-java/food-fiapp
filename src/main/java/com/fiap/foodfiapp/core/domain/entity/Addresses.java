@@ -3,7 +3,7 @@ package com.fiap.foodfiapp.core.domain.entity;
 import com.fiap.foodfiapp.core.domain.exception.InvalidDataException;
 import java.util.UUID;
 
-public class Address extends BaseEntity {
+public class Addresses extends BaseEntity {
 
     private UUID id;
     private String publicPlace;
@@ -15,11 +15,11 @@ public class Address extends BaseEntity {
     private String postalCode;
 
     // Construtor para uso do framework de persistência
-    public Address() {
+    public Addresses() {
     }
 
     // Construtor principal para criar a entidade
-    public Address(UUID id, String publicPlace, String number, String complement, String neighborhood, String city, String state, String postalCode) {
+    public Addresses(UUID id, String publicPlace, String number, String complement, String neighborhood, String city, String state, String postalCode) {
         this.id = id;
         this.publicPlace = publicPlace;
         this.number = number;
