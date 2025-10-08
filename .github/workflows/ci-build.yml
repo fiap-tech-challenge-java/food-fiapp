@@ -3,7 +3,7 @@ name: CI Build and Test
 on:
   pull_request:
     branches:
-      - main  # ou a sua branch principal, por exemplo, 'develop'
+      - main
       - develop
 
 jobs:
@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Necessário para análise de código novo
 
       - name: Configurar Java
         uses: actions/setup-java@v4
@@ -20,13 +22,74 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Executar testes com JaCoCo
-        run: mvn clean verify
+      - name: Build e executar testes com JaCoCo
+        run: mvn clean verify --batch-mode --fail-at-end
 
-      # Opcional: Adicionar um passo para publicar o relatório de cobertura
+      - name: Verificar resultados dos testes
+        if: always()
+        run: |
+          if [ -f target/surefire-reports/*.xml ]; then
+            echo "Verificando resultados dos testes..."
+            # Falha se houver testes com falha ou erro
+            if grep -q 'failures="[1-9]' target/surefire-reports/*.xml 2>/dev/null || \
+               grep -q 'errors="[1-9]' target/surefire-reports/*.xml 2>/dev/null; then
+              echo "❌ Testes falharam! O PR será bloqueado."
+              exit 1
+            fi
+            echo "✅ Todos os testes passaram!"
+          fi
+
+      - name: Verificar cobertura de código
+        if: always()
+        run: |
+          if [ -f target/site/jacoco/index.html ]; then
+            echo "📊 Verificando cobertura de código..."
+            
+            # Extrai a cobertura do relatório JaCoCo
+            COVERAGE=$(grep -o 'Total[^%]*%' target/site/jacoco/index.html | grep -o '[0-9]*%' | head -1 | tr -d '%')
+            
+            echo "Cobertura atual: ${COVERAGE}%"
+            
+            if [ -z "$COVERAGE" ]; then
+              echo "⚠️ Não foi possível determinar a cobertura"
+              exit 1
+            fi
+            
+            if [ "$COVERAGE" -lt 80 ]; then
+              echo "❌ Cobertura de código insuficiente: ${COVERAGE}% (mínimo exigido: 80%)"
+              echo "Por favor, adicione mais testes para atingir o mínimo de 80% de cobertura."
+              exit 1
+            fi
+            
+            echo "✅ Cobertura de código adequada: ${COVERAGE}%"
+          else
+            echo "❌ Relatório de cobertura não encontrado!"
+            exit 1
+          fi
+
       - name: Upload JaCoCo report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: jacoco-report
           path: target/site/jacoco
+
+      - name: Publicar resultados dos testes
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Maven Tests
+          path: target/surefire-reports/*.xml
+          reporter: java-junit
+          fail-on-error: true
+
+      - name: Comentar cobertura no PR
+        uses: madrapps/jacoco-report@v1.7.1
+        if: always()
+        with:
+          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+          title: 📊 Relatório de Cobertura de Código
+          update-comment: true
