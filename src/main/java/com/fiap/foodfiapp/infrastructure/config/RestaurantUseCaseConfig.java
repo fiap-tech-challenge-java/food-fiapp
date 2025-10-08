@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 public class RestaurantUseCaseConfig {
 
     @Bean
-    public CreateRestaurantUseCase createRestaurantUseCase(RestaurantRepository restaurantRepository, UserRepository userRepository) {
-        return new CreateRestaurantUseCaseImpl(restaurantRepository, userRepository);
+    public CreateRestaurantUseCase createRestaurantUseCase(RestaurantRepository restaurantRepository, UserRepository userRepository, AddressRepository addressRepository) {
+        return new CreateRestaurantUseCaseImpl(restaurantRepository, userRepository, addressRepository);
     }
 
     @Bean
@@ -35,8 +35,8 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public FindRestaurantByIdUseCase findRestaurantByIdUseCase(RestaurantRepository restaurantRepository) {
-        return new FindRestaurantByIdUseCaseImpl(restaurantRepository);
+    public FindRestaurantByIdUseCase findRestaurantByIdUseCase(RestaurantRepository restaurantRepository, AddressRepository addressRepository) {
+        return new FindRestaurantByIdUseCaseImpl(restaurantRepository, addressRepository);
     }
 
     @Bean
@@ -51,8 +51,8 @@ public class RestaurantUseCaseConfig {
 
     @Bean
     public FindAllPublicRestaurantsUseCase findAllPublicRestaurantsUseCase(RestaurantRepository restaurantRepository,
-                                                                          MenuItemRepository menuItemRepository,
-                                                                          AddressRepository addressRepository) {
+                                                                           MenuItemRepository menuItemRepository,
+                                                                           AddressRepository addressRepository) {
         return new FindAllPublicRestaurantsUseCaseImpl(restaurantRepository, menuItemRepository, addressRepository);
     }
 
