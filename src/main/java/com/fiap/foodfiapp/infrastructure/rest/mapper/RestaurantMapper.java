@@ -43,6 +43,8 @@ public interface RestaurantMapper {
     @Mapping(target = ".", qualifiedByName = "toRestaurantResponseWithoutOwner")
     List<RestaurantResponse> toRestaurantResponseListWithoutOwner(List<Restaurant> restaurants);
 
+    List<RestaurantResponse> toRestaurantResponseList(List<Restaurant> restaurants);
+
     @Named("addressToAddressResponseList")
     default List<com.fiap.foodfiapp.model.AddressesResponse> addressToAddressesResponseList(Addresses addresses) {
         if (addresses == null) {

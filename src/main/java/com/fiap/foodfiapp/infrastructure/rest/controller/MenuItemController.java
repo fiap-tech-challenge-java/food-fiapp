@@ -6,6 +6,7 @@ import com.fiap.foodfiapp.core.application.usecases.menuitem.*;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.exception.FileStorageException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.MenuItemMapper;
+import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
 import com.fiap.foodfiapp.model.MenuItemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ public class MenuItemController implements MenuItemsApi {
     private final FindMenuItemByIdUseCase findMenuItemByIdUseCase;
     private final UpdateMenuItemUseCase updateMenuItemUseCase;
     private final DeleteMenuItemUseCase deleteMenuItemUseCase;
+    private final AuthenticationService authenticationService;
 
     private final MenuItemMapper menuItemMapper = MenuItemMapper.INSTANCE;
 
@@ -48,7 +50,10 @@ public class MenuItemController implements MenuItemsApi {
 
     @Override
     public ResponseEntity<Void> deleteMenuItem(UUID restaurantId, UUID itemId) {
-        deleteMenuItemUseCase.execute(itemId);
+        // Get the authenticated user ID
+        UUID authenticatedUserId = authenticationService.getCurrentUser().getId();
+
+        deleteMenuItemUseCase.execute(authenticatedUserId, itemId);
         return ResponseEntity.noContent().build();
     }
 
@@ -69,14 +74,17 @@ public class MenuItemController implements MenuItemsApi {
     @Override
     public ResponseEntity<MenuItemResponse> updateMenuItem(UUID restaurantId, UUID itemId, String name, String description, Double price, Boolean availableForInStoreOnly, MultipartFile photo) {
         try {
+            // Get the authenticated user ID
+            UUID authenticatedUserId = authenticationService.getCurrentUser().getId();
+
             FileUploadRequest fileUploadRequest = null;
             if (photo != null && !photo.isEmpty()) {
                 fileUploadRequest = new FileUploadRequest(photo.getInputStream(), photo.getSize(),
                         photo.getContentType(), photo.getOriginalFilename());
             }
 
-            // O Controller não cria mais a entidade, apenas passa os dados para o UseCase.
-            MenuItem updatedItem = updateMenuItemUseCase.execute(restaurantId, itemId, name, description, price, availableForInStoreOnly, fileUploadRequest);
+            // Pass authenticated user ID instead of restaurant ID
+            MenuItem updatedItem = updateMenuItemUseCase.execute(authenticatedUserId, itemId, name, description, price, availableForInStoreOnly, fileUploadRequest);
             return ResponseEntity.ok(menuItemMapper.toMenuItemResponse(updatedItem));
         } catch (IOException e) {
             throw new FileStorageException("Failed to process menu item photo on update", e);

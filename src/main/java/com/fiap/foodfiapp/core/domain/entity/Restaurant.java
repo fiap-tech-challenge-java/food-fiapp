@@ -1,5 +1,6 @@
 package com.fiap.foodfiapp.core.domain.entity;
 
+import java.util.List;
 import java.util.UUID;
 
 public class Restaurant extends BaseEntity {
@@ -10,6 +11,7 @@ public class Restaurant extends BaseEntity {
     private UUID userOwnerId;
     private Boolean active;
     private Addresses addresses;
+    private List<MenuItem> menuItems;
 
     public Restaurant() {
     }
@@ -79,5 +81,13 @@ public class Restaurant extends BaseEntity {
 
     public void setAddress(Addresses addresses) {
         this.addresses = addresses;
+    }
+
+    public List<MenuItem> getMenuItems() {
+        return menuItems;
+    }
+
+    public void setMenuItems(List<MenuItem> menuItems) {
+        this.menuItems = menuItems;
     }
 }

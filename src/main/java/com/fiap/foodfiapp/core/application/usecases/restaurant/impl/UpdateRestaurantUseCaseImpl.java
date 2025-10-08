@@ -5,6 +5,7 @@ import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.UpdateRestaurantUseCase;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 
 import java.util.UUID;
 
@@ -16,13 +17,19 @@ public class UpdateRestaurantUseCaseImpl implements UpdateRestaurantUseCase {
     }
 
     @Override
-    public Restaurant execute(UUID id, Restaurant restaurantUpdates) {
-        Restaurant existingRestaurant = restaurantRepository.findById(id);
+    public Restaurant execute(UUID authenticatedUserId, UUID restaurantId, Restaurant restaurantUpdates) {
+        // 1. Verificação de existência do restaurante
+        Restaurant existingRestaurant = restaurantRepository.findById(restaurantId);
         if (existingRestaurant == null) {
-            throw new BusinessException("Restaurant not found with id: " + id);
+            throw new BusinessException("Restaurante não encontrado.");
         }
 
-        // Aplica as atualizações da entidade de domínio na entidade existente
+        // 2. Verificação de posse do restaurante
+        if (!authenticatedUserId.equals(existingRestaurant.getUserOwnerId())) {
+            throw new UnauthorizedAccessException("Permissão negada. Você só pode editar seus próprios restaurantes.");
+        }
+
+        // 3. Aplica as atualizações da entidade de domínio na entidade existente
         if (restaurantUpdates.getName() != null) {
             existingRestaurant.setName(restaurantUpdates.getName());
         }

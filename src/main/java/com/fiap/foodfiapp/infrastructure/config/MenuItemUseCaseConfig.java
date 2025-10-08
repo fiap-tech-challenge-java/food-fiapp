@@ -17,8 +17,8 @@ public class MenuItemUseCaseConfig {
     }
 
     @Bean
-    public DeleteMenuItemUseCase deleteMenuItemUseCase(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository) {
-        return new DeleteMenuItemUseCaseImpl(menuItemRepository, fileStorageRepository);
+    public DeleteMenuItemUseCase deleteMenuItemUseCase(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository, RestaurantRepository restaurantRepository) {
+        return new DeleteMenuItemUseCaseImpl(menuItemRepository, fileStorageRepository, restaurantRepository);
     }
 
     @Bean

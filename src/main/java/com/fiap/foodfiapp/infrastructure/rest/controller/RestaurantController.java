@@ -3,6 +3,7 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 import com.fiap.foodfiapp.api.RestaurantsApi;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.*;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
+import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
 import com.fiap.foodfiapp.model.CreateRestaurantRequest;
 import com.fiap.foodfiapp.model.RestaurantResponse;
 import com.fiap.foodfiapp.model.UpdateRestaurantRequest;
@@ -26,6 +27,8 @@ public class RestaurantController implements RestaurantsApi {
     private final UpdateRestaurantUseCase updateRestaurantUseCase;
     private final DeleteRestaurantUseCase deleteRestaurantUseCase;
     private final FindAllPublicRestaurantsUseCase findAllPublicRestaurantsUseCase;
+    private final FindMyRestaurantsUseCase findMyRestaurantsUseCase;
+    private final AuthenticationService authenticationService;
 
     private final RestaurantMapper restaurantMapper = RestaurantMapper.INSTANCE;
 
@@ -37,7 +40,10 @@ public class RestaurantController implements RestaurantsApi {
 
     @Override
     public ResponseEntity<Void> restaurantsIdDelete(UUID id) {
-        deleteRestaurantUseCase.execute(id);
+        // Get the authenticated user ID
+        UUID authenticatedUserId = authenticationService.getCurrentUser().getId();
+
+        deleteRestaurantUseCase.execute(authenticatedUserId, id);
         return ResponseEntity.noContent().build();
     }
 
@@ -52,11 +58,14 @@ public class RestaurantController implements RestaurantsApi {
 
     @Override
     public ResponseEntity<RestaurantResponse> restaurantsIdPut(UUID id, UpdateRestaurantRequest updateRestaurantRequest) {
+        // Get the authenticated user ID
+        UUID authenticatedUserId = authenticationService.getCurrentUser().getId();
+
         // Mapeia o DTO de requisição para a entidade de domínio
         var restaurantUpdates = restaurantMapper.toRestaurant(updateRestaurantRequest);
 
         // Chama o use case com a entidade de domínio
-        var updatedRestaurant = updateRestaurantUseCase.execute(id, restaurantUpdates);
+        var updatedRestaurant = updateRestaurantUseCase.execute(authenticatedUserId, id, restaurantUpdates);
         return ResponseEntity.ok(restaurantMapper.toRestaurantResponse(updatedRestaurant));
     }
 
@@ -75,5 +84,17 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<List<RestaurantResponse>> getPublicRestaurants() {
         var restaurants = findAllPublicRestaurantsUseCase.execute();
         return ResponseEntity.ok(restaurantMapper.toRestaurantResponseListWithoutOwner(restaurants));
+    }
+
+    @GetMapping("/restaurants/my-restaurants")
+    public ResponseEntity<List<RestaurantResponse>> getMyRestaurants() {
+        // Get the authenticated user
+        var currentUser = authenticationService.getCurrentUser();
+
+        // Call findMyRestaurantsUseCase with currentUser.getId()
+        var restaurants = findMyRestaurantsUseCase.execute(currentUser.getId());
+
+        // Map result to List<RestaurantResponse> and return ResponseEntity.ok()
+        return ResponseEntity.ok(restaurantMapper.toRestaurantResponseList(restaurants));
     }
 }

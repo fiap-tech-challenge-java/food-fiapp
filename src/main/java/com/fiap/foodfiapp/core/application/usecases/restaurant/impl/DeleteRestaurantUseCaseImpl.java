@@ -8,6 +8,7 @@ import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
+import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,28 +27,33 @@ public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
     }
 
     @Override
-    public void execute(UUID id) {
-        // Busca o restaurante; se não existir, não faz nada (idempotente)
-        Restaurant restaurant = restaurantRepository.findById(id);
+    public void execute(UUID authenticatedUserId, UUID restaurantId) {
+        // 1. Busca o restaurante; se não existir, operação é idempotente
+        Restaurant restaurant = restaurantRepository.findById(restaurantId);
         if (restaurant == null) {
             return;
         }
 
-        // Exclusão lógica do restaurante
-        restaurantRepository.delete(id);
+        // 2. Verificação de posse do restaurante
+        if (!authenticatedUserId.equals(restaurant.getUserOwnerId())) {
+            throw new UnauthorizedAccessException("Permissão negada. Você só pode deletar seus próprios restaurantes.");
+        }
+
+        // 3. Exclusão lógica do restaurante
+        restaurantRepository.delete(restaurantId);
 
         // Exclusão lógica dos itens do cardápio associados
-        List<MenuItem> items = menuItemRepository.findAllByRestaurantId(id);
+        List<MenuItem> items = menuItemRepository.findAllByRestaurantId(restaurantId);
         for (MenuItem item : items) {
             item.setIsActive(false);
             menuItemRepository.save(item);
         }
 
         // Exclusão lógica dos endereços associados ao restaurante
-        List<Addresses> addresses = addressRepository.findByOwner(id, AddressOwnerTypeEnum.RESTAURANT.getDescription());
+        List<Addresses> addresses = addressRepository.findByOwner(restaurantId, AddressOwnerTypeEnum.RESTAURANT.getDescription());
         for (Addresses address : addresses) {
             address.setIsActive(false);
-            addressRepository.save(address, id, AddressOwnerTypeEnum.RESTAURANT.getDescription());
+            addressRepository.save(address, restaurantId, AddressOwnerTypeEnum.RESTAURANT.getDescription());
         }
     }
 }

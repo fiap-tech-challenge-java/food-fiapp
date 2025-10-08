@@ -50,7 +50,14 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public FindAllPublicRestaurantsUseCase findAllPublicRestaurantsUseCase(RestaurantRepository restaurantRepository) {
-        return new FindAllPublicRestaurantsUseCaseImpl(restaurantRepository);
+    public FindAllPublicRestaurantsUseCase findAllPublicRestaurantsUseCase(RestaurantRepository restaurantRepository,
+                                                                          MenuItemRepository menuItemRepository,
+                                                                          AddressRepository addressRepository) {
+        return new FindAllPublicRestaurantsUseCaseImpl(restaurantRepository, menuItemRepository, addressRepository);
+    }
+
+    @Bean
+    public FindMyRestaurantsUseCase findMyRestaurantsUseCase(RestaurantRepository restaurantRepository) {
+        return new FindMyRestaurantsUseCaseImpl(restaurantRepository);
     }
 }
