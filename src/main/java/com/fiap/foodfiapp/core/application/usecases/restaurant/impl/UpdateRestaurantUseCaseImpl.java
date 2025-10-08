@@ -18,6 +18,10 @@ public class UpdateRestaurantUseCaseImpl implements UpdateRestaurantUseCase {
 
     @Override
     public Restaurant execute(UUID authenticatedUserId, UUID restaurantId, Restaurant restaurantUpdates) {
+        // Set the restaurant ID internally - this is now handled by the use case
+        restaurantUpdates.setId(restaurantId);
+        restaurantUpdates.setUserOwnerId(authenticatedUserId);
+
         // 1. Verificação de existência do restaurante
         Restaurant existingRestaurant = restaurantRepository.findById(restaurantId);
         if (existingRestaurant == null) {

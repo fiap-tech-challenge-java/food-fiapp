@@ -10,6 +10,7 @@ import com.fiap.foodfiapp.core.domain.exception.UserTypeNameAlreadyExistsExcepti
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
 import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.infrastructure.rest.exception.GlobalExceptionHandler;
+import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -44,6 +45,9 @@ class UserTypeControllerTest {
     @Mock
     private UserTypeRepository userTypeRepository;
 
+    @Mock
+    private AuthenticationService authenticationService;
+
     private UserTypeController userTypeController;
 
     private ObjectMapper objectMapper;
@@ -55,8 +59,12 @@ class UserTypeControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        // Mock the authentication service to return admin user for all tests
+        when(authenticationService.isCurrentUserAdmin()).thenReturn(true);
+
         userTypeController = new UserTypeController(createUserTypeUseCase, updateUserTypeUseCase,
-                deleteUserTypeUseCase, userTypeRepository);
+                deleteUserTypeUseCase, userTypeRepository, authenticationService);
         mockMvc = MockMvcBuilders.standaloneSetup(userTypeController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();

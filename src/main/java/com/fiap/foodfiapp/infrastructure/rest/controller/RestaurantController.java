@@ -2,6 +2,9 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 
 import com.fiap.foodfiapp.api.RestaurantsApi;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.*;
+import com.fiap.foodfiapp.core.domain.entity.Restaurant;
+import com.fiap.foodfiapp.core.domain.exception.UnauthorizedException;
+import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
 import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
 import com.fiap.foodfiapp.model.CreateRestaurantRequest;
@@ -10,12 +13,9 @@ import com.fiap.foodfiapp.model.UpdateRestaurantRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -28,73 +28,143 @@ public class RestaurantController implements RestaurantsApi {
     private final DeleteRestaurantUseCase deleteRestaurantUseCase;
     private final FindAllPublicRestaurantsUseCase findAllPublicRestaurantsUseCase;
     private final FindMyRestaurantsUseCase findMyRestaurantsUseCase;
+    private final FindAllRestaurantsByUserIdUseCase findAllRestaurantsByUserIdUseCase;
+    private final ValidateRestaurantOwnershipUseCase validateRestaurantOwnershipUseCase;
     private final AuthenticationService authenticationService;
 
     private final RestaurantMapper restaurantMapper = RestaurantMapper.INSTANCE;
 
     @Override
-    public ResponseEntity<List<RestaurantResponse>> restaurantsGet() {
-        // TODO: Criar e usar um FindAllRestaurantsUseCase
-        return ResponseEntity.ok(Collections.emptyList());
+    public ResponseEntity<List<RestaurantResponse>> usersUserIdRestaurantsGet(UUID userId) {
+        // Main authentication check
+    //    if (!authenticationService.canAccessUserProfile(userId)) {
+    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+    //    }
+
+        // Get all restaurants for the specified user
+        var restaurants = findMyRestaurantsUseCase.execute(userId);
+        var response = restaurantMapper.toRestaurantResponseList(restaurants);
+        return ResponseEntity.ok(response);
     }
 
     @Override
-    public ResponseEntity<Void> restaurantsIdDelete(UUID id) {
-        // Get the authenticated user ID
-        UUID authenticatedUserId = authenticationService.getCurrentUser().getId();
+    public ResponseEntity<List<RestaurantResponse>> usersUserIdRestaurantsMyRestaurantsGet(UUID userId) {
+        // Main authentication check
+    //    if (!authenticationService.canAccessUserProfile(userId)) {
+    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+    //    }
 
-        deleteRestaurantUseCase.execute(authenticatedUserId, id);
+        var restaurants = findMyRestaurantsUseCase.execute(userId);
+        var response = restaurantMapper.toRestaurantResponseList(restaurants);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<List<RestaurantResponse>> usersUserIdRestaurantsPublicListGet(UUID userId) {
+        // Main authentication check
+    //    if (!authenticationService.canAccessUserProfile(userId)) {
+    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+    //    }
+
+        // Get all public restaurants - userId is required for authentication but not filtering
+        var restaurants = findAllPublicRestaurantsUseCase.execute(userId);
+        var response = restaurantMapper.toRestaurantResponseList(restaurants);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<RestaurantResponse> usersUserIdRestaurantsPost(UUID userId, CreateRestaurantRequest createRestaurantRequest) {
+        // Main authentication check
+    //    if (!authenticationService.canAccessUserProfile(userId)) {
+    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+    //    }
+
+        // Convert request to domain entity - no need to set userOwnerId manually
+        Restaurant restaurant = restaurantMapper.toRestaurant(createRestaurantRequest);
+
+        // Use case handles setting the owner ID internally
+        var createdRestaurant = createRestaurantUseCase.execute(userId, restaurant);
+        var response = restaurantMapper.toRestaurantResponse(createdRestaurant);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Override
+    public ResponseEntity<RestaurantResponse> usersUserIdRestaurantsRestaurantIdGet(UUID userId, UUID restaurantId) {
+        var restaurant = findRestaurantByIdUseCase.execute(restaurantId);
+
+        // Use the validation use case instead of directly accessing domain entity
+        if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        var response = restaurantMapper.toRestaurantResponse(restaurant);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<RestaurantResponse> usersUserIdRestaurantsRestaurantIdPut(UUID userId, UUID restaurantId, UpdateRestaurantRequest updateRestaurantRequest) {
+        // Main authentication check
+    //    if (!authenticationService.canAccessUserProfile(userId)) {
+    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+    //    }
+
+        // Use the validation use case instead of directly accessing domain entity
+        if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // Convert request to domain entity - no need to set ID and userOwnerId manually
+        Restaurant restaurant = restaurantMapper.toRestaurant(updateRestaurantRequest);
+
+        // Use case handles setting the restaurant ID and user owner ID internally
+        var updatedRestaurant = updateRestaurantUseCase.execute(userId, restaurantId, restaurant);
+        var response = restaurantMapper.toRestaurantResponse(updatedRestaurant);
+        return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> usersUserIdRestaurantsRestaurantIdDelete(UUID userId, UUID restaurantId) {
+        // Main authentication check
+    //    if (!authenticationService.canAccessUserProfile(userId)) {
+    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+    //    }
+
+        // Use the validation use case instead of directly accessing domain entity
+        if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        deleteRestaurantUseCase.execute(userId, restaurantId);
         return ResponseEntity.noContent().build();
     }
 
-    @Override
-    public ResponseEntity<RestaurantResponse> restaurantsIdGet(UUID id) {
-        // O controller não enriquece mais a resposta. Apenas mapeia o resultado do caso de uso.
-        return Optional.ofNullable(findRestaurantByIdUseCase.execute(id))
-                .map(restaurantMapper::toRestaurantResponse)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    /**
+     * Get public restaurants list - for customers
+     */
+    public ResponseEntity<List<RestaurantResponse>> getPublicRestaurantsList(UUID userId) {
+        // Main authentication check
+     //   if (!authenticationService.canAccessUserProfile(userId)) {
+    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+    //    }
+
+        // Get all public restaurants
+        var restaurants = findAllPublicRestaurantsUseCase.execute(userId);
+        var response = restaurantMapper.toRestaurantResponseList(restaurants);
+        return ResponseEntity.ok(response);
     }
 
-    @Override
-    public ResponseEntity<RestaurantResponse> restaurantsIdPut(UUID id, UpdateRestaurantRequest updateRestaurantRequest) {
-        // Get the authenticated user ID
-        UUID authenticatedUserId = authenticationService.getCurrentUser().getId();
+    /**
+     * Get my restaurants - for owners
+     */
+    public ResponseEntity<List<RestaurantResponse>> getMyRestaurants(UUID userId) {
+        // Main authentication check
+     //   if (!authenticationService.canAccessUserProfile(userId)) {
+    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+    //    }
 
-        // Mapeia o DTO de requisição para a entidade de domínio
-        var restaurantUpdates = restaurantMapper.toRestaurant(updateRestaurantRequest);
-
-        // Chama o use case com a entidade de domínio
-        var updatedRestaurant = updateRestaurantUseCase.execute(authenticatedUserId, id, restaurantUpdates);
-        return ResponseEntity.ok(restaurantMapper.toRestaurantResponse(updatedRestaurant));
-    }
-
-    @Override
-    public ResponseEntity<RestaurantResponse> restaurantsPost(CreateRestaurantRequest createRestaurantRequest) {
-        // Mapeia o DTO de requisição para a entidade de domínio
-        // O mapper agora faz o mapeamento completo, incluindo o ownerId -> userOwnerId
-        var restaurant = restaurantMapper.toRestaurant(createRestaurantRequest);
-
-        // Chama o use case com a entidade de domínio
-        var createdRestaurant = createRestaurantUseCase.execute(restaurant);
-        return ResponseEntity.status(HttpStatus.CREATED).body(restaurantMapper.toRestaurantResponse(createdRestaurant));
-    }
-
-    @GetMapping("/restaurants/public")
-    public ResponseEntity<List<RestaurantResponse>> getPublicRestaurants() {
-        var restaurants = findAllPublicRestaurantsUseCase.execute();
-        return ResponseEntity.ok(restaurantMapper.toRestaurantResponseListWithoutOwner(restaurants));
-    }
-
-    @GetMapping("/restaurants/my-restaurants")
-    public ResponseEntity<List<RestaurantResponse>> getMyRestaurants() {
-        // Get the authenticated user
-        var currentUser = authenticationService.getCurrentUser();
-
-        // Call findMyRestaurantsUseCase with currentUser.getId()
-        var restaurants = findMyRestaurantsUseCase.execute(currentUser.getId());
-
-        // Map result to List<RestaurantResponse> and return ResponseEntity.ok()
-        return ResponseEntity.ok(restaurantMapper.toRestaurantResponseList(restaurants));
+        // Get restaurants by user ID
+        var restaurants = findAllRestaurantsByUserIdUseCase.execute(userId);
+        var response = restaurantMapper.toRestaurantResponseList(restaurants);
+        return ResponseEntity.ok(response);
     }
 }

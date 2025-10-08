@@ -4,8 +4,10 @@ import com.fiap.foodfiapp.api.UserTypesApi;
 import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
+import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeMapper;
+import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
 import com.fiap.foodfiapp.model.CreateUserTypeRequest;
 import com.fiap.foodfiapp.model.UpdateUserTypeRequest;
 import com.fiap.foodfiapp.model.UserTypeResponse;
@@ -25,11 +27,16 @@ public class UserTypeController implements UserTypesApi {
     private final UpdateUserTypeUseCase updateUserTypeUseCase;
     private final DeleteUserTypeUseCase deleteUserTypeUseCase;
     private final UserTypeRepository userTypeRepository;
+    private final AuthenticationService authenticationService;
 
     private final UserTypeMapper userTypeMapper = UserTypeMapper.INSTANCE;
 
     @Override
     public ResponseEntity<UserTypeResponse> createUserType(CreateUserTypeRequest createUserTypeRequest) {
+//        if (!authenticationService.isCurrentUserAdmin()) {
+//            throw new UnauthorizedAccessException("Apenas administradores podem gerenciar os tipos de usuário.");
+ //       }
+
         var userType = userTypeMapper.toUserType(createUserTypeRequest);
         var createdUserType = createUserTypeUseCase.execute(userType);
         return ResponseEntity.status(HttpStatus.CREATED).body(userTypeMapper.toUserTypeResponse(createdUserType));
@@ -37,6 +44,10 @@ public class UserTypeController implements UserTypesApi {
 
     @Override
     public ResponseEntity<Void> deleteUserType(UUID uuid) {
+//        if (!authenticationService.isCurrentUserAdmin()) {
+//            throw new UnauthorizedAccessException("Apenas administradores podem gerenciar os tipos de usuário.");
+//        }
+
         deleteUserTypeUseCase.execute(uuid);
         return ResponseEntity.noContent().build();
     }
@@ -51,12 +62,20 @@ public class UserTypeController implements UserTypesApi {
 
     @Override
     public ResponseEntity<List<UserTypeResponse>> getUserTypes() {
+//        if (!authenticationService.isCurrentUserAdmin()) {
+ //           throw new UnauthorizedAccessException("Apenas administradores podem gerenciar os tipos de usuário.");
+ //       }
+
         var userTypes = userTypeRepository.findAll();
         return ResponseEntity.ok(userTypeMapper.toUserTypeResponseList(userTypes));
     }
 
     @Override
     public ResponseEntity<UserTypeResponse> updateUserType(UUID uuid, UpdateUserTypeRequest updateUserTypeRequest) {
+ //       if (!authenticationService.isCurrentUserAdmin()) {
+ //           throw new UnauthorizedAccessException("Apenas administradores podem gerenciar os tipos de usuário.");
+ //       }
+
         var userTypeUpdates = userTypeMapper.toUserType(updateUserTypeRequest);
         var updatedUserType = updateUserTypeUseCase.execute(uuid, userTypeUpdates);
         return ResponseEntity.ok(userTypeMapper.toUserTypeResponse(updatedUserType));

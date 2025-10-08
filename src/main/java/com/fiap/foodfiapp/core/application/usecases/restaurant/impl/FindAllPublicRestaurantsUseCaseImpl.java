@@ -8,6 +8,7 @@ import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
 
 import java.util.List;
+import java.util.UUID;
 
 public class FindAllPublicRestaurantsUseCaseImpl implements FindAllPublicRestaurantsUseCase {
 
@@ -24,7 +25,10 @@ public class FindAllPublicRestaurantsUseCaseImpl implements FindAllPublicRestaur
     }
 
     @Override
-    public List<Restaurant> execute() {
+    public List<Restaurant> execute(UUID userId) {
+
+        //verificar se o userId é um customer
+
         List<Restaurant> restaurants = restaurantRepository.findAllActive();
 
         // Iterate over each restaurant to populate menu items and addresses

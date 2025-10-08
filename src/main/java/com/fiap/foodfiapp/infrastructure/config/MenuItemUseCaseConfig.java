@@ -35,4 +35,9 @@ public class MenuItemUseCaseConfig {
     public FindAllMenuItemsUseCase findAllMenuItemsUseCase(MenuItemRepository menuItemRepository) {
         return new FindAllMenuItemsUseCaseImpl(menuItemRepository);
     }
+
+    @Bean
+    public ValidateMenuItemOwnershipUseCase validateMenuItemOwnershipUseCase(MenuItemRepository menuItemRepository) {
+        return new ValidateMenuItemOwnershipUseCaseImpl(menuItemRepository);
+    }
 }

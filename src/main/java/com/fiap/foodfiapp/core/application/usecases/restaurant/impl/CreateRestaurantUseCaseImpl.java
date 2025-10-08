@@ -22,7 +22,10 @@ public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
     }
 
     @Override
-    public Restaurant execute(Restaurant restaurant) {
+    public Restaurant execute(UUID userId, Restaurant restaurant) {
+        // Set the user owner ID internally - this is now handled by the use case
+        restaurant.setUserOwnerId(userId);
+
         UUID authenticatedUserId = restaurant.getUserOwnerId();
 
         // RN14: validar existência do usuário (owner)
