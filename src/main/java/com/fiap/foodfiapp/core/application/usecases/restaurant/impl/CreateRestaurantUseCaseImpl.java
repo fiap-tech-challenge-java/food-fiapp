@@ -50,7 +50,7 @@ public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
         }
 
         // Definir campos padrão
-        restaurant.setActive(true);
+        restaurant.setIsActive(true);
 
         var savedRestaurant = this.restaurantRepository.save(restaurant);
 

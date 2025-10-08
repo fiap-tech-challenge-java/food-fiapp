@@ -60,4 +60,9 @@ public class RestaurantUseCaseConfig {
     public FindMyRestaurantsUseCase findMyRestaurantsUseCase(RestaurantRepository restaurantRepository) {
         return new FindMyRestaurantsUseCaseImpl(restaurantRepository);
     }
+
+    @Bean
+    public ValidateRestaurantOwnershipUseCase validateRestaurantOwnershipUseCase(RestaurantRepository restaurantRepository) {
+        return new ValidateRestaurantOwnershipUseCaseImpl(restaurantRepository);
+    }
 }
