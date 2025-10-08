@@ -19,8 +19,8 @@ public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
     private final AddressRepository addressRepository;
 
     public DeleteRestaurantUseCaseImpl(RestaurantRepository restaurantRepository,
-                                       MenuItemRepository menuItemRepository,
-                                       AddressRepository addressRepository) {
+            MenuItemRepository menuItemRepository,
+            AddressRepository addressRepository) {
         this.restaurantRepository = restaurantRepository;
         this.menuItemRepository = menuItemRepository;
         this.addressRepository = addressRepository;
@@ -50,7 +50,8 @@ public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
         }
 
         // Exclusão lógica dos endereços associados ao restaurante
-        List<Addresses> addresses = addressRepository.findByOwner(restaurantId, AddressOwnerTypeEnum.RESTAURANT.getDescription());
+        List<Addresses> addresses = addressRepository.findByOwner(restaurantId,
+                AddressOwnerTypeEnum.RESTAURANT.getDescription());
         for (Addresses address : addresses) {
             address.setIsActive(false);
             addressRepository.save(address, restaurantId, AddressOwnerTypeEnum.RESTAURANT.getDescription());

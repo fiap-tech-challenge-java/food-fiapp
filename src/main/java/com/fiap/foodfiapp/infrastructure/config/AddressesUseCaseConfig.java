@@ -23,7 +23,9 @@ public class AddressesUseCaseConfig {
      * porque a implementação 'AddressRepositoryImpl' está anotada com @Component.
      */
     @Bean
-    public CreateAddressesUseCase createAddressUseCase(AddressRepository addressRepository, UserRepository userRepository, RestaurantRepository restaurantRepository, ValidateOwnerUseCase validateOwnerUseCase) {
+    public CreateAddressesUseCase createAddressUseCase(AddressRepository addressRepository,
+            UserRepository userRepository, RestaurantRepository restaurantRepository,
+            ValidateOwnerUseCase validateOwnerUseCase) {
         return new CreateAddressesUseCaseImpl(addressRepository, validateOwnerUseCase);
     }
 
@@ -31,7 +33,9 @@ public class AddressesUseCaseConfig {
      * Define o bean para o caso de uso de atualização de endereço.
      */
     @Bean
-    public UpdateAddressesUseCase updateAddressUseCase(AddressRepository addressRepository, UserRepository userRepository, RestaurantRepository restaurantRepository, ValidateOwnerUseCase validateOwnerUseCase) {
+    public UpdateAddressesUseCase updateAddressUseCase(AddressRepository addressRepository,
+            UserRepository userRepository, RestaurantRepository restaurantRepository,
+            ValidateOwnerUseCase validateOwnerUseCase) {
         return new UpdateAddressesUseCaseImpl(addressRepository, validateOwnerUseCase);
     }
 
@@ -39,7 +43,9 @@ public class AddressesUseCaseConfig {
      * Define o bean para o caso de uso de exclusão de endereço.
      */
     @Bean
-    public DeleteAddressesUseCase deleteAddressUseCase(AddressRepository addressRepository, UserRepository userRepository, RestaurantRepository restaurantRepository, ValidateOwnerUseCase validateOwnerUseCase) {
+    public DeleteAddressesUseCase deleteAddressUseCase(AddressRepository addressRepository,
+            UserRepository userRepository, RestaurantRepository restaurantRepository,
+            ValidateOwnerUseCase validateOwnerUseCase) {
         return new DeleteAddressesUseCaseImpl(addressRepository, validateOwnerUseCase);
     }
 
@@ -47,7 +53,8 @@ public class AddressesUseCaseConfig {
      * Define o bean para o caso de uso de busca de endereços por proprietário.
      */
     @Bean
-    public FindAddressesByOwnerUseCase findAddressByOwnerUseCase(AddressRepository addressRepository, UserRepository userRepository, RestaurantRepository restaurantRepository) {
+    public FindAddressesByOwnerUseCase findAddressByOwnerUseCase(AddressRepository addressRepository,
+            UserRepository userRepository, RestaurantRepository restaurantRepository) {
         return new FindAddressesByOwnerUseCaseImpl(addressRepository);
     }
 
@@ -55,7 +62,8 @@ public class AddressesUseCaseConfig {
      * Define o bean para o caso de uso de validação de proprietário de endereço.
      */
     @Bean
-    public ValidateOwnerUseCase validateOwnerUseCase(UserRepository userRepository, RestaurantRepository restaurantRepository) {
+    public ValidateOwnerUseCase validateOwnerUseCase(UserRepository userRepository,
+            RestaurantRepository restaurantRepository) {
         return new ValidateOwnerUseCaseImpl(userRepository, restaurantRepository);
     }
 }

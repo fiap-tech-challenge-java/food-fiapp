@@ -19,7 +19,7 @@ public class Restaurant extends BaseEntity {
 
     // Construtor atualizado para incluir a descrição
     public Restaurant(UUID id, String name, String cuisineType, String openingHours,
-                      UUID userOwnerId, String description, Addresses address) {
+            UUID userOwnerId, String description, Addresses address) {
         this.id = id;
         this.name = name;
         this.cuisineType = cuisineType;

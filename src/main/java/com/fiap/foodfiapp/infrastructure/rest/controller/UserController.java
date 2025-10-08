@@ -80,7 +80,8 @@ public class UserController implements UsersApi {
     public ResponseEntity<UserResponse> updateUser(UUID id, UpdateUserRequest updateUserRequest) {
         // RN: Apenas o próprio usuário ou administrador pode atualizar o perfil
         if (!authenticationService.canModifyUserProfile(id)) {
-            throw new UnauthorizedException("You can only update your own profile or you need administrator privileges");
+            throw new UnauthorizedException(
+                    "You can only update your own profile or you need administrator privileges");
         }
 
         var userUpdates = userMapper.toUser(updateUserRequest);

@@ -12,7 +12,8 @@ import org.springframework.context.annotation.Configuration;
 public class UserUseCaseConfig {
 
     @Bean
-    public CreateUserUseCase createUserUseCase(UserRepository userRepository, UserTypeRepository userTypeRepository, AddressRepository addressRepository) {
+    public CreateUserUseCase createUserUseCase(UserRepository userRepository, UserTypeRepository userTypeRepository,
+            AddressRepository addressRepository) {
         return new CreateUserUseCaseImpl(userRepository, userTypeRepository, addressRepository);
     }
 
@@ -27,12 +28,14 @@ public class UserUseCaseConfig {
     }
 
     @Bean
-    public FindUserByEmailUseCase findUserByEmailUseCase(UserRepository userRepository, AddressRepository addressRepository) {
+    public FindUserByEmailUseCase findUserByEmailUseCase(UserRepository userRepository,
+            AddressRepository addressRepository) {
         return new FindByEmailUseCaseImpl(userRepository, addressRepository);
     }
 
     @Bean
-    public FindUserByUsernameUseCase findUserByUsernameUseCase(UserRepository userRepository, AddressRepository addressRepository) {
+    public FindUserByUsernameUseCase findUserByUsernameUseCase(UserRepository userRepository,
+            AddressRepository addressRepository) {
         return new FindUserByUsernameUseCaseImpl(userRepository, addressRepository);
     }
 

@@ -33,42 +33,50 @@ public class AddressesController implements AddressesApi {
     private final AddressesMapper addressesMapper = AddressesMapper.INSTANCE;
 
     @Override
-    public ResponseEntity<AddressesResponse> createAddressesForUser(UUID userId, CreateAddressesRequest createAddressesRequest) {
-       // if (!authenticationService.canAccessUserProfile(userId)) {
-        //    throw new UnauthorizedException("Permissão negada. Você só pode acessar seus próprios endereços.");
-        //}
+    public ResponseEntity<AddressesResponse> createAddressesForUser(UUID userId,
+            CreateAddressesRequest createAddressesRequest) {
+        // if (!authenticationService.canAccessUserProfile(userId)) {
+        // throw new UnauthorizedException("Permissão negada. Você só pode acessar seus
+        // próprios endereços.");
+        // }
 
         var address = addressesMapper.toAddress(createAddressesRequest);
-        var createdAddress = createAddressesUseCase.execute(address, userId, AddressOwnerTypeEnum.USER.getDescription());
+        var createdAddress = createAddressesUseCase.execute(address, userId,
+                AddressOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.status(HttpStatus.CREATED).body(addressesMapper.toAddressesResponse(createdAddress));
     }
 
     @Override
     public ResponseEntity<List<AddressesResponse>> listAddressesByUserId(UUID userId) {
-       // if (!authenticationService.canAccessUserProfile(userId)) {
-       //     throw new UnauthorizedException("Permissão negada. Você só pode acessar seus próprios endereços.");
-       // }
+        // if (!authenticationService.canAccessUserProfile(userId)) {
+        // throw new UnauthorizedException("Permissão negada. Você só pode acessar seus
+        // próprios endereços.");
+        // }
 
         var address = findAddressesByOwnerUseCase.execute(userId, AddressOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.ok(addressesMapper.toAddressesResponseList(address));
     }
 
     @Override
-    public ResponseEntity<AddressesResponse> updateAddressesForUser(UUID userId, UUID addressesId, UpdateAddressesRequest updateAddressesRequest) {
-       // if (!authenticationService.canAccessUserProfile(userId)) {
-       //     throw new UnauthorizedException("Permissão negada. Você só pode acessar seus próprios endereços.");
-       // }
+    public ResponseEntity<AddressesResponse> updateAddressesForUser(UUID userId, UUID addressesId,
+            UpdateAddressesRequest updateAddressesRequest) {
+        // if (!authenticationService.canAccessUserProfile(userId)) {
+        // throw new UnauthorizedException("Permissão negada. Você só pode acessar seus
+        // próprios endereços.");
+        // }
 
         var addressUpdates = addressesMapper.toAddress(updateAddressesRequest);
-        var updatedAddress = updateAddressesUseCase.execute(addressesId, addressUpdates, userId, AddressOwnerTypeEnum.USER.getDescription());
+        var updatedAddress = updateAddressesUseCase.execute(addressesId, addressUpdates, userId,
+                AddressOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.ok(addressesMapper.toAddressesResponse(updatedAddress));
     }
 
     @Override
     public ResponseEntity<Void> deleteAddressesForUser(UUID userId, UUID addressesId) {
-       // if (!authenticationService.canAccessUserProfile(userId)) {
-       //     throw new UnauthorizedException("Permissão negada. Você só pode acessar seus próprios endereços.");
-      //  }
+        // if (!authenticationService.canAccessUserProfile(userId)) {
+        // throw new UnauthorizedException("Permissão negada. Você só pode acessar seus
+        // próprios endereços.");
+        // }
 
         deleteAddressesUseCase.execute(userId, addressesId, AddressOwnerTypeEnum.USER.getDescription());
         return ResponseEntity.noContent().build();

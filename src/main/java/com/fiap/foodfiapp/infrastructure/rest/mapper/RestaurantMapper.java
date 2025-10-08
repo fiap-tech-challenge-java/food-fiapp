@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-@Mapper(uses = {UserMapper.class, AddressesMapper.class, MenuItemMapper.class}, componentModel = "spring")
+@Mapper(uses = { UserMapper.class, AddressesMapper.class, MenuItemMapper.class }, componentModel = "spring")
 public abstract class RestaurantMapper {
 
     @Autowired
@@ -26,16 +26,6 @@ public abstract class RestaurantMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "address", source = "addresses")
-    @Mapping(target = "userOwnerId", ignore = true)
-    @Mapping(target = "description", ignore = true) // Ignoramos na criação, pode ser adicionado se necessário
-    public abstract Restaurant toRestaurant(CreateRestaurantRequest createRestaurantRequest);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "address", source = "addresses") // ALTERE ESTA LINHA (de ignore=true para source="addresses")
-    @Mapping(target = "userOwnerId", ignore = true)
-    @Mapping(target = "description", ignore = true)
-    public abstract Restaurant toRestaurant(UpdateRestaurantRequest updateRestaurantRequest);
-
 
     @Mapping(source = "address", target = "addresses", qualifiedByName = "addressToAddressResponseList")
     @Mapping(source = "isActive", target = "isActive") // CORRIGIDO de "active" para "isActive"
@@ -50,7 +40,8 @@ public abstract class RestaurantMapper {
         if (address == null) {
             return Collections.emptyList();
         }
-        // Usa o mapper injetado para converter o objeto de endereço único em uma lista de um elemento
+        // Usa o mapper injetado para converter o objeto de endereço único em uma lista
+        // de um elemento
         return Collections.singletonList(AddressesMapper.INSTANCE.toAddressesResponse(address));
     }
 
