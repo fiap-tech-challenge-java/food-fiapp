@@ -23,6 +23,7 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "isActive", constant = "true")
     User toUser(CreateUserRequest createUserRequest);
 
     @Mapping(source = "userTypeUuid", target = "userType", qualifiedByName = "uuidToUserType")
@@ -30,6 +31,7 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
     User toUser(UpdateUserRequest updateUserRequest);
 
     @Mapping(source = "userType", target = "userType", qualifiedByName = "userTypeToName")

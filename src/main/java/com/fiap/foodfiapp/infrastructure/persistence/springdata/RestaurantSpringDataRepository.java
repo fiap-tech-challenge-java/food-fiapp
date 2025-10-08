@@ -15,7 +15,6 @@ public interface RestaurantSpringDataRepository extends JpaRepository<Restaurant
 
     List<RestaurantEntity> findAllByUserOwnerIdAndIsActiveTrue(UUID userId);
 
-    @EntityGraph(attributePaths = {"address"})
     Optional<RestaurantEntity> findByIdAndIsActiveTrue(UUID id);
 
     List<RestaurantEntity> findAllByIsActiveTrue();

@@ -2,6 +2,7 @@ package com.fiap.foodfiapp.infrastructure.config;
 
 import com.fiap.foodfiapp.core.application.usecases.menuitem.*;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.*;
+import com.fiap.foodfiapp.core.application.usecases.restaurant.ValidateRestaurantOwnershipUseCase;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
@@ -12,13 +13,16 @@ import org.springframework.context.annotation.Configuration;
 public class MenuItemUseCaseConfig {
 
     @Bean
-    public CreateMenuItemUseCase createMenuItemUseCase(MenuItemRepository menuItemRepository, RestaurantRepository restaurantRepository, FileStorageRepository fileStorageRepository) {
-        return new CreateMenuItemUseCaseImpl(menuItemRepository, restaurantRepository, fileStorageRepository);
+    public CreateMenuItemUseCase createMenuItemUseCase(MenuItemRepository menuItemRepository,
+                                                     RestaurantRepository restaurantRepository,
+                                                     FileStorageRepository fileStorageRepository,
+                                                     ValidateRestaurantOwnershipUseCase validateRestaurantOwnershipUseCase) {
+        return new CreateMenuItemUseCaseImpl(menuItemRepository, restaurantRepository, fileStorageRepository, validateRestaurantOwnershipUseCase);
     }
 
     @Bean
-    public DeleteMenuItemUseCase deleteMenuItemUseCase(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository) {
-        return new DeleteMenuItemUseCaseImpl(menuItemRepository, fileStorageRepository);
+    public DeleteMenuItemUseCase deleteMenuItemUseCase(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository, RestaurantRepository restaurantRepository) {
+        return new DeleteMenuItemUseCaseImpl(menuItemRepository, fileStorageRepository, restaurantRepository);
     }
 
     @Bean
@@ -34,5 +38,10 @@ public class MenuItemUseCaseConfig {
     @Bean
     public FindAllMenuItemsUseCase findAllMenuItemsUseCase(MenuItemRepository menuItemRepository) {
         return new FindAllMenuItemsUseCaseImpl(menuItemRepository);
+    }
+
+    @Bean
+    public ValidateMenuItemOwnershipUseCase validateMenuItemOwnershipUseCase(MenuItemRepository menuItemRepository) {
+        return new ValidateMenuItemOwnershipUseCaseImpl(menuItemRepository);
     }
 }

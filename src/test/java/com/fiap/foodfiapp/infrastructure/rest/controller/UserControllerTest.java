@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap.foodfiapp.core.application.usecases.user.CreateUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.FindUserUseCase;
+import com.fiap.foodfiapp.core.application.usecases.user.FindAllUserUseCase;
 import com.fiap.foodfiapp.core.application.usecases.user.UpdateUserUseCase;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
@@ -34,190 +35,183 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class UserControllerTest {
 
-    private MockMvc mockMvc;
+        private MockMvc mockMvc;
 
-    @Mock
-    private CreateUserUseCase createUserUseCase;
+        @Mock
+        private CreateUserUseCase createUserUseCase;
 
-    @Mock
-    private UpdateUserUseCase updateUserUseCase;
+        @Mock
+        private UpdateUserUseCase updateUserUseCase;
 
-    @Mock
-    private FindUserUseCase findUserUseCase;
+        @Mock
+        private FindUserUseCase findUserUseCase;
 
-    @Mock
-    private DeleteUserUseCase deleteUserUseCase;
+        @Mock
+        private FindAllUserUseCase findAllUserUseCase;
 
-    @Mock
-    private AuthenticationService authenticationService;
+        @Mock
+        private DeleteUserUseCase deleteUserUseCase;
 
-    private ObjectMapper objectMapper;
-    private String createUserJson;
-    private String updateUserJson;
-    private User user;
-    private UUID userId;
-    private UserType userType;
+        @Mock
+        private AuthenticationService authenticationService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+        private ObjectMapper objectMapper;
+        private String createUserJson;
+        private String updateUserJson;
+        private User user;
+        private UUID userId;
+        private UserType userType;
 
-        UserController userController = new UserController(createUserUseCase, updateUserUseCase,
-                findUserUseCase, deleteUserUseCase, authenticationService);
-        mockMvc = MockMvcBuilders.standaloneSetup(userController)
-                .setControllerAdvice(new GlobalExceptionHandler())
-                .build();
+        @BeforeEach
+        void setUp() {
+                MockitoAnnotations.openMocks(this);
 
-        objectMapper = new ObjectMapper();
+                UserController userController = new UserController(createUserUseCase, updateUserUseCase,
+                                findUserUseCase, findAllUserUseCase, deleteUserUseCase, authenticationService);
+                mockMvc = MockMvcBuilders.standaloneSetup(userController)
+                                .setControllerAdvice(new GlobalExceptionHandler())
+                                .build();
 
-        userId = UUID.randomUUID();
-        userType = new UserType(UUID.randomUUID(), "CLIENT");
+                objectMapper = new ObjectMapper();
 
-        // Build request JSONs instead of using generated DTOs
-        createUserJson = objectMapper.createObjectNode()
-                .put("name", "Test User")
-                .put("email", "test@email.com")
-                .put("password", "password123")
-                .put("cpf", "12345678901")
-                .put("login", "login_test")
-                .put("userTypeUuid", userType.getUuid().toString())
-                .put("active", true)
-                .toString();
+                userId = UUID.randomUUID();
+                userType = new UserType(UUID.randomUUID(), "CLIENT");
 
-        updateUserJson = objectMapper.createObjectNode()
-                .put("name", "Updated User")
-                .put("email", "updated@email.com")
-                .toString();
+                // Build request JSONs instead of using generated DTOs
+                createUserJson = objectMapper.createObjectNode()
+                                .put("name", "Test User")
+                                .put("email", "test@email.com")
+                                .put("password", "password123")
+                                .put("cpf", "12345678901")
+                                .put("login", "login_test")
+                                .put("userTypeUuid", userType.getUuid().toString())
+                                .put("active", true)
+                                .toString();
 
-        user = new User(userId, "Test User", "test@email.com", "login_test", "12345678901",
-                Collections.emptyList(), userType, true, OffsetDateTime.now(), OffsetDateTime.now(), "password123");
-    }
+                updateUserJson = objectMapper.createObjectNode()
+                                .put("name", "Updated User")
+                                .put("email", "updated@email.com")
+                                .toString();
 
-    @Test
-    void shouldReturnAllUsersWhenUserIsAdmin() throws Exception {
-        List<User> userList = List.of(user);
-        when(authenticationService.isCurrentUserAdmin()).thenReturn(true);
-        when(findUserUseCase.findAll()).thenReturn(userList);
+                user = new User(userId, "Test User", "test@email.com", "login_test", "12345678901",
+                                Collections.emptyList(), userType, true, OffsetDateTime.now(), OffsetDateTime.now(),
+                                "password123");
+        }
 
-        mockMvc.perform(get("/users"))
-                .andExpect(status().isOk());
+        @Test
+        void shouldReturnAllUsersWhenUserIsAdmin() throws Exception {
+                List<User> userList = List.of(user);
+                when(authenticationService.isCurrentUserAdmin()).thenReturn(true);
+                when(findAllUserUseCase.execute()).thenReturn(userList);
 
-        verify(authenticationService).isCurrentUserAdmin();
-        verify(findUserUseCase).findAll();
-    }
+                mockMvc.perform(get("/users"))
+                                .andExpect(status().isOk());
 
-    @Test
-    void shouldReturnUnauthorizedWhenNonAdminTriesToGetAllUsers() throws Exception {
-        when(authenticationService.isCurrentUserAdmin()).thenReturn(false);
+                verify(authenticationService).isCurrentUserAdmin();
+                verify(findAllUserUseCase).execute();
+        }
 
-        mockMvc.perform(get("/users"))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
-                .andExpect(jsonPath("$.message").value("Only administrators can view all users"));
+        @Test
+        void shouldReturnUserWhenAuthorizedToViewProfile() throws Exception {
+                when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(true);
+                when(findUserUseCase.execute(eq(userId))).thenReturn(Optional.of(user));
 
-        verify(authenticationService).isCurrentUserAdmin();
-        verify(findUserUseCase, never()).findAll();
-    }
+                mockMvc.perform(get("/users/{id}", userId))
+                                .andExpect(status().isOk());
 
-    @Test
-    void shouldReturnUserWhenAuthorizedToViewProfile() throws Exception {
-        when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(true);
-        when(findUserUseCase.findById(eq(userId))).thenReturn(Optional.of(user));
+                verify(authenticationService).canAccessUserProfile(eq(userId));
+                verify(findUserUseCase).execute(eq(userId));
+        }
 
-        mockMvc.perform(get("/users/{id}", userId))
-                .andExpect(status().isOk());
+        @Test
+        void shouldReturnUnauthorizedWhenNotAuthorizedToViewProfile() throws Exception {
+                when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(false);
 
-        verify(authenticationService).canAccessUserProfile(eq(userId));
-        verify(findUserUseCase).findById(eq(userId));
-    }
+                mockMvc.perform(get("/users/{id}", userId))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+                                .andExpect(jsonPath("$.message").value(
+                                                "You can only view your own profile or you need administrator privileges"));
 
-    @Test
-    void shouldReturnUnauthorizedWhenNotAuthorizedToViewProfile() throws Exception {
-        when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(false);
+                verify(authenticationService).canAccessUserProfile(eq(userId));
+                verify(findUserUseCase, never()).execute(eq(userId));
+        }
 
-        mockMvc.perform(get("/users/{id}", userId))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
-                .andExpect(jsonPath("$.message").value("You can only view your own profile or you need administrator privileges"));
+        @Test
+        void shouldReturnNotFoundWhenUserNotFoundById() throws Exception {
+                when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(true);
+                when(findUserUseCase.execute(eq(userId))).thenReturn(Optional.empty());
 
-        verify(authenticationService).canAccessUserProfile(eq(userId));
-        verify(findUserUseCase, never()).findById(eq(userId));
-    }
+                mockMvc.perform(get("/users/{id}", userId))
+                                .andExpect(status().isNotFound());
 
-    @Test
-    void shouldReturnNotFoundWhenUserNotFoundById() throws Exception {
-        when(authenticationService.canAccessUserProfile(eq(userId))).thenReturn(true);
-        when(findUserUseCase.findById(eq(userId))).thenReturn(Optional.empty());
+                verify(authenticationService).canAccessUserProfile(eq(userId));
+                verify(findUserUseCase).execute(eq(userId));
+        }
 
-        mockMvc.perform(get("/users/{id}", userId))
-                .andExpect(status().isNotFound());
+        @Test
+        void shouldDeleteUserWhenAuthorizedAdmin() throws Exception {
+                when(authenticationService.canDeleteUserProfile(eq(userId))).thenReturn(true);
 
-        verify(authenticationService).canAccessUserProfile(eq(userId));
-        verify(findUserUseCase).findById(eq(userId));
-    }
+                mockMvc.perform(delete("/users/{id}", userId))
+                                .andExpect(status().isNoContent());
 
-    @Test
-    void shouldDeleteUserWhenAuthorizedAdmin() throws Exception {
-        when(authenticationService.canDeleteUserProfile(eq(userId))).thenReturn(true);
+                verify(authenticationService).canDeleteUserProfile(eq(userId));
+                verify(deleteUserUseCase).execute(eq(userId));
+        }
 
-        mockMvc.perform(delete("/users/{id}", userId))
-                .andExpect(status().isNoContent());
+        @Test
+        void shouldReturnUnauthorizedWhenNonAdminTriesToDeleteUser() throws Exception {
+                when(authenticationService.canDeleteUserProfile(eq(userId))).thenReturn(false);
 
-        verify(authenticationService).canDeleteUserProfile(eq(userId));
-        verify(deleteUserUseCase).execute(eq(userId));
-    }
+                mockMvc.perform(delete("/users/{id}", userId))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+                                .andExpect(jsonPath("$.message").value("Only administrators can delete users"));
 
-    @Test
-    void shouldReturnUnauthorizedWhenNonAdminTriesToDeleteUser() throws Exception {
-        when(authenticationService.canDeleteUserProfile(eq(userId))).thenReturn(false);
+                verify(authenticationService).canDeleteUserProfile(eq(userId));
+                verify(deleteUserUseCase, never()).execute(eq(userId));
+        }
 
-        mockMvc.perform(delete("/users/{id}", userId))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
-                .andExpect(jsonPath("$.message").value("Only administrators can delete users"));
+        @Test
+        void shouldUpdateUserWhenAuthorized() throws Exception {
+                when(authenticationService.canModifyUserProfile(eq(userId))).thenReturn(true);
+                when(updateUserUseCase.execute(eq(userId), any())).thenReturn(user);
 
-        verify(authenticationService).canDeleteUserProfile(eq(userId));
-        verify(deleteUserUseCase, never()).execute(eq(userId));
-    }
+                mockMvc.perform(put("/users/{id}", userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(updateUserJson))
+                                .andExpect(status().isOk());
 
-    @Test
-    void shouldUpdateUserWhenAuthorized() throws Exception {
-        when(authenticationService.canModifyUserProfile(eq(userId))).thenReturn(true);
-        when(updateUserUseCase.execute(eq(userId), any())).thenReturn(user);
+                verify(authenticationService).canModifyUserProfile(eq(userId));
+                verify(updateUserUseCase).execute(eq(userId), any());
+        }
 
-        mockMvc.perform(put("/users/{id}", userId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateUserJson))
-                .andExpect(status().isOk());
+        @Test
+        void shouldReturnUnauthorizedWhenNotAuthorizedToUpdateUser() throws Exception {
+                when(authenticationService.canModifyUserProfile(eq(userId))).thenReturn(false);
 
-        verify(authenticationService).canModifyUserProfile(eq(userId));
-        verify(updateUserUseCase).execute(eq(userId), any());
-    }
+                mockMvc.perform(put("/users/{id}", userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(updateUserJson))
+                                .andExpect(status().isUnauthorized())
+                                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+                                .andExpect(jsonPath("$.message").value(
+                                                "You can only update your own profile or you need administrator privileges"));
 
-    @Test
-    void shouldReturnUnauthorizedWhenNotAuthorizedToUpdateUser() throws Exception {
-        when(authenticationService.canModifyUserProfile(eq(userId))).thenReturn(false);
+                verify(authenticationService).canModifyUserProfile(eq(userId));
+                verify(updateUserUseCase, never()).execute(eq(userId), any());
+        }
 
-        mockMvc.perform(put("/users/{id}", userId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updateUserJson))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
-                .andExpect(jsonPath("$.message").value("You can only update your own profile or you need administrator privileges"));
+        @Test
+        void shouldCreateUserSuccessfully() throws Exception {
+                when(createUserUseCase.execute(any())).thenReturn(user);
 
-        verify(authenticationService).canModifyUserProfile(eq(userId));
-        verify(updateUserUseCase, never()).execute(eq(userId), any());
-    }
+                mockMvc.perform(post("/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(createUserJson))
+                                .andExpect(status().isCreated());
 
-    @Test
-    void shouldCreateUserSuccessfully() throws Exception {
-        when(createUserUseCase.execute(any())).thenReturn(user);
-
-        mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createUserJson))
-                .andExpect(status().isCreated());
-
-        verify(createUserUseCase).execute(any());
-    }
+                verify(createUserUseCase).execute(any());
+        }
 }

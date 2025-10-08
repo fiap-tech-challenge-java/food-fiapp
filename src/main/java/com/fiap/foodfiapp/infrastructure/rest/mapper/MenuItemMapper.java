@@ -4,14 +4,12 @@ import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.model.MenuItemResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MenuItemMapper {
 
-    MenuItemMapper INSTANCE = Mappers.getMapper(MenuItemMapper.class);
 
     @Mapping(source = "id", target = "id")
     @Mapping(source = "name", target = "name")

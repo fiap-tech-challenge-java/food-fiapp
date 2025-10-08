@@ -481,12 +481,88 @@ paths:
         '404':
           description: Usuario ou endereco nao encontrado.
 
-  /restaurants:
+  # Rotas de restaurantes - todas aninhadas sob usuário para validação
+  /users/{userId}/restaurants/public-list:
+    parameters:
+      - name: userId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do usuário que está acessando a lista pública.
+
     get:
       tags:
         - restaurants
-      summary: Lista todos os restaurantes
-      description: Retorna uma lista de todos os restaurantes cadastrados.
+      summary: Lista todos os restaurantes públicos
+      description: Retorna uma lista de todos os restaurantes ativos com seus itens de menu. Acesso permitido apenas para usuários do tipo CUSTOMER.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de restaurantes públicos retornada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RestaurantResponse'
+        '403':
+          description: Acesso negado - usuário não é do tipo CUSTOMER.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{userId}/restaurants/my-restaurants:
+    parameters:
+      - name: userId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do usuário proprietário dos restaurantes.
+
+    get:
+      tags:
+        - restaurants
+      summary: Lista os restaurantes do usuário
+      description: Retorna uma lista de todos os restaurantes pertencentes ao usuário. Acesso permitido apenas para o próprio usuário do tipo OWNER.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de restaurantes do usuário retornada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RestaurantResponse'
+        '403':
+          description: Acesso negado - usuário não é do tipo OWNER ou não é o próprio usuário.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{userId}/restaurants:
+    parameters:
+      - name: userId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do usuário proprietário dos restaurantes.
+
+    get:
+      tags:
+        - restaurants
+      summary: Lista todos os restaurantes de um usuário
+      description: Retorna uma lista de todos os restaurantes cadastrados para um usuário específico.
       security:
         - bearerAuth: []
       responses:
@@ -498,11 +574,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RestaurantResponse'
+
     post:
       tags:
         - restaurants
       summary: Cria um novo restaurante
-      description: Cadastra um novo restaurante. Apenas usuarios do tipo "Owner" ou "Admin" podem realizar esta operacao.
+      description: Cadastra um novo restaurante para o usuário especificado. Apenas usuários do tipo "OWNER" podem realizar esta operação.
       security:
         - bearerAuth: []
       requestBody:
@@ -519,33 +596,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestaurantResponse'
         '400':
-          description: Dados invalidos.
+          description: Dados inválidos.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '403':
-          description: Acesso negado.
+          description: Acesso negado - usuário não é do tipo OWNER.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /restaurants/{id}:
+  /users/{userId}/restaurants/{restaurantId}:
+    parameters:
+      - name: userId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do usuário proprietário do restaurante.
+      - name: restaurantId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do restaurante.
+
     get:
       tags:
         - restaurants
       summary: Busca um restaurante pelo ID
-      description: Retorna os detalhes de um restaurante especifico.
+      description: Retorna os detalhes de um restaurante específico de um usuário.
       security:
         - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
       responses:
         '200':
           description: Restaurante encontrado.
@@ -554,25 +640,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/RestaurantResponse'
         '404':
-          description: Restaurante nao encontrado.
+          description: Restaurante não encontrado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
     put:
       tags:
         - restaurants
       summary: Atualiza um restaurante existente
-      description: Atualiza os dados de um restaurante. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      description: Atualiza os dados de um restaurante. Apenas o proprietário do restaurante pode realizar esta operação.
       security:
         - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
       requestBody:
         required: true
         content:
@@ -593,25 +673,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: Restaurante nao encontrado.
+          description: Restaurante não encontrado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
     delete:
       tags:
         - restaurants
       summary: Deleta um restaurante
-      description: Deleta um restaurante. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      description: Deleta um restaurante. Apenas o proprietário do restaurante pode realizar esta operação.
       security:
         - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
       responses:
         '204':
           description: Restaurante deletado com sucesso.
@@ -622,52 +696,56 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: Restaurante nao encontrado.
+          description: Restaurante não encontrado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /restaurants/{restaurantId}/menu-items:
+  # Rotas de menu-items aninhadas sob usuário e restaurante
+  /users/{userId}/restaurants/{restaurantId}/menu-items:
+    parameters:
+      - name: userId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do usuário proprietário do restaurante.
+      - name: restaurantId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do restaurante.
+
     get:
       operationId: listMenuItems
       tags:
         - menu-items
-      summary: Lista os itens do cardapio de um restaurante
-      description: Retorna todos os itens do cardapio de um restaurante especifico.
+      summary: Lista os itens do cardápio de um restaurante
+      description: Retorna todos os itens do cardápio de um restaurante específico.
       security:
         - bearerAuth: []
-      parameters:
-        - name: restaurantId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
       responses:
         '200':
-          description: Lista de itens do cardapio retornada com sucesso.
+          description: Lista de itens do cardápio retornada com sucesso.
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/MenuItemResponse'
+
     post:
       operationId: createMenuItem
       tags:
         - menu-items
-      summary: Adiciona um novo item ao cardapio
-      description: Adiciona um novo item ao cardapio de um restaurante. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      summary: Adiciona um novo item ao cardápio
+      description: Adiciona um novo item ao cardápio de um restaurante. Apenas o proprietário do restaurante pode realizar esta operação.
       security:
         - bearerAuth: []
-      parameters:
-        - name: restaurantId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
       requestBody:
         required: true
         content:
@@ -677,85 +755,83 @@ paths:
               properties:
                 name:
                   type: string
-                  description: Nome do item do cardapio
+                  description: Nome do item do cardápio
                 description:
                   type: string
-                  description: Descricao do item
+                  description: Descrição do item
                 price:
                   type: number
                   format: double
-                  description: Preco do item
+                  description: Preço do item
                 availableForInStoreOnly:
                   type: boolean
-                  description: Disponivel apenas para consumo no local
+                  description: Disponível apenas para consumo no local
                 photo:
                   type: string
                   format: binary
                   description: Arquivo de imagem do item
       responses:
         '201':
-          description: Item do cardapio criado com sucesso.
+          description: Item do cardápio criado com sucesso.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuItemResponse'
 
-  /restaurants/{restaurantId}/menu-items/{itemId}:
+  /users/{userId}/restaurants/{restaurantId}/menu-items/{itemId}:
+    parameters:
+      - name: userId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do usuário proprietário do restaurante.
+      - name: restaurantId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do restaurante.
+      - name: itemId
+        schema:
+          format: uuid
+          type: string
+        in: path
+        required: true
+        description: O ID único do item do cardápio.
+
     get:
       operationId: getMenuItem
       tags:
         - menu-items
-      summary: Busca um item do cardapio pelo ID
-      description: Retorna os detalhes de um item especifico do cardapio.
+      summary: Busca um item do cardápio pelo ID
+      description: Retorna os detalhes de um item específico do cardápio.
       security:
         - bearerAuth: []
-      parameters:
-        - name: restaurantId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: itemId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
       responses:
         '200':
-          description: Item do cardapio encontrado.
+          description: Item do cardápio encontrado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MenuItemResponse'
         '404':
-          description: Item do cardapio nao encontrado.
+          description: Item do cardápio não encontrado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
     put:
       operationId: updateMenuItem
       tags:
         - menu-items
-      summary: Atualiza um item do cardapio
-      description: Atualiza os dados de um item do cardapio. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      summary: Atualiza um item do cardápio
+      description: Atualiza os dados de um item do cardápio. Apenas o proprietário do restaurante pode realizar esta operação.
       security:
         - bearerAuth: []
-      parameters:
-        - name: restaurantId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: itemId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
       requestBody:
         required: true
         content:
@@ -765,24 +841,24 @@ paths:
               properties:
                 name:
                   type: string
-                  description: Nome do item do cardapio
+                  description: Nome do item do cardápio
                 description:
                   type: string
-                  description: Descricao do item
+                  description: Descrição do item
                 price:
                   type: number
                   format: double
-                  description: Preco do item
+                  description: Preço do item
                 availableForInStoreOnly:
                   type: boolean
-                  description: Disponivel apenas para consumo no local
+                  description: Disponível apenas para consumo no local
                 photo:
                   type: string
                   format: binary
                   description: Arquivo de imagem do item
       responses:
         '200':
-          description: Item do cardapio atualizado com sucesso.
+          description: Item do cardápio atualizado com sucesso.
           content:
             application/json:
               schema:
@@ -794,35 +870,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: Item do cardapio nao encontrado.
+          description: Item do cardápio não encontrado.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
     delete:
       operationId: deleteMenuItem
       tags:
         - menu-items
-      summary: Remove um item do cardapio
-      description: Remove um item do cardapio. Apenas o "Owner" do restaurante ou um "Admin" pode realizar esta operacao.
+      summary: Remove um item do cardápio
+      description: Remove um item do cardápio. Apenas o proprietário do restaurante pode realizar esta operação.
       security:
         - bearerAuth: []
-      parameters:
-        - name: restaurantId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: itemId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
       responses:
         '204':
-          description: Item do cardapio removido com sucesso.
+          description: Item do cardápio removido com sucesso.
         '403':
           description: Acesso negado.
           content:
@@ -830,7 +894,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
-          description: Item do cardapio nao encontrado.
+          description: Item do cardápio não encontrado.
           content:
             application/json:
               schema:
@@ -1252,7 +1316,6 @@ components:
         - addresses
         - cuisineType
         - openingHours
-        - ownerId
       properties:
         name:
           type: string
@@ -1274,11 +1337,6 @@ components:
           example: 'Segunda a Sexta: 11:00 - 15:00, 18:00 - 23:00 | Sabado e Domingo: 12:00 - 23:00'
           minLength: 5
           maxLength: 255
-        ownerId:
-          type: string
-          format: uuid
-          description: ID do usuario que sera o dono do restaurante. Deve ser um usuario do tipo OWNER.
-          example: 123e4567-e89b-12d3-a456-426614174000
 
     UpdateRestaurantRequest:
       title: Solicitacao de Atualizacao de Restaurante
@@ -1292,11 +1350,7 @@ components:
           minLength: 3
           maxLength: 100
         addresses:
-          type: string
-          description: Novo endereco do restaurante.
-          example: Avenida Central, 456, Centro, Sao Paulo - SP
-          minLength: 10
-          maxLength: 255
+          $ref: '#/components/schemas/AddressesRequest'
         cuisineType:
           type: string
           description: Novo tipo de cozinha servida.
@@ -1337,9 +1391,28 @@ components:
           type: string
           description: Horario de funcionamento formatado.
           example: 'Segunda a Sexta: 11:00 - 15:00, 18:00 - 23:00 | Sabado e Domingo: 12:00 - 23:00'
+        menuItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/MenuItemResponse'
+          description: Lista de itens do cardapio do restaurante.
         owner:
-          $ref: '#/components/schemas/UserResponse'
-          description: Dados do dono do restaurante.
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: ID do dono do restaurante.
+              example: 123e4567-e89b-12d3-a456-426614174000
+            name:
+              type: string
+              description: Nome do dono do restaurante.
+              example: João Silva
+            email:
+              type: string
+              description: Email do dono do restaurante.
+              example: joao.silva@example.com
+          description: Dados básicos do dono do restaurante.
         isActive:
           type: boolean
           description: Indica se o restaurante esta ativo.

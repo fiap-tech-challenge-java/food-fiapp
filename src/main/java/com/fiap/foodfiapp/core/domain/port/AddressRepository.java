@@ -15,4 +15,6 @@ public interface AddressRepository {
     void delete(UUID id);
 
     List<Addresses> findByOwner(UUID ownerId, String ownerType);
+
+    Optional<Addresses> findByIdAndOwnerId(UUID id, UUID ownerId);
 }
