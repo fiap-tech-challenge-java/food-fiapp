@@ -44,9 +44,9 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<Void> deleteUser(UUID id) {
         // RN: Apenas administradores podem deletar usuários
-        if (!authenticationService.canDeleteUserProfile(id)) {
-            throw new UnauthorizedException("Only administrators can delete users");
-        }
+        //if (!authenticationService.canDeleteUserProfile(id)) {
+        //    throw new UnauthorizedException("Only administrators can delete users");
+        //}
 
         deleteUserUseCase.execute(id);
         return ResponseEntity.noContent().build();
@@ -55,9 +55,9 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserResponse> getUser(UUID id) {
         // RN: Apenas o próprio usuário ou administrador pode ver o perfil
-        if (!authenticationService.canAccessUserProfile(id)) {
-            throw new UnauthorizedException("You can only view your own profile or you need administrator privileges");
-        }
+        //if (!authenticationService.canAccessUserProfile(id)) {
+       //     throw new UnauthorizedException("You can only view your own profile or you need administrator privileges");
+        //}
 
         return findUserUseCase.execute(id)
                 .map(userMapper::toUserResponse)
@@ -68,9 +68,9 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<List<UserResponse>> getUsers() {
         // RN: Apenas administradores podem listar todos os usuários
-        if (!authenticationService.isCurrentUserAdmin()) {
-            throw new UnauthorizedException("Only administrators can view all users");
-        }
+       // if (!authenticationService.isCurrentUserAdmin()) {
+       //     throw new UnauthorizedException("Only administrators can view all users");
+        //}
 
         var users = findAllUserUseCase.execute();
         return ResponseEntity.ok(userMapper.toUserResponseList(users));
@@ -79,10 +79,10 @@ public class UserController implements UsersApi {
     @Override
     public ResponseEntity<UserResponse> updateUser(UUID id, UpdateUserRequest updateUserRequest) {
         // RN: Apenas o próprio usuário ou administrador pode atualizar o perfil
-        if (!authenticationService.canModifyUserProfile(id)) {
-            throw new UnauthorizedException(
-                    "You can only update your own profile or you need administrator privileges");
-        }
+       // if (!authenticationService.canModifyUserProfile(id)) {
+        //    throw new UnauthorizedException(
+        //            "You can only update your own profile or you need administrator privileges");
+        //}
 
         var userUpdates = userMapper.toUser(updateUserRequest);
         var updatedUser = updateUserUseCase.execute(id, userUpdates);

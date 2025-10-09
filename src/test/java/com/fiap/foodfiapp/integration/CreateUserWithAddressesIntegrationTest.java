@@ -71,7 +71,7 @@ class CreateUserWithAddressesIntegrationTest {
         user.setId(userId);
         user.setName("Test User");
         user.setEmail("test@example.com");
-        user.setCpf("12345678901");
+        user.setCpf("52998224725"); // Valid CPF
         user.setLogin("testuser");
         user.setPassword("password123");
         user.setUserType(userType);
