@@ -5,6 +5,7 @@ import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.*;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.ValidateRestaurantOwnershipUseCase;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +27,8 @@ public class MenuItemUseCaseConfig {
     }
 
     @Bean
-    public UpdateMenuItemUseCase updateMenuItemUseCase(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository, RestaurantRepository restaurantRepository) {
-        return new UpdateMenuItemUseCaseImpl(menuItemRepository, fileStorageRepository, restaurantRepository);
+    public UpdateMenuItemUseCase updateMenuItemUseCase(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository, RestaurantRepository restaurantRepository, UserRepository userRepository) {
+        return new UpdateMenuItemUseCaseImpl(menuItemRepository, fileStorageRepository, restaurantRepository, userRepository);
     }
 
     @Bean

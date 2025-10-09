@@ -1,0 +1,16 @@
+# application-local.yml
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5439/foodfiapp}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgrespass}
+  jpa:
+    show-sql: true
+
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  public:
+    endpoint: ${MINIO_PUBLIC_ENDPOINT:http://localhost:9000}
+
+jwt:
+  secret: ${JWT_SECRET:dev-secret-change-me}

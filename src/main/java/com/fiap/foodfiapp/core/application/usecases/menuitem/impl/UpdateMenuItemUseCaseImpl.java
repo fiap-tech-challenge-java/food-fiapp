@@ -5,10 +5,13 @@ import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.UpdateMenuItemUseCase;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
+import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.validator.MenuItemValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,25 +23,48 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
     private final MenuItemRepository menuItemRepository;
     private final FileStorageRepository fileStorageRepository;
     private final RestaurantRepository restaurantRepository;
+    private final UserRepository userRepository;
 
-    public UpdateMenuItemUseCaseImpl(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository, RestaurantRepository restaurantRepository) {
+    public UpdateMenuItemUseCaseImpl(MenuItemRepository menuItemRepository, FileStorageRepository fileStorageRepository, RestaurantRepository restaurantRepository, UserRepository userRepository) {
         this.menuItemRepository = menuItemRepository;
         this.fileStorageRepository = fileStorageRepository;
         this.restaurantRepository = restaurantRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public MenuItem execute(UUID authenticatedUserId, UUID id, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException {
-        if (authenticatedUserId == null) {
-            throw new IllegalArgumentException("Authenticated user ID cannot be null");
+        // Validate individual fields that are being updated
+        if (name != null) {
+            MenuItemValidator.validateName(name);
         }
-        
+        if (price != null) {
+            MenuItemValidator.validatePrice(price);
+        }
+        if (description != null) {
+            MenuItemValidator.validateDescription(description);
+        }
+
         var existingItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Menu item not found with id: " + id));
 
+        if (authenticatedUserId == null) {
+            throw new UnauthorizedAccessException("Authenticated user not found");
+        }
+
+        // Check if user is ADMIN
+        User user = userRepository.findById(authenticatedUserId).orElse(null);
+        boolean isAdmin = false;
+        if (user != null && user.getUserType() != null) {
+            String userTypeName = user.getUserType().getName();
+            isAdmin = "ADMIN".equalsIgnoreCase(userTypeName);
+        }
+
         Restaurant restaurant = restaurantRepository.findById(existingItem.getRestaurantId());
-        if (restaurant == null || restaurant.getUserOwnerId() == null || !authenticatedUserId.equals(restaurant.getUserOwnerId())) {
-            throw new UnauthorizedAccessException("Only the restaurant owner can update this menu item");
+
+        // ADMIN can update any menu item, others only their own restaurant's items
+        if (!isAdmin && (restaurant == null || restaurant.getUserOwnerId() == null || !authenticatedUserId.equals(restaurant.getUserOwnerId()))) {
+            throw new UnauthorizedAccessException("Only the restaurant owner or ADMIN can update this menu item");
         }
 
         String photoUrl = existingItem.getPhotoUrl();

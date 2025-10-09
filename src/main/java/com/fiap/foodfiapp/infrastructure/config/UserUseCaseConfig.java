@@ -48,4 +48,14 @@ public class UserUseCaseConfig {
     public DeleteUserUseCase deleteUserUseCase(UserRepository userRepository, AddressRepository addressRepository) {
         return new DeleteUserUseCaseImpl(userRepository, addressRepository);
     }
+
+    @Bean
+    public IsAdminUseCase isAdminUseCase(UserRepository userRepository) {
+        return new IsAdminUseCaseImpl(userRepository);
+    }
+
+    @Bean
+    public ValidateAdminOrOwnerUseCase validateAdminOrOwnerUseCase(UserRepository userRepository) {
+        return new ValidateAdminOrOwnerUseCaseImpl(userRepository);
+    }
 }
