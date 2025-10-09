@@ -21,8 +21,12 @@ public class UpdateRestaurantUseCaseImpl implements UpdateRestaurantUseCase {
 
     @Override
     public Restaurant execute(UUID authenticatedUserId, UUID restaurantId, Restaurant restaurantUpdates) {
-        restaurantUpdates.setId(restaurantId);
-        restaurantUpdates.setUserOwnerId(authenticatedUserId);
+        if (restaurantId == null) {
+            throw new NullPointerException("Restaurant ID cannot be null");
+        }
+        if (restaurantUpdates == null) {
+            throw new NullPointerException("Restaurant updates cannot be null");
+        }
 
         Restaurant existingRestaurant = restaurantRepository.findById(restaurantId);
         if (existingRestaurant == null) {

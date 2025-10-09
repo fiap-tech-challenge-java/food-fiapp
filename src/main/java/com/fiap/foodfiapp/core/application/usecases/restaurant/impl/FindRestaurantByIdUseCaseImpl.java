@@ -19,6 +19,10 @@ public class FindRestaurantByIdUseCaseImpl implements FindRestaurantByIdUseCase 
 
     @Override
     public Restaurant execute(UUID id) {
+        if (id == null) {
+            throw new NullPointerException("Restaurant ID cannot be null");
+        }
+        
         var restaurant = this.restaurantRepository.findById(id);
 
         if (restaurant != null) {

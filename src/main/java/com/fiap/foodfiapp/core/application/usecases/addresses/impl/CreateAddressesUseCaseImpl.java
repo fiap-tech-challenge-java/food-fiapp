@@ -19,6 +19,17 @@ public class CreateAddressesUseCaseImpl implements CreateAddressesUseCase {
 
     @Override
     public Addresses execute(Addresses addresses, UUID ownerId, String ownerType) {
+        // Validate input parameters
+        if (addresses == null) {
+            throw new IllegalArgumentException("Address cannot be null");
+        }
+        if (ownerId == null) {
+            throw new IllegalArgumentException("Owner ID cannot be null");
+        }
+        if (ownerType == null || ownerType.trim().isEmpty()) {
+            throw new IllegalArgumentException("Owner type cannot be null or empty");
+        }
+        
         // Validate owner before creating the address
         validateOwnerUseCase.execute(ownerId, ownerType);
 

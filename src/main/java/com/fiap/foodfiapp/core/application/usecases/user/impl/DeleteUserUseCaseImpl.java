@@ -20,6 +20,11 @@ public class DeleteUserUseCaseImpl implements DeleteUserUseCase {
 
     @Override
     public void execute(UUID id) {
+        // Check for null ID
+        if (id == null) {
+            return;
+        }
+        
         // Verifica se o usuário existe
         var optionalUser = userRepository.findById(id);
         if (optionalUser.isEmpty()) {

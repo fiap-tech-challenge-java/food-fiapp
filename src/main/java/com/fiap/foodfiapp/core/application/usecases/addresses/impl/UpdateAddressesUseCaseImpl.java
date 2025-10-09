@@ -19,6 +19,20 @@ public class UpdateAddressesUseCaseImpl implements UpdateAddressesUseCase {
 
     @Override
     public Addresses execute(UUID addressId, Addresses addressesUpdates, UUID ownerId, String ownerType) {
+        // Validate input parameters first
+        if (addressesUpdates == null) {
+            throw new NullPointerException("Address updates cannot be null");
+        }
+        if (ownerId == null) {
+            throw new NullPointerException("Owner ID cannot be null");
+        }
+        if (ownerType == null) {
+            throw new NullPointerException("Owner type cannot be null");
+        }
+        if (ownerType.trim().isEmpty()) {
+            throw new IllegalArgumentException("Owner type cannot be empty");
+        }
+        
         // Validate owner before updating the address
         validateOwnerUseCase.execute(ownerId, ownerType);
 

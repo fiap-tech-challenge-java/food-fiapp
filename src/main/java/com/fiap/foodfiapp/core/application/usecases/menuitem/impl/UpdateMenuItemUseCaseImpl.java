@@ -29,12 +29,12 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
 
     @Override
     public MenuItem execute(UUID authenticatedUserId, UUID id, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException {
+        if (authenticatedUserId == null) {
+            throw new IllegalArgumentException("Authenticated user ID cannot be null");
+        }
+        
         var existingItem = menuItemRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Menu item not found with id: " + id));
-
-        if (authenticatedUserId == null) {
-            throw new UnauthorizedAccessException("Authenticated user not found");
-        }
 
         Restaurant restaurant = restaurantRepository.findById(existingItem.getRestaurantId());
         if (restaurant == null || restaurant.getUserOwnerId() == null || !authenticatedUserId.equals(restaurant.getUserOwnerId())) {
@@ -43,6 +43,19 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
 
         String photoUrl = existingItem.getPhotoUrl();
         if (photo != null && photo.content() != null) {
+            String originalFilename = photo.originalFilename();
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+            }
+            String fileName = String.format("%s-%s%s", restaurant.getId(), id, extension);
+
+            // Upload new photo first
+            try (var is = photo.content()) {
+                photoUrl = fileStorageRepository.store(is, photo.size(), photo.contentType(), fileName);
+            }
+            
+            // Only delete old photo after successful upload
             if (existingItem.getPhotoUrl() != null && !existingItem.getPhotoUrl().isBlank()) {
                 try {
                     String oldFileName = existingItem.getPhotoUrl().substring(existingItem.getPhotoUrl().lastIndexOf('/') + 1);
@@ -51,25 +64,24 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
                     logger.warn("Failed to delete old menu item photo: {}", e.getMessage());
                 }
             }
-
-            String originalFilename = photo.originalFilename();
-            String extension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
-            }
-            String fileName = String.format("%s-%s%s", restaurant.getId(), id, extension);
-
-            try (var is = photo.content()) {
-                photoUrl = fileStorageRepository.store(is, photo.size(), photo.contentType(), fileName);
-            }
         }
 
-        // Atualiza a entidade existente com os novos dados
-        existingItem.setName(name);
-        existingItem.setDescription(description);
-        existingItem.setPrice(price);
-        existingItem.setLocalOnly(availableForInStoreOnly != null && availableForInStoreOnly);
-        existingItem.setPhotoUrl(photoUrl);
+        // Atualiza a entidade existente com os novos dados (somente se não forem null)
+        if (name != null) {
+            existingItem.setName(name);
+        }
+        if (description != null) {
+            existingItem.setDescription(description);
+        }
+        if (price != null) {
+            existingItem.setPrice(price);
+        }
+        if (availableForInStoreOnly != null) {
+            existingItem.setLocalOnly(availableForInStoreOnly);
+        }
+        if (photoUrl != null && !photoUrl.equals(existingItem.getPhotoUrl())) {
+            existingItem.setPhotoUrl(photoUrl);
+        }
 
         return menuItemRepository.save(existingItem);
     }

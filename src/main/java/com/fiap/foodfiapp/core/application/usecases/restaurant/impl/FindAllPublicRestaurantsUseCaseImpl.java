@@ -45,6 +45,7 @@ public class FindAllPublicRestaurantsUseCaseImpl implements FindAllPublicRestaur
             }
         }
 
-        return restaurants;
+        // Return an unmodifiable list to prevent external modifications
+        return java.util.Collections.unmodifiableList(new java.util.ArrayList<>(restaurants));
     }
 }

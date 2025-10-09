@@ -28,6 +28,11 @@ public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
 
     @Override
     public void execute(UUID authenticatedUserId, UUID restaurantId) {
+        // 0. Check for null restaurant ID (idempotent operation)
+        if (restaurantId == null) {
+            return;
+        }
+        
         // 1. Busca o restaurante; se não existir, operação é idempotente
         Restaurant restaurant = restaurantRepository.findById(restaurantId);
         if (restaurant == null) {

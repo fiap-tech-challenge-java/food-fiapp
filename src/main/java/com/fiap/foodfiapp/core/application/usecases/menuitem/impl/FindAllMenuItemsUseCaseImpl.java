@@ -17,6 +17,10 @@ public class FindAllMenuItemsUseCaseImpl implements FindAllMenuItemsUseCase {
 
     @Override
     public List<MenuItem> execute(UUID restaurantId) {
+        if (restaurantId == null) {
+            throw new IllegalArgumentException("Restaurant ID cannot be null");
+        }
+        
         return menuItemRepository.findAllByRestaurantId(restaurantId);
     }
 }

@@ -17,6 +17,10 @@ public class FindMenuItemByIdUseCaseImpl implements FindMenuItemByIdUseCase {
 
     @Override
     public Optional<MenuItem> execute(UUID id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Menu item ID cannot be null");
+        }
+        
         return menuItemRepository.findById(id);
     }
 }

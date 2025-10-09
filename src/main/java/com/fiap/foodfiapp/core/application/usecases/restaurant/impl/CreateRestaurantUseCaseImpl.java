@@ -27,14 +27,24 @@ public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
 
     @Override
     public Restaurant execute(UUID userId, Restaurant restaurant) {
+        // Validate restaurant parameter
+        if (restaurant == null) {
+            throw new IllegalArgumentException("Restaurant cannot be null");
+        }
+        
         // Set the user owner ID internally - this is now handled by the use case
         restaurant.setUserOwnerId(userId);
+
+        // Validate restaurant name
+        if (restaurant.getName() == null || restaurant.getName().trim().isEmpty()) {
+            throw new BusinessException("Restaurant name is required");
+        }
 
         UUID authenticatedUserId = restaurant.getUserOwnerId();
 
         // RN14: validar existência do usuário (owner)
         User owner = userRepository.findById(authenticatedUserId)
-                .orElseThrow(() -> new UserNotFoundException("id", String.valueOf(authenticatedUserId)));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + authenticatedUserId));
 
         // RN14: validar papel do usuário (deve ser OWNER / Dono de Restaurante)
         String userTypeName = owner.getUserType() != null ? owner.getUserType().getName() : null;

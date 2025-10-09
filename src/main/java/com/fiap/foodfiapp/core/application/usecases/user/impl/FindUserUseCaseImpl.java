@@ -22,6 +22,9 @@ public class FindUserUseCaseImpl implements FindUserUseCase {
 
     @Override
     public Optional<User> execute(UUID id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         var optionalUser = userRepository.findById(id);
         optionalUser.ifPresent(this::loadUserAddresses);
         return optionalUser;
