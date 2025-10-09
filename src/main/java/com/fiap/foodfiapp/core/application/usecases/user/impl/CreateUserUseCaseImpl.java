@@ -11,6 +11,8 @@ import com.fiap.foodfiapp.core.domain.exception.CpfAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.LoginAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
 import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
+import com.fiap.foodfiapp.core.domain.validator.AddressValidator;
+import com.fiap.foodfiapp.core.domain.validator.UserValidator;
 
 import java.util.stream.Collectors;
 
@@ -27,10 +29,16 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
 
     @Override
     public User execute(User user) {
+        // Validate user data first
+        UserValidator.validate(user);
+
         // RN: Validação obrigatória de endereço
         if (user.getAddress() == null || user.getAddress().isEmpty()) {
             throw new BusinessException("At least one address is required for user creation.");
         }
+
+        // Validate all addresses
+        user.getAddress().forEach(AddressValidator::validate);
 
         // RN: Reviver utilizador inativo se houver match por e-mail
         var existingByEmail = userRepository.findByEmail(user.getEmail());

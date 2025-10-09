@@ -3,6 +3,7 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 import com.fiap.foodfiapp.api.RestaurantsApi;
 import com.fiap.foodfiapp.core.application.usecases.restaurant.*;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
+import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.core.domain.exception.UnauthorizedException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.RestaurantMapper;
 import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
@@ -36,7 +37,7 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<List<RestaurantResponse>> usersUserIdRestaurantsGet(UUID userId) {
         // Main authentication check
         //    if (!authenticationService.canAccessUserProfile(userId)) {
-        //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+        //        throw new UnauthorizedException("Permission denied. Unauthorized operation for this user.");
         //    }
 
         // Get all restaurants for the specified user
@@ -49,7 +50,7 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<List<RestaurantResponse>> usersUserIdRestaurantsMyRestaurantsGet(UUID userId) {
         // Main authentication check
         //    if (!authenticationService.canAccessUserProfile(userId)) {
-        //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+        //        throw new UnauthorizedException("Permission denied. Unauthorized operation for this user.");
         //    }
 
         var restaurants = findMyRestaurantsUseCase.execute(userId);
@@ -61,7 +62,7 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<List<RestaurantResponse>> usersUserIdRestaurantsPublicListGet(UUID userId) {
         // Main authentication check
         //    if (!authenticationService.canAccessUserProfile(userId)) {
-        //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+        //        throw new UnauthorizedException("Permission denied. Unauthorized operation for this user.");
         //    }
 
         // Get all public restaurants - userId is required for authentication but not filtering
@@ -74,7 +75,7 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<RestaurantResponse> usersUserIdRestaurantsPost(UUID userId, CreateRestaurantRequest createRestaurantRequest) {
         // Main authentication check
         //    if (!authenticationService.canAccessUserProfile(userId)) {
-        //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+        //        throw new UnauthorizedException("Permission denied. Unauthorized operation for this user.");
         //    }
 
         // Convert request to domain entity - no need to set userOwnerId manually
@@ -90,7 +91,7 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<RestaurantResponse> usersUserIdRestaurantsRestaurantIdGet(UUID userId, UUID restaurantId) {
         // Use the validation use case instead of directly accessing domain entity
         if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
-            throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+            throw new UnauthorizedException("Permission denied. Unauthorized operation for this user.");
         }
 
         // Now get the restaurant after validation
@@ -104,12 +105,12 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<RestaurantResponse> usersUserIdRestaurantsRestaurantIdPut(UUID userId, UUID restaurantId, UpdateRestaurantRequest updateRestaurantRequest) {
         // Main authentication check
         //    if (!authenticationService.canAccessUserProfile(userId)) {
-        //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+        //        throw new UnauthorizedException("Permission denied. Unauthorized operation for this user.");
         //    }
 
         // Use the validation use case instead of directly accessing domain entity
         if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new UnauthorizedAccessException("You do not have permission to update this restaurant.");
         }
 
         // Convert request to domain entity - no need to set ID and userOwnerId manually
@@ -125,12 +126,12 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<Void> usersUserIdRestaurantsRestaurantIdDelete(UUID userId, UUID restaurantId) {
         // Main authentication check
         //    if (!authenticationService.canAccessUserProfile(userId)) {
-        //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+        //        throw new UnauthorizedException("Permission denied. Unauthorized operation for this user.");
         //    }
 
         // Use the validation use case instead of directly accessing domain entity
         if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new UnauthorizedAccessException("You do not have permission to delete this restaurant.");
         }
 
         deleteRestaurantUseCase.execute(userId, restaurantId);
@@ -143,7 +144,7 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<List<RestaurantResponse>> getPublicRestaurantsList(UUID userId) {
         // Main authentication check
         //   if (!authenticationService.canAccessUserProfile(userId)) {
-        //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+        //        throw new UnauthorizedException("Permission denied. Unauthorized operation for this user.");
         //    }
 
         // Get all public restaurants
@@ -158,7 +159,7 @@ public class RestaurantController implements RestaurantsApi {
     public ResponseEntity<List<RestaurantResponse>> getMyRestaurants(UUID userId) {
         // Main authentication check
         //   if (!authenticationService.canAccessUserProfile(userId)) {
-        //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
+        //        throw new UnauthorizedException("Permission denied. Unauthorized operation for this user.");
         //    }
 
         // Get restaurants by user ID

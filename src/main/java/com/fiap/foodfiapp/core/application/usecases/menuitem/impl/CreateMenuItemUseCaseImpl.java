@@ -8,6 +8,7 @@ import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
+import com.fiap.foodfiapp.core.domain.validator.MenuItemValidator;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -27,6 +28,11 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
 
     @Override
     public MenuItem execute(UUID userId, UUID restaurantId, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException {
+        // Validate menu item data first
+        MenuItemValidator.validateName(name);
+        MenuItemValidator.validatePrice(price);
+        MenuItemValidator.validateDescription(description);
+
         // Valida se o usuário é o proprietário do restaurante
         if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
             throw new IllegalArgumentException("Usuário não possui permissão para criar itens de menu neste restaurante. Apenas o proprietário pode adicionar itens ao menu.");
