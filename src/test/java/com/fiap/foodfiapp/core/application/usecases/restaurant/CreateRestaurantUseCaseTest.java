@@ -1,6 +1,7 @@
 package com.fiap.foodfiapp.core.application.usecases.restaurant;
 
 import com.fiap.foodfiapp.core.application.usecases.restaurant.impl.CreateRestaurantUseCaseImpl;
+import com.fiap.foodfiapp.core.domain.entity.Addresses;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
@@ -185,5 +186,159 @@ class CreateRestaurantUseCaseTest {
         );
         
         verify(restaurantRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldAllowAdminToCreateRestaurant() {
+        // Arrange
+        User adminUser = new User();
+        adminUser.setId(ownerId);
+        UserType adminType = new UserType();
+        adminType.setName("ADMIN");
+        adminUser.setUserType(adminType);
+        
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(adminUser));
+        when(restaurantRepository.findByNameAndUser(restaurantName, ownerId)).thenReturn(null);
+        when(restaurantRepository.save(any(Restaurant.class))).thenReturn(restaurant);
+
+        // Act
+        Restaurant result = createRestaurantUseCase.execute(ownerId, restaurant);
+
+        // Assert
+        assertNotNull(result);
+        verify(restaurantRepository).save(any(Restaurant.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserHasNullUserType() {
+        // Arrange
+        User userWithNullType = new User();
+        userWithNullType.setId(ownerId);
+        userWithNullType.setUserType(null);
+        
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(userWithNullType));
+
+        // Act & Assert
+        assertThrows(
+            UnauthorizedAccessException.class,
+            () -> createRestaurantUseCase.execute(ownerId, restaurant)
+        );
+        
+        verify(restaurantRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldCreateRestaurantWithAddress() {
+        // Arrange
+        Addresses address = new Addresses(null, "Main St", "123", "Apt 4", "Downtown", "City", "ST", "12345678");
+        restaurant.setAddress(address);
+        
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(ownerUser));
+        when(restaurantRepository.findByNameAndUser(restaurantName, ownerId)).thenReturn(null);
+        when(restaurantRepository.save(any(Restaurant.class))).thenReturn(restaurant);
+        when(addressRepository.save(any(Addresses.class), any(UUID.class), anyString())).thenReturn(address);
+
+        // Act
+        Restaurant result = createRestaurantUseCase.execute(ownerId, restaurant);
+
+        // Assert
+        assertNotNull(result);
+        verify(restaurantRepository).save(any(Restaurant.class));
+        verify(addressRepository).save(any(Addresses.class), any(UUID.class), eq("RESTAURANT"));
+    }
+
+    @Test
+    void shouldCreateRestaurantWithoutAddress() {
+        // Arrange
+        restaurant.setAddress(null);
+        
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(ownerUser));
+        when(restaurantRepository.findByNameAndUser(restaurantName, ownerId)).thenReturn(null);
+        when(restaurantRepository.save(any(Restaurant.class))).thenReturn(restaurant);
+
+        // Act
+        Restaurant result = createRestaurantUseCase.execute(ownerId, restaurant);
+
+        // Assert
+        assertNotNull(result);
+        verify(restaurantRepository).save(any(Restaurant.class));
+        verify(addressRepository, never()).save(any(), any(), any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRestaurantNameIsBlank() {
+        // Arrange
+        restaurant.setName("   ");
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(ownerUser));
+
+        // Act & Assert
+        assertThrows(
+            BusinessException.class,
+            () -> createRestaurantUseCase.execute(ownerId, restaurant)
+        );
+        
+        verify(restaurantRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldBeCaseInsensitiveForAdminCheck() {
+        // Arrange
+        User adminUser = new User();
+        adminUser.setId(ownerId);
+        UserType adminType = new UserType();
+        adminType.setName("admin"); // lowercase
+        adminUser.setUserType(adminType);
+        
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(adminUser));
+        when(restaurantRepository.findByNameAndUser(restaurantName, ownerId)).thenReturn(null);
+        when(restaurantRepository.save(any(Restaurant.class))).thenReturn(restaurant);
+
+        // Act
+        Restaurant result = createRestaurantUseCase.execute(ownerId, restaurant);
+
+        // Assert
+        assertNotNull(result);
+        verify(restaurantRepository).save(any(Restaurant.class));
+    }
+
+    @Test
+    void shouldHandleUserWithNullUserType() {
+        // Arrange
+        User userWithNullType = new User();
+        userWithNullType.setId(ownerId);
+        userWithNullType.setUserType(null); // Null userType
+        
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(userWithNullType));
+
+        // Act & Assert
+        UnauthorizedAccessException exception = assertThrows(
+            UnauthorizedAccessException.class,
+            () -> createRestaurantUseCase.execute(ownerId, restaurant)
+        );
+        
+        assertTrue(exception.getMessage().contains("Only users with role 'OWNER' or 'ADMIN' can create restaurants"));
+        verify(userRepository).findById(ownerId);
+        verify(restaurantRepository, never()).save(any(Restaurant.class));
+    }
+
+    @Test
+    void shouldAllowDonoDeRestauranteRoleToCreateRestaurant() {
+        // Arrange
+        User donoUser = new User();
+        donoUser.setId(ownerId);
+        UserType donoType = new UserType();
+        donoType.setName("DONO DE RESTAURANTE");
+        donoUser.setUserType(donoType);
+        
+        when(userRepository.findById(ownerId)).thenReturn(Optional.of(donoUser));
+        when(restaurantRepository.findByNameAndUser(restaurantName, ownerId)).thenReturn(null);
+        when(restaurantRepository.save(any(Restaurant.class))).thenReturn(restaurant);
+
+        // Act
+        Restaurant result = createRestaurantUseCase.execute(ownerId, restaurant);
+
+        // Assert
+        assertNotNull(result);
+        verify(restaurantRepository).save(any(Restaurant.class));
     }
 }

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -212,6 +213,22 @@ class CreateUserUseCaseTest {
 
         // Act & Assert
         assertThrows(BusinessException.class, () -> createUserUseCase.execute(user));
+        verify(userRepository, never()).save(any(User.class));
+        verify(addressRepository, never()).save(any(Addresses.class), any(UUID.class), anyString());
+    }
+
+    @Test
+    void shouldHandleEmptyAddressList() {
+        // Arrange
+        user.setAddress(Collections.emptyList());
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByCpf(user.getCpf())).thenReturn(Optional.empty());
+        when(userRepository.findByLogin(user.getLogin())).thenReturn(Optional.empty());
+        when(userTypeRepository.findById(userType.getUuid())).thenReturn(Optional.of(userType));
+
+        // Act & Assert
+        BusinessException exception = assertThrows(BusinessException.class, () -> createUserUseCase.execute(user));
+        assertEquals("At least one address is required for user creation.", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
         verify(addressRepository, never()).save(any(Addresses.class), any(UUID.class), anyString());
     }

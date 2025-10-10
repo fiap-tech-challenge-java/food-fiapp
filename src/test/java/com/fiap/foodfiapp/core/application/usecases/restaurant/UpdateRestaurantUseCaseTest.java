@@ -1,10 +1,12 @@
 package com.fiap.foodfiapp.core.application.usecases.restaurant;
 
 import com.fiap.foodfiapp.core.application.usecases.restaurant.impl.UpdateRestaurantUseCaseImpl;
+import com.fiap.foodfiapp.core.domain.entity.Addresses;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
@@ -14,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -350,5 +354,149 @@ class UpdateRestaurantUseCaseTest {
         // Assert - Immutable fields should not be updated
         assertEquals(restaurantId, result.getId()); // ID should remain the same
         assertEquals(existingRestaurant.getUserOwnerId(), result.getUserOwnerId()); // Owner ID should remain unchanged
+    }
+
+    @Test
+    void shouldAllowAdminToUpdateAnyRestaurant() {
+        // Arrange
+        UUID adminUserId = UUID.randomUUID();
+        User adminUser = new User();
+        adminUser.setId(adminUserId);
+        UserType adminType = new UserType();
+        adminType.setName("ADMIN");
+        adminUser.setUserType(adminType);
+        when(userRepository.findById(adminUserId)).thenReturn(Optional.of(adminUser));
+        
+        updateData.setName("Admin Updated Name");
+        when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
+        when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Restaurant result = updateRestaurantUseCase.execute(adminUserId, restaurantId, updateData);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Admin Updated Name", result.getName());
+        verify(restaurantRepository).update(any(Restaurant.class));
+    }
+
+    @Test
+    void shouldHandleUserNotFound() {
+        // Arrange
+        UUID unknownUserId = UUID.randomUUID();
+        when(userRepository.findById(unknownUserId)).thenReturn(Optional.empty());
+        when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
+        
+        updateData.setName("Updated Name");
+
+        // Act & Assert
+        assertThrows(
+            UnauthorizedAccessException.class,
+            () -> updateRestaurantUseCase.execute(unknownUserId, restaurantId, updateData)
+        );
+        
+        verify(restaurantRepository, never()).update(any());
+    }
+
+    @Test
+    void shouldHandleUserWithNullUserType() {
+        // Arrange
+        UUID userId = UUID.randomUUID();
+        User userWithNullType = new User();
+        userWithNullType.setId(userId);
+        userWithNullType.setUserType(null);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(userWithNullType));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
+        
+        updateData.setName("Updated Name");
+
+        // Act & Assert
+        assertThrows(
+            UnauthorizedAccessException.class,
+            () -> updateRestaurantUseCase.execute(userId, restaurantId, updateData)
+        );
+        
+        verify(restaurantRepository, never()).update(any());
+    }
+
+    @Test
+    void shouldUpdateRestaurantWithNewAddress() {
+        // Arrange
+        UUID authenticatedUserId = existingRestaurant.getUserOwnerId();
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
+        Addresses newAddress = new Addresses(null, "New St", "456", "Suite 10", "Uptown", "NewCity", "NC", "98765432");
+        updateData.setAddress(newAddress);
+        
+        when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
+        when(addressRepository.findByOwner(restaurantId, "RESTAURANT")).thenReturn(Collections.emptyList());
+        when(addressRepository.save(any(Addresses.class), eq(restaurantId), eq("RESTAURANT"))).thenReturn(newAddress);
+        when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Restaurant result = updateRestaurantUseCase.execute(authenticatedUserId, restaurantId, updateData);
+
+        // Assert
+        assertNotNull(result);
+        verify(addressRepository).save(any(Addresses.class), eq(restaurantId), eq("RESTAURANT"));
+        verify(restaurantRepository).update(any(Restaurant.class));
+    }
+
+    @Test
+    void shouldUpdateExistingAddress() {
+        // Arrange
+        UUID authenticatedUserId = existingRestaurant.getUserOwnerId();
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
+        Addresses existingAddress = new Addresses(UUID.randomUUID(), "Old St", "123", "Apt 1", "Downtown", "City", "ST", "12345678");
+        Addresses updatedAddress = new Addresses(null, "Updated St", "789", "Suite 5", "Midtown", "City", "ST", "87654321");
+        updateData.setAddress(updatedAddress);
+        
+        when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
+        when(addressRepository.findByOwner(restaurantId, "RESTAURANT")).thenReturn(List.of(existingAddress));
+        when(addressRepository.save(any(Addresses.class), eq(restaurantId), eq("RESTAURANT"))).thenReturn(updatedAddress);
+        when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Restaurant result = updateRestaurantUseCase.execute(authenticatedUserId, restaurantId, updateData);
+
+        // Assert
+        assertNotNull(result);
+        verify(addressRepository).save(any(Addresses.class), eq(restaurantId), eq("RESTAURANT"));
+        verify(restaurantRepository).update(any(Restaurant.class));
+    }
+
+    @Test
+    void shouldBeCaseInsensitiveForAdminCheck() {
+        // Arrange
+        UUID adminUserId = UUID.randomUUID();
+        User adminUser = new User();
+        adminUser.setId(adminUserId);
+        UserType adminType = new UserType();
+        adminType.setName("admin"); // lowercase
+        adminUser.setUserType(adminType);
+        when(userRepository.findById(adminUserId)).thenReturn(Optional.of(adminUser));
+        
+        updateData.setName("Admin Updated Name");
+        when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
+        when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Restaurant result = updateRestaurantUseCase.execute(adminUserId, restaurantId, updateData);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Admin Updated Name", result.getName());
+        verify(restaurantRepository).update(any(Restaurant.class));
     }
 }

@@ -167,4 +167,57 @@ class FindUserUseCaseTest {
         assertFalse(result.isPresent());
         verifyNoInteractions(userRepository, addressRepository);
     }
+
+    @Test
+    void shouldHandleUserWithNullId() {
+        // Arrange
+        User userWithNullId = new User();
+        userWithNullId.setId(null);
+        userWithNullId.setName("Test User");
+        
+        when(userRepository.findById(userId)).thenReturn(Optional.of(userWithNullId));
+
+        // Act
+        Optional<User> result = findUserUseCase.execute(userId);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals(userWithNullId, result.get());
+        verify(userRepository).findById(userId);
+        // Should not call addressRepository because user.getId() is null
+        verifyNoInteractions(addressRepository);
+    }
+
+    @Test
+    void shouldHandleUserWithEmptyAddressList() {
+        // Arrange
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+        when(addressRepository.findByOwner(userId, "USER")).thenReturn(Collections.emptyList());
+
+        // Act
+        Optional<User> result = findUserUseCase.execute(userId);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals(testUser, result.get());
+        assertTrue(result.get().getAddress().isEmpty());
+        verify(userRepository).findById(userId);
+        verify(addressRepository).findByOwner(userId, "USER");
+    }
+
+    @Test
+    void shouldHandleNullUserInLoadAddresses() {
+        // Arrange
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+        when(addressRepository.findByOwner(userId, "USER")).thenReturn(testAddresses);
+
+        // Act
+        Optional<User> result = findUserUseCase.execute(userId);
+
+        // Assert
+        assertTrue(result.isPresent());
+        assertEquals(testUser, result.get());
+        verify(userRepository).findById(userId);
+        verify(addressRepository).findByOwner(userId, "USER");
+    }
 }

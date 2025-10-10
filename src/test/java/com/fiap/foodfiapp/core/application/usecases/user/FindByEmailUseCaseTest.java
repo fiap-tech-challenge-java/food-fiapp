@@ -187,4 +187,19 @@ class FindByEmailUseCaseTest {
         assertNotNull(result);
         verify(userRepository).findByEmail(uppercaseEmail);
     }
+
+    @Test
+    void shouldHandleNullUserInLoadAddresses() {
+        // Arrange
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(addressRepository.findByOwner(user.getId(), AddressOwnerTypeEnum.USER.getDescription()))
+            .thenReturn(addresses);
+
+        // Act
+        User result = findByEmailUseCase.execute(email);
+
+        // Assert
+        assertNotNull(result);
+        verify(addressRepository).findByOwner(user.getId(), AddressOwnerTypeEnum.USER.getDescription());
+    }
 }

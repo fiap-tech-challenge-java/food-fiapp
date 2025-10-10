@@ -213,4 +213,218 @@ class CreateMenuItemUseCaseTest {
             )
         );
     }
+
+    @Test
+    void shouldCreateMenuItemWithNullPhoto() throws IOException {
+        // Arrange
+        when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
+        // Act
+        UUID userId = UUID.randomUUID();
+        MenuItem result = createMenuItemUseCase.execute(userId, restaurantId, name, description, price, availableForInStoreOnly, null);
+
+        // Assert
+        assertNotNull(result);
+        assertNull(result.getPhotoUrl());
+        verify(fileStorageRepository, never()).store(any(), anyLong(), anyString(), anyString());
+        verify(menuItemRepository).save(menuItemCaptor.capture());
+        
+        MenuItem savedMenuItem = menuItemCaptor.getValue();
+        assertNull(savedMenuItem.getPhotoUrl());
+    }
+
+    @Test
+    void shouldCreateMenuItemWithNullDescription() throws IOException {
+        // Arrange
+        when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
+        // Act
+        UUID userId = UUID.randomUUID();
+        MenuItem result = createMenuItemUseCase.execute(userId, restaurantId, name, null, price, availableForInStoreOnly, null);
+
+        // Assert
+        assertNotNull(result);
+        verify(menuItemRepository).save(any(MenuItem.class));
+    }
+
+    @Test
+    void shouldCreateMenuItemWithNullAvailableForInStoreOnly() throws IOException {
+        // Arrange
+        when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
+        // Act
+        UUID userId = UUID.randomUUID();
+        MenuItem result = createMenuItemUseCase.execute(userId, restaurantId, name, description, price, null, null);
+
+        // Assert
+        assertNotNull(result);
+        verify(menuItemRepository).save(any(MenuItem.class));
+    }
+
+    @Test
+    void shouldCreateMenuItemWithPhotoFilenameWithoutExtension() throws IOException {
+        // Arrange
+        FileUploadRequest photoWithoutExtension = new FileUploadRequest(
+            new ByteArrayInputStream("test".getBytes()),
+            4,
+            "image/jpeg",
+            "photofile"
+        );
+        
+        when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
+        when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString()))
+            .thenReturn("http://example.com/photo.jpg");
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
+        // Act
+        UUID userId = UUID.randomUUID();
+        MenuItem result = createMenuItemUseCase.execute(userId, restaurantId, name, description, price, availableForInStoreOnly, photoWithoutExtension);
+
+        // Assert
+        assertNotNull(result);
+        verify(fileStorageRepository).store(any(), anyLong(), anyString(), argThat(filename -> 
+            !filename.contains(".")
+        ));
+    }
+
+    @Test
+    void shouldCreateMenuItemWithAvailableForInStoreOnlyTrue() throws IOException {
+        // Arrange
+        when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
+        // Act
+        UUID userId = UUID.randomUUID();
+        MenuItem result = createMenuItemUseCase.execute(userId, restaurantId, name, description, price, true, null);
+
+        // Assert
+        assertNotNull(result);
+        verify(menuItemRepository).save(menuItemCaptor.capture());
+        MenuItem savedMenuItem = menuItemCaptor.getValue();
+        assertTrue(savedMenuItem.isLocalOnly());
+    }
+
+    @Test
+    void shouldCreateMenuItemWithAvailableForInStoreOnlyFalse() throws IOException {
+        // Arrange
+        when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
+        // Act
+        UUID userId = UUID.randomUUID();
+        MenuItem result = createMenuItemUseCase.execute(userId, restaurantId, name, description, price, false, null);
+
+        // Assert
+        assertNotNull(result);
+        verify(menuItemRepository).save(menuItemCaptor.capture());
+        MenuItem savedMenuItem = menuItemCaptor.getValue();
+        assertFalse(savedMenuItem.isLocalOnly());
+    }
+
+    @Test
+    void shouldHandlePhotoFilenameWithNoDot() throws IOException {
+        // Arrange
+        byte[] photoContent = "test photo content".getBytes();
+        FileUploadRequest photoWithoutExtension = new FileUploadRequest(
+            new ByteArrayInputStream(photoContent),
+            photoContent.length,
+            "image/jpeg",
+            "photofile"  // No extension
+        );
+        
+        when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
+        when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString())).thenReturn("http://example.com/photo.jpg");
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
+        // Act
+        UUID userId = UUID.randomUUID();
+        MenuItem result = createMenuItemUseCase.execute(userId, restaurantId, name, description, price, availableForInStoreOnly, photoWithoutExtension);
+
+        // Assert
+        assertNotNull(result);
+        assertNotNull(result.getPhotoUrl());
+        verify(fileStorageRepository).store(any(), anyLong(), anyString(), anyString());
+    }
+
+    @Test
+    void shouldHandlePhotoFilenameWithNull() throws IOException {
+        // Arrange
+        byte[] photoContent = "test photo content".getBytes();
+        FileUploadRequest photoWithNullFilename = new FileUploadRequest(
+            new ByteArrayInputStream(photoContent),
+            photoContent.length,
+            "image/jpeg",
+            null  // Null filename
+        );
+        
+        when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
+        when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString())).thenReturn("http://example.com/photo.jpg");
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
+        // Act
+        UUID userId = UUID.randomUUID();
+        MenuItem result = createMenuItemUseCase.execute(userId, restaurantId, name, description, price, availableForInStoreOnly, photoWithNullFilename);
+
+        // Assert
+        assertNotNull(result);
+        assertNotNull(result.getPhotoUrl());
+        verify(fileStorageRepository).store(any(), anyLong(), anyString(), anyString());
+    }
+
+    @Test
+    void shouldCreateMenuItemWithPhotoContentNotNull() throws IOException {
+        // Arrange
+        when(restaurantRepository.existsById(restaurantId)).thenReturn(true);
+        when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString())).thenReturn("http://example.com/photo.jpg");
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> {
+            MenuItem saved = invocation.getArgument(0);
+            saved.setId(UUID.randomUUID());
+            return saved;
+        });
+
+        // Act
+        UUID userId = UUID.randomUUID();
+        MenuItem result = createMenuItemUseCase.execute(userId, restaurantId, name, description, price, availableForInStoreOnly, photo);
+
+        // Assert
+        assertNotNull(result);
+        assertNotNull(result.getPhotoUrl());
+        assertEquals("http://example.com/photo.jpg", result.getPhotoUrl());
+        verify(fileStorageRepository).store(any(), anyLong(), anyString(), anyString());
+    }
 }

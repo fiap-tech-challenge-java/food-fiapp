@@ -342,6 +342,14 @@ class UpdateMenuItemUseCaseTest {
             ""
         );
         
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
         when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
         when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
         when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString()))
@@ -358,5 +366,315 @@ class UpdateMenuItemUseCaseTest {
             true,
             emptyFilenamePhoto
         ));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRestaurantIsNull() {
+        // Arrange
+        User nonAdminUser = new User();
+        nonAdminUser.setId(authenticatedUserId);
+        UserType customerType = new UserType();
+        customerType.setName("CUSTOMER");
+        nonAdminUser.setUserType(customerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(nonAdminUser));
+        
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(null);
+        
+        // Act & Assert
+        UnauthorizedAccessException exception = assertThrows(
+            UnauthorizedAccessException.class,
+            () -> updateMenuItemUseCase.execute(
+                authenticatedUserId,
+                menuItemId,
+                "New Name",
+                "New description",
+                29.99,
+                true,
+                null
+            )
+        );
+        
+        assertEquals("Only the restaurant owner or ADMIN can update this menu item", exception.getMessage());
+        verify(menuItemRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenRestaurantUserOwnerIdIsNull() {
+        // Arrange
+        User nonAdminUser = new User();
+        nonAdminUser.setId(authenticatedUserId);
+        UserType customerType = new UserType();
+        customerType.setName("CUSTOMER");
+        nonAdminUser.setUserType(customerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(nonAdminUser));
+        
+        Restaurant restaurantWithNullOwner = new Restaurant();
+        restaurantWithNullOwner.setId(restaurantId);
+        restaurantWithNullOwner.setUserOwnerId(null);
+        
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurantWithNullOwner);
+        
+        // Act & Assert
+        UnauthorizedAccessException exception = assertThrows(
+            UnauthorizedAccessException.class,
+            () -> updateMenuItemUseCase.execute(
+                authenticatedUserId,
+                menuItemId,
+                "New Name",
+                "New description",
+                29.99,
+                true,
+                null
+            )
+        );
+        
+        assertEquals("Only the restaurant owner or ADMIN can update this menu item", exception.getMessage());
+        verify(menuItemRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldAllowAdminToUpdateWhenRestaurantIsNull() throws IOException {
+        // Arrange
+        User adminUser = new User();
+        adminUser.setId(authenticatedUserId);
+        UserType adminType = new UserType();
+        adminType.setName("ADMIN");
+        adminUser.setUserType(adminType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(adminUser));
+        
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(null);
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
+        // Act
+        MenuItem result = updateMenuItemUseCase.execute(
+            authenticatedUserId,
+            menuItemId,
+            "New Name",
+            "New description",
+            29.99,
+            true,
+            null
+        );
+        
+        // Assert
+        assertNotNull(result);
+        assertEquals("New Name", result.getName());
+        verify(menuItemRepository).save(any(MenuItem.class));
+    }
+
+    @Test
+    void shouldHandleUserWithNullUserType() {
+        // Arrange
+        UUID differentUserId = UUID.randomUUID(); // Use a different user ID that is not the owner
+        User userWithNullType = new User();
+        userWithNullType.setId(differentUserId);
+        userWithNullType.setUserType(null);
+        when(userRepository.findById(differentUserId)).thenReturn(Optional.of(userWithNullType));
+        
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+        
+        // Act & Assert
+        UnauthorizedAccessException exception = assertThrows(
+            UnauthorizedAccessException.class,
+            () -> updateMenuItemUseCase.execute(
+                differentUserId,
+                menuItemId,
+                "New Name",
+                "New description",
+                29.99,
+                true,
+                null
+            )
+        );
+        
+        assertEquals("Only the restaurant owner or ADMIN can update this menu item", exception.getMessage());
+        verify(menuItemRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldHandlePhotoWithNullOriginalFilename() throws IOException {
+        // Arrange
+        FileUploadRequest photoWithNullFilename = new FileUploadRequest(
+            new ByteArrayInputStream("test".getBytes()),
+            4,
+            "image/jpeg",
+            null
+        );
+        
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+        when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString()))
+            .thenReturn("http://example.com/new-photo.jpg");
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
+        // Act
+        MenuItem result = updateMenuItemUseCase.execute(
+            authenticatedUserId,
+            menuItemId,
+            "New Burger",
+            "New description",
+            29.99,
+            true,
+            photoWithNullFilename
+        );
+        
+        // Assert
+        assertNotNull(result);
+        verify(fileStorageRepository).store(any(), anyLong(), anyString(), argThat(filename -> 
+            !filename.contains(".")
+        ));
+    }
+
+    @Test
+    void shouldAllowAdminToUpdateAnyMenuItem() throws IOException {
+        // Arrange
+        User adminUser = new User();
+        adminUser.setId(authenticatedUserId);
+        UserType adminType = new UserType();
+        adminType.setName("ADMIN");
+        adminUser.setUserType(adminType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(adminUser));
+        
+        // Restaurant owned by different user
+        UUID differentOwnerId = UUID.randomUUID();
+        restaurant.setUserOwnerId(differentOwnerId);
+        
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
+        // Act
+        MenuItem result = updateMenuItemUseCase.execute(
+            authenticatedUserId,
+            menuItemId,
+            "New Burger",
+            "New description",
+            29.99,
+            true,
+            null
+        );
+        
+        // Assert
+        assertNotNull(result);
+        assertEquals("New Burger", result.getName());
+        verify(menuItemRepository).save(any(MenuItem.class));
+    }
+
+    @Test
+    void shouldDeleteOldPhotoWhenUpdatingWithNewPhotoAndOldPhotoExists() throws IOException {
+        // Arrange
+        existingMenuItem.setPhotoUrl("http://example.com/old-photo.jpg");
+        
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+        when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString()))
+            .thenReturn("http://example.com/new-photo.jpg");
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
+        // Act
+        MenuItem result = updateMenuItemUseCase.execute(
+            authenticatedUserId,
+            menuItemId,
+            "New Burger",
+            "New description",
+            29.99,
+            true,
+            photoRequest
+        );
+        
+        // Assert
+        assertNotNull(result);
+        verify(fileStorageRepository).store(any(), anyLong(), anyString(), anyString());
+        verify(fileStorageRepository).delete("old-photo.jpg");
+    }
+
+    @Test
+    void shouldHandleIOExceptionWhenDeletingOldPhoto() throws IOException {
+        // Arrange
+        existingMenuItem.setPhotoUrl("http://example.com/old-photo.jpg");
+        
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+        when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString()))
+            .thenReturn("http://example.com/new-photo.jpg");
+        doThrow(new IOException("Failed to delete old photo")).when(fileStorageRepository).delete("old-photo.jpg");
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
+        // Act - Should not throw exception, just log warning
+        MenuItem result = updateMenuItemUseCase.execute(
+            authenticatedUserId,
+            menuItemId,
+            "New Burger",
+            "New description",
+            29.99,
+            true,
+            photoRequest
+        );
+        
+        // Assert
+        assertNotNull(result);
+        verify(fileStorageRepository).store(any(), anyLong(), anyString(), anyString());
+        verify(fileStorageRepository).delete("old-photo.jpg");
+        verify(menuItemRepository).save(any(MenuItem.class));
+    }
+
+    @Test
+    void shouldNotDeleteOldPhotoWhenOldPhotoUrlIsBlank() throws IOException {
+        // Arrange
+        existingMenuItem.setPhotoUrl("   "); // Blank URL
+        
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+        when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString()))
+            .thenReturn("http://example.com/new-photo.jpg");
+        when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        
+        // Act
+        MenuItem result = updateMenuItemUseCase.execute(
+            authenticatedUserId,
+            menuItemId,
+            "New Burger",
+            "New description",
+            29.99,
+            true,
+            photoRequest
+        );
+        
+        // Assert
+        assertNotNull(result);
+        verify(fileStorageRepository).store(any(), anyLong(), anyString(), anyString());
+        verify(fileStorageRepository, never()).delete(anyString());
     }
 }

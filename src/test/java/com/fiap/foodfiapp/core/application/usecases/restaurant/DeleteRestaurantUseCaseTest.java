@@ -329,4 +329,21 @@ class DeleteRestaurantUseCaseTest {
         verify(menuItemRepository, never()).save(argThat(item -> item.getRestaurantId().equals(secondRestaurantId)));
         verify(addressRepository, never()).save(any(Addresses.class), eq(secondRestaurantId), anyString());
     }
+
+    @Test
+    void shouldHandleRestaurantWithNoAddresses() {
+        // Arrange
+        when(restaurantRepository.findById(restaurantId)).thenReturn(testRestaurant);
+        when(menuItemRepository.findAllByRestaurantId(restaurantId)).thenReturn(testMenuItems);
+        when(addressRepository.findByOwner(restaurantId, AddressOwnerTypeEnum.RESTAURANT.getDescription()))
+            .thenReturn(Collections.emptyList());
+        
+        // Act
+        deleteRestaurantUseCase.execute(authenticatedUserId, restaurantId);
+        
+        // Assert
+        verify(restaurantRepository).delete(restaurantId);
+        verify(menuItemRepository, times(testMenuItems.size())).save(any(MenuItem.class));
+        verify(addressRepository, never()).save(any(Addresses.class), any(UUID.class), anyString());
+    }
 }

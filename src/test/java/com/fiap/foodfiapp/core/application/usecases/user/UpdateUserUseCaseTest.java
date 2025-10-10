@@ -214,4 +214,133 @@ class UpdateUserUseCaseTest {
         // Assert
         assertEquals(originalCreatedAt, result.getCreatedAt());
     }
+
+    @Test
+    void shouldPreserveUserTypeWhenUserTypeIsNull() {
+        // Arrange
+        userUpdates.setUserType(null);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        User result = updateUserUseCase.execute(userId, userUpdates);
+
+        // Assert
+        assertEquals(existingUser.getUserType(), result.getUserType());
+        verify(userTypeRepository, never()).findById(any());
+    }
+
+    @Test
+    void shouldPreserveUserTypeWhenUserTypeUuidIsNull() {
+        // Arrange
+        UserType userTypeWithoutUuid = new UserType();
+        userTypeWithoutUuid.setUuid(null);
+        userUpdates.setUserType(userTypeWithoutUuid);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        User result = updateUserUseCase.execute(userId, userUpdates);
+
+        // Assert
+        assertEquals(existingUser.getUserType(), result.getUserType());
+        verify(userTypeRepository, never()).findById(any());
+    }
+
+    @Test
+    void shouldNotCheckEmailWhenEmailIsNull() {
+        // Arrange
+        userUpdates.setEmail(null);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userTypeRepository.findById(any())).thenReturn(Optional.of(userType));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        User result = updateUserUseCase.execute(userId, userUpdates);
+
+        // Assert
+        assertNotNull(result);
+        verify(userRepository, never()).findByEmail(any());
+    }
+
+    @Test
+    void shouldNotCheckEmailWhenEmailIsSame() {
+        // Arrange
+        userUpdates.setEmail(existingUser.getEmail());
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userTypeRepository.findById(any())).thenReturn(Optional.of(userType));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        User result = updateUserUseCase.execute(userId, userUpdates);
+
+        // Assert
+        assertNotNull(result);
+        verify(userRepository, never()).findByEmail(any());
+    }
+
+    @Test
+    void shouldAllowUpdateWhenEmailExistsButBelongsToSameUser() {
+        // Arrange
+        userUpdates.setEmail("newemail@example.com");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByEmail("newemail@example.com")).thenReturn(Optional.of(existingUser));
+        when(userTypeRepository.findById(any())).thenReturn(Optional.of(userType));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        User result = updateUserUseCase.execute(userId, userUpdates);
+
+        // Assert
+        assertNotNull(result);
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void shouldUpdateWithNullName() {
+        // Arrange
+        userUpdates.setName(null);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userTypeRepository.findById(any())).thenReturn(Optional.of(userType));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        User result = updateUserUseCase.execute(userId, userUpdates);
+
+        // Assert
+        assertNotNull(result);
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void shouldUpdateWithNullCpf() {
+        // Arrange
+        userUpdates.setCpf(null);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userTypeRepository.findById(any())).thenReturn(Optional.of(userType));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        User result = updateUserUseCase.execute(userId, userUpdates);
+
+        // Assert
+        assertNotNull(result);
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void shouldUpdateWithNullLogin() {
+        // Arrange
+        userUpdates.setLogin(null);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+        when(userTypeRepository.findById(any())).thenReturn(Optional.of(userType));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        User result = updateUserUseCase.execute(userId, userUpdates);
+
+        // Assert
+        assertNotNull(result);
+        verify(userRepository).save(any(User.class));
+    }
 }
