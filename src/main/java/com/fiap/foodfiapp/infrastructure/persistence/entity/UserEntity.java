@@ -35,7 +35,7 @@ public class UserEntity extends BaseEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_type_uuid", referencedColumnName = "uuid")
     private UserTypeEntity userType;
 
