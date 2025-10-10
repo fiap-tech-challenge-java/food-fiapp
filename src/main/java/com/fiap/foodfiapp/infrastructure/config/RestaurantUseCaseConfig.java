@@ -25,8 +25,8 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public UpdateRestaurantUseCase updateRestaurantUseCase(RestaurantRepository restaurantRepository, AddressRepository addressRepository) { // ADICIONE AddressRepository
-        return new UpdateRestaurantUseCaseImpl(restaurantRepository, addressRepository); // ATUALIZE AQUI
+    public UpdateRestaurantUseCase updateRestaurantUseCase(RestaurantRepository restaurantRepository, AddressRepository addressRepository, UserRepository userRepository) {
+        return new UpdateRestaurantUseCaseImpl(restaurantRepository, addressRepository, userRepository);
     }
 
     @Bean
@@ -62,7 +62,7 @@ public class RestaurantUseCaseConfig {
     }
 
     @Bean
-    public ValidateRestaurantOwnershipUseCase validateRestaurantOwnershipUseCase(RestaurantRepository restaurantRepository) {
-        return new ValidateRestaurantOwnershipUseCaseImpl(restaurantRepository);
+    public ValidateRestaurantOwnershipUseCase validateRestaurantOwnershipUseCase(RestaurantRepository restaurantRepository, UserRepository userRepository) {
+        return new ValidateRestaurantOwnershipUseCaseImpl(restaurantRepository, userRepository);
     }
 }

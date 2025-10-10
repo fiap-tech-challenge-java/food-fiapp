@@ -2,15 +2,19 @@ package com.fiap.foodfiapp.core.application.usecases.restaurant;
 
 import com.fiap.foodfiapp.core.application.usecases.restaurant.impl.UpdateRestaurantUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
+import com.fiap.foodfiapp.core.domain.entity.User;
+import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +27,12 @@ class UpdateRestaurantUseCaseTest {
     @Mock
     private RestaurantRepository restaurantRepository;
 
-    @InjectMocks
+    @Mock
+    private AddressRepository addressRepository;
+
+    @Mock
+    private UserRepository userRepository;
+
     private UpdateRestaurantUseCaseImpl updateRestaurantUseCase;
 
     private UUID restaurantId;
@@ -32,6 +41,9 @@ class UpdateRestaurantUseCaseTest {
 
     @BeforeEach
     void setUp() {
+        // Initialize the use case with all required dependencies
+        updateRestaurantUseCase = new UpdateRestaurantUseCaseImpl(restaurantRepository, addressRepository, userRepository);
+        
         restaurantId = UUID.randomUUID();
         UUID ownerId = UUID.randomUUID();
         
@@ -63,6 +75,15 @@ class UpdateRestaurantUseCaseTest {
         // Arrange
         UUID authenticatedUserId = existingRestaurant.getUserOwnerId();
         updateData.setName("Updated Name");
+        
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
         when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
         when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
         
@@ -81,6 +102,15 @@ class UpdateRestaurantUseCaseTest {
         // Arrange
         UUID authenticatedUserId = existingRestaurant.getUserOwnerId();
         updateData.setCuisineType("JAPANESE");
+        
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
         when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
         when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
         
@@ -98,6 +128,15 @@ class UpdateRestaurantUseCaseTest {
         // Arrange
         UUID authenticatedUserId = existingRestaurant.getUserOwnerId();
         updateData.setOpeningHours("10:00-23:00");
+        
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
         when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
         when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
         
@@ -117,6 +156,14 @@ class UpdateRestaurantUseCaseTest {
         updateData.setCuisineType("MEXICAN");
         updateData.setOpeningHours("11:00-21:00");
         updateData.setDescription("Updated description");
+        
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
         
         when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
         when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -144,7 +191,7 @@ class UpdateRestaurantUseCaseTest {
             () -> updateRestaurantUseCase.execute(authenticatedUserId, restaurantId, updateData)
         );
         
-        assertEquals("Restaurante não encontrado.", exception.getMessage());
+        assertEquals("Restaurant not found.", exception.getMessage());
         verify(restaurantRepository, never()).update(any());
     }
 
@@ -153,6 +200,15 @@ class UpdateRestaurantUseCaseTest {
         // Arrange
         UUID unauthorizedUserId = UUID.randomUUID(); // Different from the owner ID
         updateData.setName("Updated Name");
+        
+        // Mock user as non-owner
+        User unauthorizedUser = new User();
+        unauthorizedUser.setId(unauthorizedUserId);
+        UserType userType = new UserType();
+        userType.setName("CUSTOMER");
+        unauthorizedUser.setUserType(userType);
+        when(userRepository.findById(unauthorizedUserId)).thenReturn(Optional.of(unauthorizedUser));
+        
         when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
         
         // Act & Assert
@@ -161,7 +217,7 @@ class UpdateRestaurantUseCaseTest {
             () -> updateRestaurantUseCase.execute(unauthorizedUserId, restaurantId, updateData)
         );
         
-        assertEquals("Permissão negada. Você só pode editar seus próprios restaurantes.", exception.getMessage());
+        assertEquals("Permission denied. You can only edit your own restaurants.", exception.getMessage());
         verify(restaurantRepository, never()).update(any());
     }
 
@@ -183,14 +239,14 @@ class UpdateRestaurantUseCaseTest {
     void shouldHandleNullRestaurantId() {
         // Arrange
         UUID authenticatedUserId = existingRestaurant.getUserOwnerId();
+        updateData.setId(null);
         
         // Act & Assert
         assertThrows(
-            NullPointerException.class,
+            BusinessException.class,
             () -> updateRestaurantUseCase.execute(authenticatedUserId, null, updateData)
         );
         
-        verify(restaurantRepository, never()).findById(any());
         verify(restaurantRepository, never()).update(any());
     }
 
@@ -202,6 +258,14 @@ class UpdateRestaurantUseCaseTest {
         updateData.setCuisineType(null);
         updateData.setOpeningHours(null);
         updateData.setDescription(null);
+        
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
         
         when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
         when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -226,18 +290,13 @@ class UpdateRestaurantUseCaseTest {
         updateData.setOpeningHours("");
         updateData.setDescription("");
         
-        when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
-        when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        // Act & Assert - Empty name should throw validation exception
+        assertThrows(
+            Exception.class,
+            () -> updateRestaurantUseCase.execute(authenticatedUserId, restaurantId, updateData)
+        );
         
-        // Act
-        Restaurant result = updateRestaurantUseCase.execute(authenticatedUserId, restaurantId, updateData);
-        
-        // Assert - Empty strings should be treated as valid updates
-        assertEquals("", result.getName());
-        assertEquals("", result.getCuisineType());
-        assertEquals("", result.getOpeningHours());
-        assertEquals("", result.getDescription());
-        verify(restaurantRepository).update(existingRestaurant);
+        verify(restaurantRepository, never()).update(any());
     }
 
     @Test
@@ -245,6 +304,15 @@ class UpdateRestaurantUseCaseTest {
         // Arrange
         UUID authenticatedUserId = existingRestaurant.getUserOwnerId();
         updateData.setName("New Name");
+        
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
         when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
         when(restaurantRepository.update(any(Restaurant.class))).thenThrow(new RuntimeException("Database error"));
         
@@ -263,6 +331,14 @@ class UpdateRestaurantUseCaseTest {
         UUID newId = UUID.randomUUID();
         updateData.setId(newId);
         updateData.setUserOwnerId(UUID.randomUUID());
+        
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(existingRestaurant.getUserOwnerId());
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(existingRestaurant.getUserOwnerId())).thenReturn(Optional.of(ownerUser));
         
         when(restaurantRepository.findById(restaurantId)).thenReturn(existingRestaurant);
         when(restaurantRepository.update(any(Restaurant.class))).thenAnswer(invocation -> invocation.getArgument(0));

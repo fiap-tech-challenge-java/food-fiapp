@@ -6,11 +6,14 @@ import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
 import com.fiap.foodfiapp.core.domain.exception.BusinessException;
+import com.fiap.foodfiapp.core.domain.exception.RestaurantNameAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.core.domain.exception.UserNotFoundException;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
+import com.fiap.foodfiapp.core.domain.validator.AddressValidator;
+import com.fiap.foodfiapp.core.domain.validator.RestaurantValidator;
 
 import java.util.UUID;
 
@@ -27,11 +30,9 @@ public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
 
     @Override
     public Restaurant execute(UUID userId, Restaurant restaurant) {
-        // Validate restaurant parameter
-        if (restaurant == null) {
-            throw new IllegalArgumentException("Restaurant cannot be null");
-        }
-        
+        // Validate restaurant data first
+        RestaurantValidator.validate(restaurant);
+
         // Set the user owner ID internally - this is now handled by the use case
         restaurant.setUserOwnerId(userId);
 
@@ -46,17 +47,26 @@ public class CreateRestaurantUseCaseImpl implements CreateRestaurantUseCase {
         User owner = userRepository.findById(authenticatedUserId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + authenticatedUserId));
 
-        // RN14: validar papel do usuário (deve ser OWNER / Dono de Restaurante)
+        // Check if user is ADMIN - ADMIN can create restaurants for any user
         String userTypeName = owner.getUserType() != null ? owner.getUserType().getName() : null;
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(userTypeName);
+
+        // RN14: validar papel do usuário (deve ser OWNER, DONO DE RESTAURANTE ou ADMIN)
         boolean isOwner = "OWNER".equalsIgnoreCase(userTypeName) || "DONO DE RESTAURANTE".equalsIgnoreCase(userTypeName);
-        if (!isOwner) {
-            throw new UnauthorizedAccessException("Only users with role 'OWNER' can create restaurants");
+
+        if (!isAdmin && !isOwner) {
+            throw new UnauthorizedAccessException("Only users with role 'OWNER' or 'ADMIN' can create restaurants");
         }
 
         // RN17: Não permitir restaurantes duplicados por dono (nome + owner)
         Restaurant existing = restaurantRepository.findByNameAndUser(restaurant.getName(), authenticatedUserId);
         if (existing != null) {
             throw new BusinessException("A restaurant with name '" + restaurant.getName() + "' already exists for this owner");
+        }
+
+        // Validate address if provided
+        if (restaurant.getAddress() != null) {
+            AddressValidator.validate(restaurant.getAddress());
         }
 
         // Definir campos padrão

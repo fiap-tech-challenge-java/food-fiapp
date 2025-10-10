@@ -45,7 +45,7 @@ public class UserTypeController implements UserTypesApi {
     @Override
     public ResponseEntity<Void> deleteUserType(UUID uuid) {
 //        if (!authenticationService.isCurrentUserAdmin()) {
-//            throw new UnauthorizedAccessException("Apenas administradores podem gerenciar os tipos de usuário.");
+//            throw new UnauthorizedAccessException("Only administrators can manage user types.");
 //        }
 
         deleteUserTypeUseCase.execute(uuid);
@@ -63,7 +63,7 @@ public class UserTypeController implements UserTypesApi {
     @Override
     public ResponseEntity<List<UserTypeResponse>> getUserTypes() {
 //        if (!authenticationService.isCurrentUserAdmin()) {
- //           throw new UnauthorizedAccessException("Apenas administradores podem gerenciar os tipos de usuário.");
+ //           throw new UnauthorizedAccessException("Only administrators can manage user types.");
  //       }
 
         var userTypes = userTypeRepository.findAll();
@@ -73,7 +73,7 @@ public class UserTypeController implements UserTypesApi {
     @Override
     public ResponseEntity<UserTypeResponse> updateUserType(UUID uuid, UpdateUserTypeRequest updateUserTypeRequest) {
  //       if (!authenticationService.isCurrentUserAdmin()) {
- //           throw new UnauthorizedAccessException("Apenas administradores podem gerenciar os tipos de usuário.");
+ //           throw new UnauthorizedAccessException("Only administrators can manage user types.");
  //       }
 
         var userTypeUpdates = userTypeMapper.toUserType(updateUserTypeRequest);

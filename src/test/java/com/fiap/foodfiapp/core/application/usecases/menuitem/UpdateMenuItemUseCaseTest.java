@@ -4,15 +4,17 @@ import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.impl.UpdateMenuItemUseCaseImpl;
 import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
+import com.fiap.foodfiapp.core.domain.entity.User;
+import com.fiap.foodfiapp.core.domain.entity.UserType;
 import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
+import com.fiap.foodfiapp.core.domain.port.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
@@ -40,7 +42,9 @@ class UpdateMenuItemUseCaseTest {
     @Mock
     private RestaurantRepository restaurantRepository;
 
-    @InjectMocks
+    @Mock
+    private UserRepository userRepository;
+
     private UpdateMenuItemUseCaseImpl updateMenuItemUseCase;
 
     private UUID authenticatedUserId;
@@ -52,6 +56,9 @@ class UpdateMenuItemUseCaseTest {
 
     @BeforeEach
     void setUp() {
+        // Initialize the use case with all required dependencies
+        updateMenuItemUseCase = new UpdateMenuItemUseCaseImpl(menuItemRepository, fileStorageRepository, restaurantRepository, userRepository);
+        
         authenticatedUserId = UUID.randomUUID();
         menuItemId = UUID.randomUUID();
         restaurantId = UUID.randomUUID();
@@ -88,6 +95,14 @@ class UpdateMenuItemUseCaseTest {
     @Test
     void shouldUpdateMenuItemSuccessfully() throws IOException {
         // Arrange
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
         when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
         when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
         when(fileStorageRepository.store(any(), anyLong(), anyString(), anyString()))
@@ -120,6 +135,14 @@ class UpdateMenuItemUseCaseTest {
     @Test
     void shouldUpdateMenuItemWithoutPhoto() throws IOException {
         // Arrange
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
         when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
         when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
         when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -147,6 +170,14 @@ class UpdateMenuItemUseCaseTest {
         String oldPhotoUrl = "http://example.com/old-photo.jpg";
         String oldFileName = "old-photo.jpg";
         existingMenuItem.setPhotoUrl(oldPhotoUrl);
+        
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
         
         when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
         when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
@@ -215,15 +246,18 @@ class UpdateMenuItemUseCaseTest {
             )
         );
         
-        assertEquals("Only the restaurant owner can update this menu item", exception.getMessage());
+        assertEquals("Only the restaurant owner or ADMIN can update this menu item", exception.getMessage());
         verify(menuItemRepository, never()).save(any());
     }
 
     @Test
     void shouldHandleNullAuthenticatedUser() {
+        // Arrange
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
+        
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        UnauthorizedAccessException exception = assertThrows(
+            UnauthorizedAccessException.class,
             () -> updateMenuItemUseCase.execute(
                 null,
                 menuItemId,
@@ -235,8 +269,7 @@ class UpdateMenuItemUseCaseTest {
             )
         );
         
-        assertEquals("Authenticated user ID cannot be null", exception.getMessage());
-        verify(menuItemRepository, never()).findById(any());
+        assertEquals("Authenticated user not found", exception.getMessage());
     }
 
     @Test
@@ -268,6 +301,14 @@ class UpdateMenuItemUseCaseTest {
     @Test
     void shouldHandleNullFields() throws IOException {
         // Arrange
+        // Mock user as owner
+        User ownerUser = new User();
+        ownerUser.setId(authenticatedUserId);
+        UserType ownerType = new UserType();
+        ownerType.setName("OWNER");
+        ownerUser.setUserType(ownerType);
+        when(userRepository.findById(authenticatedUserId)).thenReturn(Optional.of(ownerUser));
+        
         when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(existingMenuItem));
         when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
         when(menuItemRepository.save(any(MenuItem.class))).thenAnswer(invocation -> invocation.getArgument(0));

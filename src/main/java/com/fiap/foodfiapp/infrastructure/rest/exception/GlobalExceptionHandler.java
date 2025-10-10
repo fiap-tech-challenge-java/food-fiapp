@@ -163,6 +163,110 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    @ExceptionHandler(InvalidRestaurantNameException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRestaurantNameException(InvalidRestaurantNameException ex,
+                                                                              HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "INVALID_RESTAURANT_NAME",
+                HttpStatus.BAD_REQUEST,
+                request.getRequestURI()
+        );
+        logger.warn("Invalid restaurant name: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidCuisineTypeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCuisineTypeException(InvalidCuisineTypeException ex,
+                                                                           HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "INVALID_CUISINE_TYPE",
+                HttpStatus.BAD_REQUEST,
+                request.getRequestURI()
+        );
+        logger.warn("Invalid cuisine type: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidOpeningHoursException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidOpeningHoursException(InvalidOpeningHoursException ex,
+                                                                            HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "INVALID_OPENING_HOURS",
+                HttpStatus.BAD_REQUEST,
+                request.getRequestURI()
+        );
+        logger.warn("Invalid opening hours: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidMenuItemNameException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidMenuItemNameException(InvalidMenuItemNameException ex,
+                                                                            HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "INVALID_MENU_ITEM_NAME",
+                HttpStatus.BAD_REQUEST,
+                request.getRequestURI()
+        );
+        logger.warn("Invalid menu item name: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidPriceException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPriceException(InvalidPriceException ex,
+                                                                     HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "INVALID_PRICE",
+                HttpStatus.BAD_REQUEST,
+                request.getRequestURI()
+        );
+        logger.warn("Invalid price: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidNameException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidNameException(InvalidNameException ex,
+                                                                    HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "INVALID_NAME",
+                HttpStatus.BAD_REQUEST,
+                request.getRequestURI()
+        );
+        logger.warn("Invalid name: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidPostalCodeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPostalCodeException(InvalidPostalCodeException ex,
+                                                                          HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "INVALID_POSTAL_CODE",
+                HttpStatus.BAD_REQUEST,
+                request.getRequestURI()
+        );
+        logger.warn("Invalid postal code: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(RestaurantNameAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleRestaurantNameAlreadyExistsException(RestaurantNameAlreadyExistsException ex,
+                                                                                    HttpServletRequest request) {
+        ErrorResponse errorResponse = createErrorResponse(
+                ex.getMessage(),
+                "RESTAURANT_NAME_ALREADY_EXISTS",
+                HttpStatus.CONFLICT,
+                request.getRequestURI()
+        );
+        logger.warn("Restaurant name already exists: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<ErrorResponse> handleFileStorageException(FileStorageException ex,
                                                                     HttpServletRequest request) {

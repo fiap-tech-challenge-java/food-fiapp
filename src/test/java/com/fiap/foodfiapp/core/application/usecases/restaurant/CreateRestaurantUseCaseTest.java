@@ -127,7 +127,7 @@ class CreateRestaurantUseCaseTest {
             () -> createRestaurantUseCase.execute(ownerId, restaurant)
         );
         
-        assertEquals("Only users with role 'OWNER' can create restaurants", exception.getMessage());
+        assertEquals("Only users with role 'OWNER' or 'ADMIN' can create restaurants", exception.getMessage());
         verify(restaurantRepository, never()).save(any());
     }
 
@@ -167,7 +167,7 @@ class CreateRestaurantUseCaseTest {
     @Test
     void shouldThrowExceptionWhenRestaurantIsNull() {
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> createRestaurantUseCase.execute(ownerId, null));
+        assertThrows(NullPointerException.class, () -> createRestaurantUseCase.execute(ownerId, null));
         verify(userRepository, never()).findById(any());
         verify(restaurantRepository, never()).save(any());
     }

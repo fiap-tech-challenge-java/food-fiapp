@@ -36,8 +36,8 @@ public class AddressesController implements AddressesApi {
     public ResponseEntity<AddressesResponse> createAddressesForUser(UUID userId,
             CreateAddressesRequest createAddressesRequest) {
         // if (!authenticationService.canAccessUserProfile(userId)) {
-        // throw new UnauthorizedException("Permissão negada. Você só pode acessar seus
-        // próprios endereços.");
+        // throw new UnauthorizedException("Permission denied. You can only access your
+        // own addresses.");
         // }
 
         var address = addressesMapper.toAddress(createAddressesRequest);
@@ -49,8 +49,8 @@ public class AddressesController implements AddressesApi {
     @Override
     public ResponseEntity<List<AddressesResponse>> listAddressesByUserId(UUID userId) {
         // if (!authenticationService.canAccessUserProfile(userId)) {
-        // throw new UnauthorizedException("Permissão negada. Você só pode acessar seus
-        // próprios endereços.");
+        // throw new UnauthorizedException("Permission denied. You can only access your
+        // own addresses.");
         // }
 
         var address = findAddressesByOwnerUseCase.execute(userId, AddressOwnerTypeEnum.USER.getDescription());
@@ -61,8 +61,8 @@ public class AddressesController implements AddressesApi {
     public ResponseEntity<AddressesResponse> updateAddressesForUser(UUID userId, UUID addressesId,
             UpdateAddressesRequest updateAddressesRequest) {
         // if (!authenticationService.canAccessUserProfile(userId)) {
-        // throw new UnauthorizedException("Permissão negada. Você só pode acessar seus
-        // próprios endereços.");
+        // throw new UnauthorizedException("Permission denied. You can only access your
+        // own addresses.");
         // }
 
         var addressUpdates = addressesMapper.toAddress(updateAddressesRequest);
@@ -74,8 +74,8 @@ public class AddressesController implements AddressesApi {
     @Override
     public ResponseEntity<Void> deleteAddressesForUser(UUID userId, UUID addressesId) {
         // if (!authenticationService.canAccessUserProfile(userId)) {
-        // throw new UnauthorizedException("Permissão negada. Você só pode acessar seus
-        // próprios endereços.");
+        // throw new UnauthorizedException("Permission denied. You can only access your
+        // own addresses.");
         // }
 
         deleteAddressesUseCase.execute(userId, addressesId, AddressOwnerTypeEnum.USER.getDescription());
