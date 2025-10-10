@@ -66,7 +66,7 @@ class CreateUserUseCaseTest {
         user = new User();
         user.setName("Test User");
         user.setEmail("test@example.com");
-        user.setCpf("12345678901");
+        user.setCpf("11144477735"); // Valid CPF for testing
         user.setLogin("testuser");
         user.setPassword("password123");
         user.setUserType(userType);

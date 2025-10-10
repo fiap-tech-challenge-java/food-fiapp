@@ -55,7 +55,7 @@ class UpdateUserUseCaseTest {
             "Existing User",               // name
             "existing@example.com",        // email
             "existinguser",                // login
-            "12345678901",                 // cpf
+            "11144477735",                 // cpf - Valid CPF for testing
             null,                          // addresses (can be null for test)
             userType,                      // userType
             true,                         // isActive
@@ -69,7 +69,7 @@ class UpdateUserUseCaseTest {
         userUpdates.setName("Updated User");
         userUpdates.setEmail("updated@example.com");
         userUpdates.setLogin("updateduser");
-        userUpdates.setCpf("12345678901");
+        userUpdates.setCpf("11144477735"); // Valid CPF for testing
         userUpdates.setPassword("newpassword");
         
         // Setup new user type
