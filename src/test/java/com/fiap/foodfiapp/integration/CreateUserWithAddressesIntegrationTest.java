@@ -129,7 +129,7 @@ class CreateUserWithAddressesIntegrationTest {
         assertFalse(result.getAddress().isEmpty(), "Addresses should not be empty");
         assertEquals(1, result.getAddress().size(), "Should have exactly 1 address");
 
-        Addresses returnedAddresses = result.getAddress().get(0);
+        Addresses returnedAddresses = result.getAddress().getFirst();
         assertEquals(addressId, returnedAddresses.getId());
         assertEquals("Rua Teste", returnedAddresses.getPublicPlace());
         assertEquals("123", returnedAddresses.getNumber());

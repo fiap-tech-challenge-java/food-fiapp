@@ -81,7 +81,7 @@ class UserTypeMapperTest {
 
         // Then
         assertThat(result).hasSize(2);
-        assertThat(result.get(0).getName()).isEqualTo("ADMIN");
+        assertThat(result.getFirst().getName()).isEqualTo("ADMIN");
         assertThat(result.get(1).getName()).isEqualTo("CLIENT");
     }
 }
