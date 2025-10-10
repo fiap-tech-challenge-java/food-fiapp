@@ -33,6 +33,6 @@ public class RestaurantEntity extends BaseEntity {
 
     private String description;
 
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<MenuItemEntity> menuItems = new ArrayList<>();
 }

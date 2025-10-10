@@ -9,15 +9,13 @@ public class Restaurant extends BaseEntity {
     private String cuisineType;
     private String openingHours;
     private UUID userOwnerId;
-    // private Boolean active; // REMOVA ESTA LINHA
-    private String description; // ADICIONE ESTA LINHA
+    private String description;
     private Addresses address;
     private List<MenuItem> menuItems;
 
     public Restaurant() {
     }
 
-    // Construtor atualizado para incluir a descrição
     public Restaurant(UUID id, String name, String cuisineType, String openingHours,
             UUID userOwnerId, String description, Addresses address) {
         this.id = id;
@@ -25,7 +23,7 @@ public class Restaurant extends BaseEntity {
         this.cuisineType = cuisineType;
         this.openingHours = openingHours;
         this.userOwnerId = userOwnerId;
-        this.description = description; // ADICIONE ESTA LINHA
+        this.description = description;
         this.address = address;
     }
 
