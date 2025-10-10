@@ -177,4 +177,80 @@ class ValidateRestaurantOwnershipUseCaseTest {
             () -> validateRestaurantOwnershipUseCase.execute(userId, restaurantId)
         );
     }
+
+    @Test
+    void shouldReturnTrueWhenUserNotFoundButIsOwner() {
+        // Arrange
+        // When user is not found, it still checks ownership
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+
+        // Act
+        boolean result = validateRestaurantOwnershipUseCase.execute(userId, restaurantId);
+
+        // Assert
+        // Returns true because userId matches restaurant.getUserOwnerId()
+        assertTrue(result);
+        verify(userRepository).findById(userId);
+        verify(restaurantRepository).findById(restaurantId);
+    }
+
+    @Test
+    void shouldReturnTrueWhenUserHasNullUserTypeButIsOwner() {
+        // Arrange
+        // When user has null userType, it still checks ownership
+        User userWithNullType = new User();
+        userWithNullType.setId(userId);
+        userWithNullType.setUserType(null);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(userWithNullType));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+
+        // Act
+        boolean result = validateRestaurantOwnershipUseCase.execute(userId, restaurantId);
+
+        // Assert
+        // Returns true because userId matches restaurant.getUserOwnerId()
+        assertTrue(result);
+        verify(userRepository).findById(userId);
+        verify(restaurantRepository).findById(restaurantId);
+    }
+
+    @Test
+    void shouldReturnTrueForAdminEvenIfNotOwner() {
+        // Arrange
+        UUID differentUserId = UUID.randomUUID();
+        User adminUser = new User();
+        adminUser.setId(differentUserId);
+        UserType adminType = new UserType();
+        adminType.setName("ADMIN");
+        adminUser.setUserType(adminType);
+        when(userRepository.findById(differentUserId)).thenReturn(Optional.of(adminUser));
+
+        // Act
+        boolean result = validateRestaurantOwnershipUseCase.execute(differentUserId, restaurantId);
+
+        // Assert
+        assertTrue(result);
+        verify(userRepository).findById(differentUserId);
+        verify(restaurantRepository, never()).findById(any());
+    }
+
+    @Test
+    void shouldBeCaseInsensitiveForAdminCheck() {
+        // Arrange
+        User adminUser = new User();
+        adminUser.setId(userId);
+        UserType adminType = new UserType();
+        adminType.setName("admin"); // lowercase
+        adminUser.setUserType(adminType);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(adminUser));
+
+        // Act
+        boolean result = validateRestaurantOwnershipUseCase.execute(userId, restaurantId);
+
+        // Assert
+        assertTrue(result);
+        verify(userRepository).findById(userId);
+        verify(restaurantRepository, never()).findById(any());
+    }
 }

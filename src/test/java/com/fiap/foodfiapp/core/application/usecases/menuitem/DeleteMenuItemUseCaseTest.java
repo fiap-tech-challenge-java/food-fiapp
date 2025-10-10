@@ -234,4 +234,102 @@ class DeleteMenuItemUseCaseTest {
         assertDoesNotThrow(() -> deleteMenuItemUseCase.execute(authenticatedUserId, menuItemId));
         verify(fileStorageRepository).delete(malformedUrl);
     }
+
+    @Test
+    void shouldNotDeletePhotoWhenPhotoUrlIsNull() {
+        // Arrange
+        testMenuItem.setPhotoUrl(null);
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(testMenuItem));
+        
+        // Act
+        deleteMenuItemUseCase.execute(authenticatedUserId, menuItemId);
+        
+        // Assert
+        verify(menuItemRepository).deleteById(menuItemId);
+        verifyNoInteractions(fileStorageRepository);
+    }
+
+    @Test
+    void shouldNotDeletePhotoWhenPhotoUrlIsBlank() {
+        // Arrange
+        testMenuItem.setPhotoUrl("   ");
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(testMenuItem));
+        
+        // Act
+        deleteMenuItemUseCase.execute(authenticatedUserId, menuItemId);
+        
+        // Assert
+        verify(menuItemRepository).deleteById(menuItemId);
+        verifyNoInteractions(fileStorageRepository);
+    }
+
+    @Test
+    void shouldNotDeletePhotoWhenPhotoUrlIsEmpty() {
+        // Arrange
+        testMenuItem.setPhotoUrl("");
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(testMenuItem));
+        
+        // Act
+        deleteMenuItemUseCase.execute(authenticatedUserId, menuItemId);
+        
+        // Assert
+        verify(menuItemRepository).deleteById(menuItemId);
+        verifyNoInteractions(fileStorageRepository);
+    }
+
+    @Test
+    void shouldHandleIOExceptionWhenDeletingPhoto() throws IOException {
+        // Arrange
+        UUID restaurantId = testMenuItem.getRestaurantId();
+        Restaurant restaurant = new Restaurant(
+            restaurantId,
+            "Test Restaurant",
+            "Test Cuisine",
+            "10:00-22:00",
+            authenticatedUserId,
+            "Test Description",
+            null
+        );
+        
+        testMenuItem.setPhotoUrl("https://example.com/photos/test-photo.jpg");
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(testMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+        doThrow(new IOException("Failed to delete file")).when(fileStorageRepository).delete("test-photo.jpg");
+        
+        // Act & Assert
+        RuntimeException exception = assertThrows(
+            RuntimeException.class,
+            () -> deleteMenuItemUseCase.execute(authenticatedUserId, menuItemId)
+        );
+        
+        assertTrue(exception.getMessage().contains("Failed to delete menu item photo"));
+        verify(fileStorageRepository).delete("test-photo.jpg");
+        verify(menuItemRepository, never()).deleteById(any());
+    }
+
+    @Test
+    void shouldExtractFilenameFromPhotoUrl() throws IOException {
+        // Arrange
+        UUID restaurantId = testMenuItem.getRestaurantId();
+        Restaurant restaurant = new Restaurant(
+            restaurantId,
+            "Test Restaurant",
+            "Test Cuisine",
+            "10:00-22:00",
+            authenticatedUserId,
+            "Test Description",
+            null
+        );
+        
+        testMenuItem.setPhotoUrl("https://example.com/photos/subfolder/my-photo.png");
+        when(menuItemRepository.findById(menuItemId)).thenReturn(Optional.of(testMenuItem));
+        when(restaurantRepository.findById(restaurantId)).thenReturn(restaurant);
+        
+        // Act
+        deleteMenuItemUseCase.execute(authenticatedUserId, menuItemId);
+        
+        // Assert
+        verify(fileStorageRepository).delete("my-photo.png");
+        verify(menuItemRepository).deleteById(menuItemId);
+    }
 }

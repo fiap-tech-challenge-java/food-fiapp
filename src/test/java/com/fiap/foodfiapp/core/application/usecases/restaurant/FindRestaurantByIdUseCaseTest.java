@@ -1,6 +1,7 @@
 package com.fiap.foodfiapp.core.application.usecases.restaurant;
 
 import com.fiap.foodfiapp.core.application.usecases.restaurant.impl.FindRestaurantByIdUseCaseImpl;
+import com.fiap.foodfiapp.core.domain.entity.Addresses;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.AddressRepository;
@@ -11,7 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -177,5 +180,26 @@ class FindRestaurantByIdUseCaseTest {
         assertSame(testRestaurant, result1);
         assertSame(testRestaurant, result2);
         verify(restaurantRepository, times(2)).findById(restaurantId);
+    }
+
+    @Test
+    void shouldHandleRestaurantWithMultipleAddresses() {
+        // Arrange
+        Addresses address1 = new Addresses(UUID.randomUUID(), "Main St", "123", "Apt 1", "Downtown", "City", "ST", "12345678");
+        Addresses address2 = new Addresses(UUID.randomUUID(), "Second St", "456", "Apt 2", "Uptown", "City", "ST", "87654321");
+        List<Addresses> addresses = Arrays.asList(address1, address2);
+        
+        when(restaurantRepository.findById(restaurantId)).thenReturn(testRestaurant);
+        when(addressRepository.findByOwner(restaurantId, "RESTAURANT")).thenReturn(addresses);
+
+        // Act
+        Restaurant result = findRestaurantByIdUseCase.execute(restaurantId);
+
+        // Assert
+        assertNotNull(result);
+        assertNotNull(result.getAddress());
+        assertEquals(address1, result.getAddress()); // Should use first address
+        verify(restaurantRepository).findById(restaurantId);
+        verify(addressRepository).findByOwner(restaurantId, "RESTAURANT");
     }
 }

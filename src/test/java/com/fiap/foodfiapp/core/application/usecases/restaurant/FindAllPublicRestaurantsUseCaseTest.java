@@ -1,6 +1,7 @@
 package com.fiap.foodfiapp.core.application.usecases.restaurant;
 
 import com.fiap.foodfiapp.core.application.usecases.restaurant.impl.FindAllPublicRestaurantsUseCaseImpl;
+import com.fiap.foodfiapp.core.domain.entity.Addresses;
 import com.fiap.foodfiapp.core.domain.entity.Restaurant;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
@@ -218,5 +219,26 @@ class FindAllPublicRestaurantsUseCaseTest {
         
         // Assert
         assertEquals(1000, result.size());
+    }
+
+    @Test
+    void shouldHandleRestaurantsWithMultipleAddresses() {
+        // Arrange
+        UUID userId = UUID.randomUUID();
+        Addresses address1 = new Addresses(UUID.randomUUID(), "Main St", "123", "Apt 1", "Downtown", "City", "ST", "12345678");
+        Addresses address2 = new Addresses(UUID.randomUUID(), "Second St", "456", "Apt 2", "Uptown", "City", "ST", "87654321");
+        List<Addresses> addresses = Arrays.asList(address1, address2);
+        
+        when(restaurantRepository.findAllActive()).thenReturn(testRestaurants);
+        when(menuItemRepository.findAllByRestaurantId(any())).thenReturn(Collections.emptyList());
+        when(addressRepository.findByOwner(any(), anyString())).thenReturn(addresses);
+        
+        // Act
+        List<Restaurant> result = findAllPublicRestaurantsUseCase.execute(userId);
+        
+        // Assert
+        assertEquals(2, result.size());
+        assertNotNull(result.get(0).getAddress());
+        assertEquals(address1, result.get(0).getAddress()); // Should use first address
     }
 }

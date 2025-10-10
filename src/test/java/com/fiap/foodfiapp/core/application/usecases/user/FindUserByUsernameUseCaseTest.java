@@ -201,4 +201,19 @@ class FindUserByUsernameUseCaseTest {
         // Assert
         verify(addressRepository, times(1)).findByOwner(user.getId(), AddressOwnerTypeEnum.USER.getDescription());
     }
+
+    @Test
+    void shouldHandleNullUser() {
+        // Arrange
+        when(userRepository.findByLogin(username)).thenReturn(Optional.of(user));
+        when(addressRepository.findByOwner(user.getId(), AddressOwnerTypeEnum.USER.getDescription()))
+            .thenReturn(addresses);
+
+        // Act
+        User result = findUserByUsernameUseCase.execute(username);
+
+        // Assert
+        assertNotNull(result);
+        verify(addressRepository).findByOwner(user.getId(), AddressOwnerTypeEnum.USER.getDescription());
+    }
 }
