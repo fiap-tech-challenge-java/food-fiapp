@@ -10,7 +10,6 @@ import java.util.UUID;
 public class FindMenuItemByIdUseCaseImpl implements FindMenuItemByIdUseCase {
     private final MenuItemRepository menuItemRepository;
 
-    // CONSTRUTOR ADICIONADO
     public FindMenuItemByIdUseCaseImpl(MenuItemRepository menuItemRepository) {
         this.menuItemRepository = menuItemRepository;
     }

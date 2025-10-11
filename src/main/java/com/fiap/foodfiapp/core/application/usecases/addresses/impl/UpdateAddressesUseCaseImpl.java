@@ -19,7 +19,6 @@ public class UpdateAddressesUseCaseImpl implements UpdateAddressesUseCase {
 
     @Override
     public Addresses execute(UUID addressId, Addresses addressesUpdates, UUID ownerId, String ownerType) {
-        // Validate input parameters first
         if (addressesUpdates == null) {
             throw new NullPointerException("Address updates cannot be null");
         }
@@ -33,7 +32,6 @@ public class UpdateAddressesUseCaseImpl implements UpdateAddressesUseCase {
             throw new IllegalArgumentException("Owner type cannot be empty");
         }
         
-        // Validate owner before updating the address
         validateOwnerUseCase.execute(ownerId, ownerType);
 
         Addresses existingAddresses = addressRepository.findByIdAndOwnerId(addressId, ownerId)

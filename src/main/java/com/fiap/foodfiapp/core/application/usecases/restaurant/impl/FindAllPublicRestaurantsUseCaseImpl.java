@@ -27,25 +27,19 @@ public class FindAllPublicRestaurantsUseCaseImpl implements FindAllPublicRestaur
     @Override
     public List<Restaurant> execute(UUID userId) {
 
-        //verificar se o userId é um customer
 
         List<Restaurant> restaurants = restaurantRepository.findAllActive();
 
-        // Iterate over each restaurant to populate menu items and addresses
         for (Restaurant restaurant : restaurants) {
-            // Find and set menu items for this restaurant
             var menuItems = menuItemRepository.findAllByRestaurantId(restaurant.getId());
             restaurant.setMenuItems(menuItems);
 
-            // Find and set addresses for this restaurant
             var addresses = addressRepository.findByOwner(restaurant.getId(), AddressOwnerTypeEnum.RESTAURANT.getDescription());
-            // Note: Since Restaurant entity has single Addresses field, we'll set the first address if available
             if (!addresses.isEmpty()) {
                 restaurant.setAddress(addresses.get(0));
             }
         }
 
-        // Return an unmodifiable list to prevent external modifications
         return java.util.Collections.unmodifiableList(new java.util.ArrayList<>(restaurants));
     }
 }

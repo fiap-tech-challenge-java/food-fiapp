@@ -28,33 +28,27 @@ public class DeleteRestaurantUseCaseImpl implements DeleteRestaurantUseCase {
 
     @Override
     public void execute(UUID authenticatedUserId, UUID restaurantId) {
-        // 0. Check for null restaurant ID (idempotent operation)
         if (restaurantId == null) {
             return;
         }
         
-        // 1. Busca o restaurante; se não existir, operação é idempotente
         Restaurant restaurant = restaurantRepository.findById(restaurantId);
         if (restaurant == null) {
             return;
         }
 
-        // 2. Verificação de posse do restaurante
         if (!authenticatedUserId.equals(restaurant.getUserOwnerId())) {
             throw new UnauthorizedAccessException("Permissão negada. Você só pode deletar seus próprios restaurantes.");
         }
 
-        // 3. Exclusão lógica do restaurante
         restaurantRepository.delete(restaurantId);
 
-        // Exclusão lógica dos itens do cardápio associados
         List<MenuItem> items = menuItemRepository.findAllByRestaurantId(restaurantId);
         for (MenuItem item : items) {
             item.setIsActive(false);
             menuItemRepository.save(item);
         }
 
-        // Exclusão lógica dos endereços associados ao restaurante
         List<Addresses> addresses = addressRepository.findByOwner(restaurantId,
                 AddressOwnerTypeEnum.RESTAURANT.getDescription());
         for (Addresses address : addresses) {

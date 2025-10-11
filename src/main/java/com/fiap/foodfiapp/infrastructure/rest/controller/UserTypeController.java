@@ -4,7 +4,6 @@ import com.fiap.foodfiapp.api.UserTypesApi;
 import com.fiap.foodfiapp.core.application.usecases.usertype.CreateUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.DeleteUserTypeUseCase;
 import com.fiap.foodfiapp.core.application.usecases.usertype.UpdateUserTypeUseCase;
-import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.core.domain.port.UserTypeRepository;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.UserTypeMapper;
 import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
@@ -33,9 +32,6 @@ public class UserTypeController implements UserTypesApi {
 
     @Override
     public ResponseEntity<UserTypeResponse> createUserType(CreateUserTypeRequest createUserTypeRequest) {
-//        if (!authenticationService.isCurrentUserAdmin()) {
-//            throw new UnauthorizedAccessException("Apenas administradores podem gerenciar os tipos de usuário.");
- //       }
 
         var userType = userTypeMapper.toUserType(createUserTypeRequest);
         var createdUserType = createUserTypeUseCase.execute(userType);
@@ -44,9 +40,6 @@ public class UserTypeController implements UserTypesApi {
 
     @Override
     public ResponseEntity<Void> deleteUserType(UUID uuid) {
-//        if (!authenticationService.isCurrentUserAdmin()) {
-//            throw new UnauthorizedAccessException("Only administrators can manage user types.");
-//        }
 
         deleteUserTypeUseCase.execute(uuid);
         return ResponseEntity.noContent().build();
@@ -62,9 +55,6 @@ public class UserTypeController implements UserTypesApi {
 
     @Override
     public ResponseEntity<List<UserTypeResponse>> getUserTypes() {
-//        if (!authenticationService.isCurrentUserAdmin()) {
- //           throw new UnauthorizedAccessException("Only administrators can manage user types.");
- //       }
 
         var userTypes = userTypeRepository.findAll();
         return ResponseEntity.ok(userTypeMapper.toUserTypeResponseList(userTypes));
@@ -72,9 +62,6 @@ public class UserTypeController implements UserTypesApi {
 
     @Override
     public ResponseEntity<UserTypeResponse> updateUserType(UUID uuid, UpdateUserTypeRequest updateUserTypeRequest) {
- //       if (!authenticationService.isCurrentUserAdmin()) {
- //           throw new UnauthorizedAccessException("Only administrators can manage user types.");
- //       }
 
         var userTypeUpdates = userTypeMapper.toUserType(updateUserTypeRequest);
         var updatedUserType = updateUserTypeUseCase.execute(uuid, userTypeUpdates);

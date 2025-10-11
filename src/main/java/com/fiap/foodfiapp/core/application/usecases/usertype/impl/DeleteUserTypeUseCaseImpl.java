@@ -22,7 +22,6 @@ public class DeleteUserTypeUseCaseImpl implements DeleteUserTypeUseCase {
         this.userRepository = userRepository;
     }
 
-    // Assinatura corrigida para receber apenas o UUID
     @Override
     public void execute(UUID uuid) {
         if (uuid == null) {

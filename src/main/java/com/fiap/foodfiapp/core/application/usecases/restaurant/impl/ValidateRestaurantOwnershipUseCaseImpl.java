@@ -20,16 +20,14 @@ public class ValidateRestaurantOwnershipUseCaseImpl implements ValidateRestauran
 
     @Override
     public boolean execute(UUID userId, UUID restaurantId) {
-        // Check if user is ADMIN
         User user = userRepository.findById(userId).orElse(null);
         if (user != null && user.getUserType() != null) {
             String userTypeName = user.getUserType().getName();
             if ("ADMIN".equalsIgnoreCase(userTypeName)) {
-                return true; // ADMIN can access any restaurant
+                return true;
             }
         }
 
-        // If not ADMIN, check ownership
         Restaurant restaurant = restaurantRepository.findById(restaurantId);
         if (restaurant == null) {
             throw new RestaurantNotFoundException("id", restaurantId.toString());

@@ -20,7 +20,6 @@ public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
 
     @Override
     public User execute(UUID userId, User userUpdates) {
-        // Validate individual fields that are being updated
         if (userUpdates.getName() != null) {
             UserValidator.validateName(userUpdates.getName());
         }
@@ -36,11 +35,6 @@ public class UpdateUserUseCaseImpl implements UpdateUserUseCase {
 
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException("User not found."));
-
-        // Check if the requesting user (from userUpdates if it has an ID, or userId) is ADMIN
-        // Note: In a real scenario, you'd get the authenticated user ID separately
-        // For now, we'll check if the user being updated is trying to change their own UserType to ADMIN
-        // This logic might need adjustment based on your authentication flow
 
         if (userUpdates.getUserType() != null && userUpdates.getUserType().getUuid() != null) {
             UserType userType = userTypeRepository.findById(userUpdates.getUserType().getUuid())

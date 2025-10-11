@@ -1,4 +1,3 @@
-// src/main/java/com/fiap/foodfiapp/core/application/usecases/restaurant/ValidateRestaurantOwnershipUseCase.java
 package com.fiap.foodfiapp.core.application.usecases.restaurant;
 
 import java.util.UUID;

@@ -44,5 +44,5 @@ public class AddressesEntity extends BaseEntity {
     private UUID ownerId;
 
     @Column(name = "owner_type", nullable = false)
-    private String ownerType; // Ex: "USER" ou "RESTAURANT"
+    private String ownerType;
 }

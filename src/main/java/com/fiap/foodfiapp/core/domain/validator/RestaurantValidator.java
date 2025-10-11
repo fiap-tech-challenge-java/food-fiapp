@@ -28,7 +28,6 @@ public class RestaurantValidator {
             throw new InvalidRestaurantNameException("Restaurant name cannot exceed 100 characters");
         }
 
-        // Validate that name contains at least some letters (not just numbers or special chars)
         if (!name.matches(".*[a-zA-Z]+.*")) {
             throw new InvalidRestaurantNameException("Restaurant name must contain at least one letter");
         }
@@ -47,7 +46,6 @@ public class RestaurantValidator {
             throw new InvalidCuisineTypeException("Cuisine type cannot exceed 50 characters");
         }
 
-        // Validate that cuisine type contains letters (not just numbers or special chars)
         if (!cuisineType.matches(".*[a-zA-Z]+.*")) {
             throw new InvalidCuisineTypeException("Cuisine type must contain at least one letter");
         }
@@ -64,7 +62,6 @@ public class RestaurantValidator {
     }
 
     public static void validateDescription(String description) {
-        // Description is optional, but if provided, it should have a max length
         if (description != null && description.length() > 500) {
             throw new InvalidDataException("Restaurant description cannot exceed 500 characters");
         }

@@ -1,4 +1,3 @@
-// src/main/java/com/fiap/foodfiapp/core/application/usecases/menuitem/impl/UpdateMenuItemUseCaseImpl.java
 package com.fiap.foodfiapp.core.application.usecases.menuitem.impl;
 
 import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
@@ -34,7 +33,6 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
 
     @Override
     public MenuItem execute(UUID authenticatedUserId, UUID id, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException {
-        // Validate individual fields that are being updated
         if (name != null) {
             MenuItemValidator.validateName(name);
         }
@@ -52,7 +50,6 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
             throw new UnauthorizedAccessException("Authenticated user not found");
         }
 
-        // Check if user is ADMIN
         User user = userRepository.findById(authenticatedUserId).orElse(null);
         boolean isAdmin = false;
         if (user != null && user.getUserType() != null) {
@@ -62,7 +59,6 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
 
         Restaurant restaurant = restaurantRepository.findById(existingItem.getRestaurantId());
 
-        // ADMIN can update any menu item, others only their own restaurant's items
         if (!isAdmin && (restaurant == null || restaurant.getUserOwnerId() == null || !authenticatedUserId.equals(restaurant.getUserOwnerId()))) {
             throw new UnauthorizedAccessException("Only the restaurant owner or ADMIN can update this menu item");
         }
@@ -76,12 +72,10 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
             }
             String fileName = String.format("%s-%s%s", restaurant.getId(), id, extension);
 
-            // Upload new photo first
             try (var is = photo.content()) {
                 photoUrl = fileStorageRepository.store(is, photo.size(), photo.contentType(), fileName);
             }
             
-            // Only delete old photo after successful upload
             if (existingItem.getPhotoUrl() != null && !existingItem.getPhotoUrl().isBlank()) {
                 try {
                     String oldFileName = existingItem.getPhotoUrl().substring(existingItem.getPhotoUrl().lastIndexOf('/') + 1);
@@ -92,7 +86,6 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
             }
         }
 
-        // Atualiza a entidade existente com os novos dados (somente se não forem null)
         if (name != null) {
             existingItem.setName(name);
         }

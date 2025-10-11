@@ -1,6 +1,5 @@
 package com.fiap.foodfiapp.core.domain.port;
 
-import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.entity.UserType;
 
 import java.util.List;

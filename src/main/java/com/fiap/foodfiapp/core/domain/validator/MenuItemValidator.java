@@ -44,7 +44,6 @@ public class MenuItemValidator {
             throw new InvalidPriceException("Price cannot exceed R$ 999,999.99");
         }
 
-        // Validate decimal places (max 2)
         String priceStr = String.valueOf(price);
         if (priceStr.contains(".")) {
             String[] parts = priceStr.split("\\.");
@@ -53,14 +52,12 @@ public class MenuItemValidator {
             }
         }
 
-        // Check for invalid values
         if (Double.isNaN(price) || Double.isInfinite(price)) {
             throw new InvalidPriceException("Invalid price value");
         }
     }
 
     public static void validateDescription(String description) {
-        // Description is optional, but if provided, it should have constraints
         if (description != null && description.length() > 500) {
             throw new InvalidDataException("Menu item description cannot exceed 500 characters");
         }

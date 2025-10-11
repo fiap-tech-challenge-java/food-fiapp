@@ -26,7 +26,6 @@ public class UpdateRestaurantUseCaseImpl implements UpdateRestaurantUseCase {
 
     @Override
     public Restaurant execute(UUID authenticatedUserId, UUID restaurantId, Restaurant restaurantUpdates) {
-        // Validate individual fields that are being updated
         if (restaurantUpdates.getName() != null) {
             RestaurantValidator.validateName(restaurantUpdates.getName());
         }
@@ -48,7 +47,6 @@ public class UpdateRestaurantUseCaseImpl implements UpdateRestaurantUseCase {
             throw new BusinessException("Restaurant not found.");
         }
 
-        // Check if user is ADMIN
         User user = userRepository.findById(authenticatedUserId).orElse(null);
         boolean isAdmin = false;
         if (user != null && user.getUserType() != null) {
@@ -56,7 +54,6 @@ public class UpdateRestaurantUseCaseImpl implements UpdateRestaurantUseCase {
             isAdmin = "ADMIN".equalsIgnoreCase(userTypeName);
         }
 
-        // ADMIN can edit any restaurant, others can only edit their own
         if (!isAdmin && !authenticatedUserId.equals(existingRestaurant.getUserOwnerId())) {
             throw new UnauthorizedAccessException("Permission denied. You can only edit your own restaurants.");
         }
@@ -74,26 +71,22 @@ public class UpdateRestaurantUseCaseImpl implements UpdateRestaurantUseCase {
             existingRestaurant.setDescription(restaurantUpdates.getDescription());
         }
 
-        // LÓGICA PARA ATUALIZAR O ENDEREÇO
         if (restaurantUpdates.getAddress() != null) {
             var addresses = addressRepository.findByOwner(restaurantId, AddressOwnerTypeEnum.RESTAURANT.getDescription());
             if (!addresses.isEmpty()) {
                 var existingAddress = addresses.get(0);
                 var addressToUpdate = restaurantUpdates.getAddress();
-                addressToUpdate.setId(existingAddress.getId()); // Garante que estamos atualizando o endereço certo
+                addressToUpdate.setId(existingAddress.getId());
                 var savedAddress = addressRepository.save(addressToUpdate, restaurantId, AddressOwnerTypeEnum.RESTAURANT.getDescription());
                 existingRestaurant.setAddress(savedAddress);
             } else {
-                // Caso o restaurante não tenha endereço, cria um novo
                 var savedAddress = addressRepository.save(restaurantUpdates.getAddress(), restaurantId, AddressOwnerTypeEnum.RESTAURANT.getDescription());
                 existingRestaurant.setAddress(savedAddress);
             }
         }
 
-        // Salva as alterações do restaurante no banco de dados
         this.restaurantRepository.update(existingRestaurant);
 
-        // Retorna o objeto que temos em memória, que já contém o endereço atualizado
         return existingRestaurant;
     }
 }
