@@ -10,13 +10,16 @@ import java.util.UUID;
 public class FindMenuItemByIdUseCaseImpl implements FindMenuItemByIdUseCase {
     private final MenuItemRepository menuItemRepository;
 
-    // CONSTRUTOR ADICIONADO
     public FindMenuItemByIdUseCaseImpl(MenuItemRepository menuItemRepository) {
         this.menuItemRepository = menuItemRepository;
     }
 
     @Override
     public Optional<MenuItem> execute(UUID id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Menu item ID cannot be null");
+        }
+        
         return menuItemRepository.findById(id);
     }
 }

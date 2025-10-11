@@ -22,14 +22,15 @@ public class FindUserUseCaseImpl implements FindUserUseCase {
 
     @Override
     public Optional<User> execute(UUID id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         var optionalUser = userRepository.findById(id);
         optionalUser.ifPresent(this::loadUserAddresses);
         return optionalUser;
     }
 
-    /**
-     * Carrega os endereços associados ao usuário
-     */
+
     private void loadUserAddresses(User user) {
         if (user != null && user.getId() != null) {
             var addresses = addressRepository.findByOwner(user.getId(), AddressOwnerTypeEnum.USER.getDescription());

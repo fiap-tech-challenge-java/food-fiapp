@@ -16,6 +16,13 @@ public class FindAddressesByOwnerUseCaseImpl implements FindAddressesByOwnerUseC
 
     @Override
     public List<Addresses> execute(UUID ownerId, String ownerType) {
+        if (ownerId == null) {
+            throw new IllegalArgumentException("Owner ID cannot be null");
+        }
+        if (ownerType == null || ownerType.trim().isEmpty()) {
+            throw new IllegalArgumentException("Owner type cannot be null or empty");
+        }
+        
         return addressRepository.findByOwner(ownerId, ownerType);
     }
 }

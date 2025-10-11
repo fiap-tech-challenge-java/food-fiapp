@@ -1,6 +1,5 @@
 package com.fiap.foodfiapp.core.domain.entity;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -14,7 +13,6 @@ public class MenuItem extends BaseEntity {
     private String photoUrl;
     private UUID restaurantId;
 
-    // Construtor principal
     public MenuItem(UUID id, String name, String description, Double price, boolean localOnly, String photoUrl, UUID restaurantId, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.id = id;
         this.name = name;
@@ -27,7 +25,6 @@ public class MenuItem extends BaseEntity {
         this.setUpdatedAt(updatedAt);
     }
 
-    // Getters
     public UUID getId() { return id; }
     public String getName() { return name; }
     public String getDescription() { return description; }
@@ -36,7 +33,6 @@ public class MenuItem extends BaseEntity {
     public String getPhotoUrl() { return photoUrl; }
     public UUID getRestaurantId() { return restaurantId; }
 
-    // Setters
     public void setId(UUID id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setDescription(String description) { this.description = description; }

@@ -31,12 +31,10 @@ public class UpdateUserTypeUseCaseImpl implements UpdateUserTypeUseCase {
             throw new CoreUserTypeModificationException();
         }
 
-        // Verificar se o UserType está em uso
         if (userRepository.existsByUserTypeUuid(uuid)) {
             throw new UserTypeInUseException();
         }
 
-        // Verificar se o nome já existe para outro UserType
         if (userTypeUpdates.getName() != null && !userTypeUpdates.getName().equals(existingUserType.getName())) {
             userTypeRepository.findByName(userTypeUpdates.getName()).ifPresent(userType -> {
                 if (!userType.getUuid().equals(uuid)) {
@@ -45,7 +43,6 @@ public class UpdateUserTypeUseCaseImpl implements UpdateUserTypeUseCase {
             });
         }
 
-        // Atualizar campos
         userTypeUpdates.setUuid(uuid);
         if (userTypeUpdates.getName() == null) {
             userTypeUpdates.setName(existingUserType.getName());

@@ -15,6 +15,16 @@ public class FindRestaurantByNameUseCaseImpl implements FindRestaurantByNameUseC
 
     @Override
     public Restaurant execute(String name, UUID userId) {
+        if (name == null) {
+            throw new NullPointerException("Restaurant name cannot be null");
+        }
+        if (userId == null) {
+            throw new NullPointerException("User ID cannot be null");
+        }
+        if (name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Restaurant name cannot be empty");
+        }
+        
         return this.restaurantRepository.findByNameAndUser(name, userId);
     }
 }

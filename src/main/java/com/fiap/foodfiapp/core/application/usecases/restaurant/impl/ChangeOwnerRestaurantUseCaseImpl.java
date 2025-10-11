@@ -14,6 +14,13 @@ public class ChangeOwnerRestaurantUseCaseImpl implements ChangeOwnerRestaurantUs
     }
     @Override
     public Restaurant execute(UUID restaurantId, UUID newOwnerId) {
+        if (restaurantId == null) {
+            throw new NullPointerException("Restaurant ID cannot be null");
+        }
+        if (newOwnerId == null) {
+            throw new NullPointerException("New owner ID cannot be null");
+        }
+        
         return this.restaurantRepository.changeOwner(restaurantId, newOwnerId);
     }
 }

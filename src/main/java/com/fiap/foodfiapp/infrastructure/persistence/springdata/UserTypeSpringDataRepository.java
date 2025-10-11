@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
-// Não implementa UserRepository do domínio diretamente para evitar conflitos de tipos.
-// O adapter UserRepositoryAdapter faz a ponte entre UserSpringDataRepository e UserRepository.
 
 @Repository
 public interface UserTypeSpringDataRepository extends JpaRepository<UserTypeEntity, UUID> {

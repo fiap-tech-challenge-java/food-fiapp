@@ -19,15 +19,13 @@ public class ValidateAdminOrOwnerUseCaseImpl implements ValidateAdminOrOwnerUseC
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("id", userId.toString()));
 
-        // Check if user is ADMIN
         String userTypeName = user.getUserType() != null ? user.getUserType().getName() : null;
         boolean isAdmin = "ADMIN".equalsIgnoreCase(userTypeName);
 
         if (isAdmin) {
-            return true; // ADMIN can access everything
+            return true;
         }
 
-        // If not ADMIN, check if user is the owner
         if (resourceOwnerId != null) {
             return userId.equals(resourceOwnerId);
         }

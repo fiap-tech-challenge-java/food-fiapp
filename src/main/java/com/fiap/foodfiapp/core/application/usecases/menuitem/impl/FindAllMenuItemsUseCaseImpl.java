@@ -10,13 +10,16 @@ import java.util.UUID;
 public class FindAllMenuItemsUseCaseImpl implements FindAllMenuItemsUseCase {
     private final MenuItemRepository menuItemRepository;
 
-    // CONSTRUTOR ADICIONADO
     public FindAllMenuItemsUseCaseImpl(MenuItemRepository menuItemRepository) {
         this.menuItemRepository = menuItemRepository;
     }
 
     @Override
     public List<MenuItem> execute(UUID restaurantId) {
+        if (restaurantId == null) {
+            throw new IllegalArgumentException("Restaurant ID cannot be null");
+        }
+        
         return menuItemRepository.findAllByRestaurantId(restaurantId);
     }
 }

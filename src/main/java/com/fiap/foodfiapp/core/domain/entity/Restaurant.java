@@ -27,8 +27,6 @@ public class Restaurant extends BaseEntity {
         this.address = address;
     }
 
-    // Getters e Setters
-
     public UUID getId() {
         return id;
     }

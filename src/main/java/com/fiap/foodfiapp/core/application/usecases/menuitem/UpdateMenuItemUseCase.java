@@ -1,4 +1,3 @@
-// src/main/java/com/fiap/foodfiapp/core/application/usecases/menuitem/UpdateMenuItemUseCase.java
 package com.fiap.foodfiapp.core.application.usecases.menuitem;
 
 import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;

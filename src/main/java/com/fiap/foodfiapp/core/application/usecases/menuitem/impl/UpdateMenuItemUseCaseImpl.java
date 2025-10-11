@@ -1,4 +1,3 @@
-// src/main/java/com/fiap/foodfiapp/core/application/usecases/menuitem/impl/UpdateMenuItemUseCaseImpl.java
 package com.fiap.foodfiapp.core.application.usecases.menuitem.impl;
 
 import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
@@ -34,7 +33,6 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
 
     @Override
     public MenuItem execute(UUID authenticatedUserId, UUID id, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException {
-        // Validate individual fields that are being updated
         if (name != null) {
             MenuItemValidator.validateName(name);
         }
@@ -52,7 +50,6 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
             throw new UnauthorizedAccessException("Authenticated user not found");
         }
 
-        // Check if user is ADMIN
         User user = userRepository.findById(authenticatedUserId).orElse(null);
         boolean isAdmin = false;
         if (user != null && user.getUserType() != null) {
@@ -62,22 +59,12 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
 
         Restaurant restaurant = restaurantRepository.findById(existingItem.getRestaurantId());
 
-        // ADMIN can update any menu item, others only their own restaurant's items
         if (!isAdmin && (restaurant == null || restaurant.getUserOwnerId() == null || !authenticatedUserId.equals(restaurant.getUserOwnerId()))) {
             throw new UnauthorizedAccessException("Only the restaurant owner or ADMIN can update this menu item");
         }
 
         String photoUrl = existingItem.getPhotoUrl();
         if (photo != null && photo.content() != null) {
-            if (existingItem.getPhotoUrl() != null && !existingItem.getPhotoUrl().isBlank()) {
-                try {
-                    String oldFileName = existingItem.getPhotoUrl().substring(existingItem.getPhotoUrl().lastIndexOf('/') + 1);
-                    fileStorageRepository.delete(oldFileName);
-                } catch (IOException e) {
-                    logger.warn("Failed to delete old menu item photo: {}", e.getMessage());
-                }
-            }
-
             String originalFilename = photo.originalFilename();
             String extension = "";
             if (originalFilename != null && originalFilename.contains(".")) {
@@ -88,14 +75,32 @@ public class UpdateMenuItemUseCaseImpl implements UpdateMenuItemUseCase {
             try (var is = photo.content()) {
                 photoUrl = fileStorageRepository.store(is, photo.size(), photo.contentType(), fileName);
             }
+            
+            if (existingItem.getPhotoUrl() != null && !existingItem.getPhotoUrl().isBlank()) {
+                try {
+                    String oldFileName = existingItem.getPhotoUrl().substring(existingItem.getPhotoUrl().lastIndexOf('/') + 1);
+                    fileStorageRepository.delete(oldFileName);
+                } catch (IOException e) {
+                    logger.warn("Failed to delete old menu item photo: {}", e.getMessage());
+                }
+            }
         }
 
-        // Atualiza a entidade existente com os novos dados
-        existingItem.setName(name);
-        existingItem.setDescription(description);
-        existingItem.setPrice(price);
-        existingItem.setLocalOnly(availableForInStoreOnly != null && availableForInStoreOnly);
-        existingItem.setPhotoUrl(photoUrl);
+        if (name != null) {
+            existingItem.setName(name);
+        }
+        if (description != null) {
+            existingItem.setDescription(description);
+        }
+        if (price != null) {
+            existingItem.setPrice(price);
+        }
+        if (availableForInStoreOnly != null) {
+            existingItem.setLocalOnly(availableForInStoreOnly);
+        }
+        if (photoUrl != null && !photoUrl.equals(existingItem.getPhotoUrl())) {
+            existingItem.setPhotoUrl(photoUrl);
+        }
 
         return menuItemRepository.save(existingItem);
     }

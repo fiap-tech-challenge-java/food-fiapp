@@ -40,7 +40,6 @@ public interface UserMapper {
 
     List<UserResponse> toUserResponseList(List<User> users);
 
-    // Métodos auxiliares para conversões específicas
     @Named("uuidToUserType")
     default UserType uuidToUserType(UUID uuid) {
         if (uuid == null) {

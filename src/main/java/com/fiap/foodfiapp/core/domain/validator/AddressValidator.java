@@ -86,17 +86,14 @@ public class AddressValidator {
             throw new InvalidPostalCodeException("Postal code is required");
         }
 
-        // Remove common formatting characters
         String cleanPostalCode = postalCode.replaceAll("[\\s\\-]", "");
 
-        // Brazilian postal code (CEP) should have 8 digits
         if (!cleanPostalCode.matches("\\d{8}")) {
             throw new InvalidPostalCodeException("Postal code must contain exactly 8 digits");
         }
     }
 
     public static void validateComplement(String complement) {
-        // Complement is optional, but if provided, it should have max length
         if (complement != null && complement.length() > 200) {
             throw new InvalidDataException("Address complement cannot exceed 200 characters");
         }

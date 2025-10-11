@@ -18,15 +18,10 @@ public class MinioStorageAdapter implements FileStorageRepository {
     @Value("${minio.public.endpoint}")
     private String minioPublicEndpoint;
 
-    // Injeção de dependência via construtor é preferível com @Component
     public MinioStorageAdapter(MinioClient minioClient) {
         this.minioClient = minioClient;
     }
 
-    /**
-     * Implementação corrigida do método store.
-     * Agora recebe os dados do arquivo de forma agnóstica ao framework.
-     */
     @Override
     public String store(InputStream content, long size, String contentType, String fileName) throws IOException {
         try {
@@ -35,13 +30,12 @@ public class MinioStorageAdapter implements FileStorageRepository {
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucketName)
                     .object(fileName)
-                    .stream(content, size, -1) // Usa o InputStream e o tamanho recebidos
-                    .contentType(contentType)       // Usa o content type recebido
+                    .stream(content, size, -1)
+                    .contentType(contentType)
                     .build());
 
             return getFileUrl(fileName);
         } catch (Exception e) {
-            // Lança uma exceção mais específica para melhor tratamento de erros
             throw new IOException("Failed to store file in MinIO: " + e.getMessage(), e);
         }
     }

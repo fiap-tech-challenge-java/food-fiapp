@@ -3,8 +3,6 @@ package com.fiap.foodfiapp.infrastructure.rest.controller;
 import com.fiap.foodfiapp.api.MenuItemsApi;
 import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
 import com.fiap.foodfiapp.core.application.usecases.menuitem.*;
-import com.fiap.foodfiapp.core.domain.exception.UnauthorizedException;
-import com.fiap.foodfiapp.core.domain.exception.UnauthorizedAccessException;
 import com.fiap.foodfiapp.infrastructure.rest.mapper.MenuItemMapper;
 import com.fiap.foodfiapp.infrastructure.security.AuthenticationService;
 import com.fiap.foodfiapp.model.MenuItemResponse;
@@ -41,11 +39,6 @@ public class MenuItemController implements MenuItemsApi {
             Boolean availableForInStoreOnly,
             MultipartFile photo) {
 
-        // Main authentication check
-     //   if (!authenticationService.canAccessUserProfile(userId)) {
-     //       throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
-     //   }
-
         try {
             // Convert MultipartFile to FileUploadRequest
             FileUploadRequest fileUploadRequest = null;
@@ -77,10 +70,7 @@ public class MenuItemController implements MenuItemsApi {
 
     @Override
     public ResponseEntity<Void> deleteMenuItem(UUID userId, UUID restaurantId, UUID itemId) {
-        // Main authentication check
-    //    if (!authenticationService.canAccessUserProfile(userId)) {
-    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
-    //    }
+
 
         deleteMenuItemUseCase.execute(userId, itemId);
         return ResponseEntity.noContent().build();
@@ -88,10 +78,7 @@ public class MenuItemController implements MenuItemsApi {
 
     @Override
     public ResponseEntity<MenuItemResponse> getMenuItem(UUID userId, UUID restaurantId, UUID itemId) {
-        // Main authentication check
-     //   if (!authenticationService.canAccessUserProfile(userId)) {
-     //       throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
-     //   }
+
 
         var menuItemOptional = findMenuItemByIdUseCase.execute(itemId);
 
@@ -101,7 +88,6 @@ public class MenuItemController implements MenuItemsApi {
 
         var menuItem = menuItemOptional.get();
 
-        // Use validation use case instead of directly accessing domain entity
         if (!validateMenuItemOwnershipUseCase.execute(itemId, restaurantId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -112,10 +98,6 @@ public class MenuItemController implements MenuItemsApi {
 
     @Override
     public ResponseEntity<List<MenuItemResponse>> listMenuItems(UUID userId, UUID restaurantId) {
-        // Main authentication check
-    //    if (!authenticationService.canAccessUserProfile(userId)) {
-    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
-     //   }
 
         var menuItems = findAllMenuItemsUseCase.execute(restaurantId);
         var response = menuItemMapper.toMenuItemResponseList(menuItems);
@@ -133,24 +115,17 @@ public class MenuItemController implements MenuItemsApi {
             Boolean availableForInStoreOnly,
             MultipartFile photo) {
 
-        // Main authentication check
-    //    if (!authenticationService.canAccessUserProfile(userId)) {
-    //        throw new UnauthorizedException("Permissão negada. Operação não autorizada para este usuário.");
-    //    }
 
-        // Find existing menu item and validate ownership using use case
         var existingMenuItemOptional = findMenuItemByIdUseCase.execute(itemId);
         if (existingMenuItemOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        // Use validation use case instead of directly accessing domain entity
         if (!validateMenuItemOwnershipUseCase.execute(itemId, restaurantId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         try {
-            // Convert MultipartFile to FileUploadRequest
             FileUploadRequest fileUploadRequest = null;
             if (photo != null && !photo.isEmpty()) {
                 fileUploadRequest = new FileUploadRequest(

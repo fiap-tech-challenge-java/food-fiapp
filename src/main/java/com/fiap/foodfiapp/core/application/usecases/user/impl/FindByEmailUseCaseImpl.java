@@ -25,9 +25,6 @@ public class FindByEmailUseCaseImpl implements FindUserByEmailUseCase {
         return user;
     }
 
-    /**
-     * Carrega os endereços associados ao usuário
-     */
     private void loadUserAddresses(User user) {
         if (user != null && user.getId() != null) {
             var addresses = addressRepository.findByOwner(user.getId(), AddressOwnerTypeEnum.USER.getDescription());

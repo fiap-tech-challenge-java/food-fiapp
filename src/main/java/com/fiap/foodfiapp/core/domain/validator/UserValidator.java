@@ -38,7 +38,6 @@ public class UserValidator {
             throw new InvalidEmailException("Email is required");
         }
 
-        // Basic email validation regex
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         if (!email.matches(emailRegex)) {
             throw new InvalidEmailException("Invalid email format");
@@ -54,20 +53,16 @@ public class UserValidator {
             throw new InvalidCpfException("CPF is required");
         }
 
-        // Remove common formatting characters
         String cleanCpf = cpf.replaceAll("[.\\-/]", "");
 
-        // Must have exactly 11 digits
         if (!cleanCpf.matches("\\d{11}")) {
             throw new InvalidCpfException("CPF must contain exactly 11 digits");
         }
 
-        // Check if all digits are the same (invalid CPF)
         if (cleanCpf.matches("(\\d)\\1{10}")) {
             throw new InvalidCpfException("Invalid CPF format");
         }
 
-        // Validate CPF algorithm
         if (!isValidCpfAlgorithm(cleanCpf)) {
             throw new InvalidCpfException("Invalid CPF");
         }
@@ -86,7 +81,6 @@ public class UserValidator {
             throw new InvalidDataException("Login cannot exceed 50 characters");
         }
 
-        // Login should contain only alphanumeric characters, dots, and underscores
         if (!login.matches("^[a-zA-Z0-9._]+$")) {
             throw new InvalidDataException("Login can only contain letters, numbers, dots, and underscores");
         }
@@ -94,7 +88,6 @@ public class UserValidator {
 
     private static boolean isValidCpfAlgorithm(String cpf) {
         try {
-            // Calculate first verification digit
             int sum = 0;
             for (int i = 0; i < 9; i++) {
                 sum += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
@@ -102,7 +95,6 @@ public class UserValidator {
             int firstDigit = 11 - (sum % 11);
             if (firstDigit >= 10) firstDigit = 0;
 
-            // Calculate second verification digit
             sum = 0;
             for (int i = 0; i < 10; i++) {
                 sum += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
@@ -110,7 +102,6 @@ public class UserValidator {
             int secondDigit = 11 - (sum % 11);
             if (secondDigit >= 10) secondDigit = 0;
 
-            // Verify digits
             return Character.getNumericValue(cpf.charAt(9)) == firstDigit &&
                    Character.getNumericValue(cpf.charAt(10)) == secondDigit;
         } catch (Exception e) {

@@ -38,9 +38,4 @@ public class UserEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_type_uuid", referencedColumnName = "uuid")
     private UserTypeEntity userType;
-
-    // A lista de endereços foi removida.
-    // O relacionamento agora é gerenciado pela camada de aplicação
-    // através do AddressRepository, usando ownerId e ownerType.
-    // Isso desacopla as entidades e adere melhor à Clean Architecture.
 }

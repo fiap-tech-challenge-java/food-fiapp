@@ -1,7 +1,6 @@
 package com.fiap.foodfiapp.core.application.usecases.user.impl;
 
 import com.fiap.foodfiapp.core.application.usecases.user.IsAdminUseCase;
-import com.fiap.foodfiapp.core.domain.entity.User;
 import com.fiap.foodfiapp.core.domain.port.UserRepository;
 
 import java.util.UUID;
