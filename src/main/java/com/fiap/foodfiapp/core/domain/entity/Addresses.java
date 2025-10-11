@@ -14,11 +14,9 @@ public class Addresses extends BaseEntity {
     private String state;
     private String postalCode;
 
-    // Construtor para uso do framework de persistência
     public Addresses() {
     }
 
-    // Construtor principal para criar a entidade
     public Addresses(UUID id, String publicPlace, String number, String complement, String neighborhood, String city, String state, String postalCode) {
         this.id = id;
         this.publicPlace = publicPlace;
@@ -28,13 +26,10 @@ public class Addresses extends BaseEntity {
         this.city = city;
         this.state = state;
         this.postalCode = postalCode;
-        validate(); // Garante que a entidade é sempre válida ao ser criada
+        validate();
     }
 
-    /**
-     * Valida as regras de negócio da entidade Endereço.
-     * Garante que os campos essenciais não são nulos ou vazios.
-     */
+
     public void validate() {
         if (publicPlace == null || publicPlace.isBlank()) {
             throw new InvalidDataException("Public place (street, avenue, etc.) is mandatory.");
@@ -56,7 +51,6 @@ public class Addresses extends BaseEntity {
         }
     }
 
-    // Getters e Setters
     public UUID getId() {
         return id;
     }

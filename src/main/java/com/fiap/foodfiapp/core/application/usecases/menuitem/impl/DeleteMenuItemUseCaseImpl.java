@@ -25,22 +25,18 @@ public class DeleteMenuItemUseCaseImpl implements DeleteMenuItemUseCase {
 
     @Override
     public void execute(UUID authenticatedUserId, UUID itemId) {
-        // 1. Buscar o item do menu
         var menuItem = menuItemRepository.findById(itemId)
                 .orElseThrow(() -> new BusinessException("Item do menu não encontrado."));
 
-        // 2. Buscar o restaurante ao qual o item pertence
         var restaurant = restaurantRepository.findById(menuItem.getRestaurantId());
         if (restaurant == null) {
             throw new BusinessException("Restaurante não encontrado.");
         }
 
-        // 3. Validar se o usuário autenticado é o dono do restaurante
         if (!authenticatedUserId.equals(restaurant.getUserOwnerId())) {
             throw new UnauthorizedAccessException("Permissão negada. Você só pode deletar itens do menu de seus próprios restaurantes.");
         }
 
-        // 4. Deletar a foto se existir
         if (menuItem.getPhotoUrl() != null && !menuItem.getPhotoUrl().isBlank()) {
             try {
                 String fileName = menuItem.getPhotoUrl().substring(menuItem.getPhotoUrl().lastIndexOf('/') + 1);
@@ -50,7 +46,6 @@ public class DeleteMenuItemUseCaseImpl implements DeleteMenuItemUseCase {
             }
         }
 
-        // 5. Deletar o item do menu
         menuItemRepository.deleteById(itemId);
     }
 }

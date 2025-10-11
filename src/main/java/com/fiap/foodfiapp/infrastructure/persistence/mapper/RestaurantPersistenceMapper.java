@@ -12,9 +12,9 @@ public interface RestaurantPersistenceMapper {
     RestaurantPersistenceMapper INSTANCE = Mappers.getMapper(RestaurantPersistenceMapper.class);
 
     @Mapping(target = "menuItems", ignore = true)
-    @Mapping(target = "description", source = "description") // ADICIONE ESTA LINHA
+    @Mapping(target = "description", source = "description")
     RestaurantEntity toEntity(Restaurant restaurant);
 
-    @Mapping(target = "address", ignore = true) // Endereço é carregado sob demanda
+    @Mapping(target = "address", ignore = true)
     Restaurant toDomain(RestaurantEntity restaurantEntity);
 }

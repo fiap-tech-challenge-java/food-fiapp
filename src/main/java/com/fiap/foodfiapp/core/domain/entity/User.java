@@ -18,7 +18,6 @@ public class User extends BaseEntity {
     public User() {
     }
 
-    // Construtor completo
     public User(UUID id, String name, String email, String login, String cpf, List<Addresses> addresses, UserType userType,
                 Boolean isActive, OffsetDateTime updatedAt, OffsetDateTime createdAt, String password) {
         this.id = id;
@@ -34,7 +33,6 @@ public class User extends BaseEntity {
         this.password = password;
     }
 
-    // Getters e Setters
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
     public String getName() { return name; }

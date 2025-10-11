@@ -17,7 +17,6 @@ public class UserType extends BaseEntity {
         this.name = name;
     }
 
-    // Construtor com timestamps
     public UserType(UUID id, String name, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.uuid = id;
         this.name = name;
@@ -25,7 +24,6 @@ public class UserType extends BaseEntity {
         this.setUpdatedAt(updatedAt);
     }
 
-    // Construtor completo com status ativo e timestamps
     public UserType(UUID id, String name, boolean active, OffsetDateTime createdAt, OffsetDateTime updatedAt) {
         this.uuid = id;
         this.name = name;

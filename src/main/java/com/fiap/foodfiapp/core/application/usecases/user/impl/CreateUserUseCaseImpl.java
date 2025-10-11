@@ -11,6 +11,8 @@ import com.fiap.foodfiapp.core.domain.exception.CpfAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.LoginAlreadyExistsException;
 import com.fiap.foodfiapp.core.domain.exception.UserTypeNotFoundException;
 import com.fiap.foodfiapp.core.domain.enums.AddressOwnerTypeEnum;
+import com.fiap.foodfiapp.core.domain.validator.AddressValidator;
+import com.fiap.foodfiapp.core.domain.validator.UserValidator;
 
 import java.util.stream.Collectors;
 
@@ -27,24 +29,23 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
 
     @Override
     public User execute(User user) {
-        // RN: Validação obrigatória de endereço
+        UserValidator.validate(user);
+
         if (user.getAddress() == null || user.getAddress().isEmpty()) {
             throw new BusinessException("At least one address is required for user creation.");
         }
 
-        // RN: Reviver utilizador inativo se houver match por e-mail
+        user.getAddress().forEach(AddressValidator::validate);
+
         var existingByEmail = userRepository.findByEmail(user.getEmail());
         if (existingByEmail.isPresent()) {
             var existing = existingByEmail.get();
             if (Boolean.TRUE.equals(existing.getIsActive())) {
-                // Mantém a lógica atual de conflito quando já está ativo
                 throw new BusinessException("User with this email already exists.");
             }
-            // Revive usuário inativo com os novos dados
             applyUserUpdates(existing, user);
             existing.setIsActive(true);
             var revived = userRepository.save(existing);
-            // Salvar endereços novos (agora obrigatórios)
             var savedAddress = user.getAddress().stream()
                     .map(address -> addressRepository.save(address, revived.getId(), AddressOwnerTypeEnum.USER.getDescription()))
                     .collect(Collectors.toList());
@@ -52,19 +53,15 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             return revived;
         }
 
-        // RN: Reviver utilizador inativo se houver match por CPF
         var existingByCpf = userRepository.findByCpf(user.getCpf());
         if (existingByCpf.isPresent()) {
             var existing = existingByCpf.get();
             if (Boolean.TRUE.equals(existing.getIsActive())) {
-                // Mantém a lógica atual de conflito quando já está ativo
                 throw new CpfAlreadyExistsException(user.getCpf());
             }
-            // Revive usuário inativo com os novos dados
             applyUserUpdates(existing, user);
             existing.setIsActive(true);
             var revived = userRepository.save(existing);
-            // Salvar endereços novos (agora obrigatórios)
             var savedAddress = user.getAddress().stream()
                     .map(address -> addressRepository.save(address, revived.getId(), AddressOwnerTypeEnum.USER.getDescription()))
                     .collect(Collectors.toList());
@@ -72,7 +69,6 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             return revived;
         }
 
-        // Validações de negócio (permanecem para casos sem revival)
         userRepository.findByCpf(user.getCpf()).ifPresent(existingUser -> {
             throw new CpfAlreadyExistsException(user.getCpf());
         });
@@ -90,15 +86,12 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
                 .orElseThrow(() -> new UserTypeNotFoundException("User type not found."));
         user.setUserType(userType);
 
-        // Salva o usuário primeiro para obter o ID
         User savedUser = userRepository.save(user);
 
-        // Salva os endereços associados ao usuário (agora obrigatórios)
         var savedAddress = user.getAddress().stream()
                 .map(address -> addressRepository.save(address, savedUser.getId(), AddressOwnerTypeEnum.USER.getDescription()))
                 .collect(Collectors.toList());
 
-        // Define os endereços salvos no usuário para retornar na resposta
         savedUser.setAddress(savedAddress);
 
         return savedUser;
@@ -111,6 +104,5 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
         target.setLogin(source.getLogin());
         target.setPassword(source.getPassword());
         target.setUserType(source.getUserType());
-        // Endereços são tratados após salvar o usuário (vinculados por ownerId)
     }
 }

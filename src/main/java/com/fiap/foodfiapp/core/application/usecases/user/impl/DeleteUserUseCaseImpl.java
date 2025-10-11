@@ -1,4 +1,3 @@
-// src/main/java/com/fiap/foodfiapp/core/application/usecases/user/impl/DeleteUserUseCaseImpl.java
 package com.fiap.foodfiapp.core.application.usecases.user.impl;
 
 import com.fiap.foodfiapp.core.application.usecases.user.DeleteUserUseCase;
@@ -20,24 +19,23 @@ public class DeleteUserUseCaseImpl implements DeleteUserUseCase {
 
     @Override
     public void execute(UUID id) {
-        // Verifica se o usuário existe
+        if (id == null) {
+            return;
+        }
+        
         var optionalUser = userRepository.findById(id);
         if (optionalUser.isEmpty()) {
-            // Operação idempotente: se não existe, não faz nada
             return;
         }
 
         var user = optionalUser.get();
-        // Se já estiver inativo, nada a fazer
         if (Boolean.FALSE.equals(user.getIsActive())) {
             return;
         }
 
-        // Exclusão lógica do usuário
         user.setIsActive(false);
         userRepository.save(user);
 
-        // Cascade: marca todos os endereços do usuário como inativos
         var ownerType = AddressOwnerTypeEnum.USER.getDescription();
         var addresses = addressRepository.findByOwner(id, ownerType);
         for (var address : addresses) {

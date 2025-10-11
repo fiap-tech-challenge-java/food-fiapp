@@ -22,13 +22,16 @@ public class DeleteUserTypeUseCaseImpl implements DeleteUserTypeUseCase {
         this.userRepository = userRepository;
     }
 
-    // Assinatura corrigida para receber apenas o UUID
     @Override
     public void execute(UUID uuid) {
+        if (uuid == null) {
+            throw new NullPointerException("User type UUID cannot be null");
+        }
+        
         UserType userType = userTypeRepository.findById(uuid)
                 .orElseThrow(() -> new UserTypeNotFoundException("User type not found."));
 
-        if (CORE_USER_TYPES.contains(userType.getName().toUpperCase())) {
+        if (userType.getName() != null && CORE_USER_TYPES.contains(userType.getName().toUpperCase())) {
             throw new CoreUserTypeModificationException();
         }
 

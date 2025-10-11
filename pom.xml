@@ -250,9 +250,26 @@
                 </executions>
                 <configuration>
                     <excludes>
+                        <!-- Código gerado automaticamente -->
                         <exclude>**/model/**</exclude>
                         <exclude>**/api/**</exclude>
+                        <exclude>**/infrastructure/persistence/mapper/**</exclude>
+                        <exclude>**/infrastructure/rest/mapper/**</exclude>
+                        
+                        <!-- Classe main do Spring Boot -->
                         <exclude>**/FoodfiappApplication.class</exclude>
+                        
+                        <!-- Entidades JPA (POJOs) -->
+                        <exclude>**/infrastructure/persistence/entity/**</exclude>
+                        
+                        <!-- Configurações Spring (melhor testar via integração) -->
+                        <exclude>**/infrastructure/config/**</exclude>
+                        <exclude>**/infrastructure/security/**</exclude>
+                        
+                        <!-- Repositories e Controllers (camada de infraestrutura) -->
+                        <exclude>**/infrastructure/persistence/repository/**</exclude>
+                        <exclude>**/infrastructure/rest/controller/**</exclude>
+                        <exclude>**/infrastructure/storage/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

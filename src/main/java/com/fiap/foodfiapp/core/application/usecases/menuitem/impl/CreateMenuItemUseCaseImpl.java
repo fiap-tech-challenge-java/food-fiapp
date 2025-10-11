@@ -1,4 +1,3 @@
-// src/main/java/com/fiap/foodfiapp/core/application/usecases/menuitem/impl/CreateMenuItemUseCaseImpl.java
 package com.fiap.foodfiapp.core.application.usecases.menuitem.impl;
 
 import com.fiap.foodfiapp.core.application.dto.FileUploadRequest;
@@ -8,6 +7,7 @@ import com.fiap.foodfiapp.core.domain.entity.MenuItem;
 import com.fiap.foodfiapp.core.domain.port.FileStorageRepository;
 import com.fiap.foodfiapp.core.domain.port.MenuItemRepository;
 import com.fiap.foodfiapp.core.domain.port.RestaurantRepository;
+import com.fiap.foodfiapp.core.domain.validator.MenuItemValidator;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -27,7 +27,10 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
 
     @Override
     public MenuItem execute(UUID userId, UUID restaurantId, String name, String description, Double price, Boolean availableForInStoreOnly, FileUploadRequest photo) throws IOException {
-        // Valida se o usuário é o proprietário do restaurante
+        MenuItemValidator.validateName(name);
+        MenuItemValidator.validatePrice(price);
+        MenuItemValidator.validateDescription(description);
+
         if (!validateRestaurantOwnershipUseCase.execute(userId, restaurantId)) {
             throw new IllegalArgumentException("Usuário não possui permissão para criar itens de menu neste restaurante. Apenas o proprietário pode adicionar itens ao menu.");
         }
@@ -36,7 +39,6 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
             throw new IllegalArgumentException("Restaurant not found or is inactive.");
         }
 
-        // A entidade agora é criada aqui, dentro da camada de aplicação.
         MenuItem menuItem = new MenuItem(null, name, description, price,
                 availableForInStoreOnly != null && availableForInStoreOnly,
                 null, restaurantId, null, null);
@@ -48,7 +50,6 @@ public class CreateMenuItemUseCaseImpl implements CreateMenuItemUseCase {
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
             }
-            // Gera um nome de ficheiro único para evitar conflitos
             String fileName = String.format("%s-%s%s", restaurantId, UUID.randomUUID(), extension);
 
             photoUrl = fileStorageRepository.store(

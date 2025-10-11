@@ -16,6 +16,10 @@ public class FindAllRestaurantsByUserIdUseCaseImpl implements FindAllRestaurants
 
     @Override
     public List<Restaurant> execute(UUID id) {
-       return this.restaurantRepository.findAllByUserId(id);
+        if (id == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+        
+        return this.restaurantRepository.findAllByUserId(id);
     }
 }

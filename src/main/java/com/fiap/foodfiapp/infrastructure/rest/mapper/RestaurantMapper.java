@@ -49,7 +49,6 @@ public abstract class RestaurantMapper {
 
     public abstract List<RestaurantResponse> toRestaurantResponseList(List<Restaurant> restaurants);
 
-    // Método para mapear AddressesRequest -> Addresses
     protected Addresses map(com.fiap.foodfiapp.model.AddressesRequest addressesRequest) {
         if (addressesRequest == null) {
             return null;
@@ -73,8 +72,6 @@ public abstract class RestaurantMapper {
         if (address == null) {
             return Collections.emptyList();
         }
-        // Usa o mapper injetado para converter o objeto de endereço único em uma lista
-        // de um elemento
         return Collections.singletonList(AddressesMapper.INSTANCE.toAddressesResponse(address));
     }
 
@@ -84,7 +81,6 @@ public abstract class RestaurantMapper {
             return null;
         }
 
-        // Busca o usuário. Se não encontrar, lança uma exceção clara.
         User user = userRepository.findById(userOwnerId)
                 .orElseThrow(() -> new UserNotFoundException("Owner (user) not found with id: " + userOwnerId));
 

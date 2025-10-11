@@ -163,4 +163,25 @@ class UpdateUserTypeUseCaseTest {
         assertEquals("BASIC", userTypeUpdates.getName());
         verify(userTypeRepository).save(userTypeUpdates);
     }
+
+    @Test
+    void shouldUpdateWhenNameFoundButSameUuid() {
+        // Arrange
+        userTypeUpdates.setName("UPDATED_NAME");
+        UserType foundUserType = new UserType();
+        foundUserType.setUuid(userTypeUuid); // Same UUID
+        foundUserType.setName("UPDATED_NAME");
+
+        when(userTypeRepository.findById(userTypeUuid)).thenReturn(Optional.of(existingUserType));
+        when(userRepository.existsByUserTypeUuid(userTypeUuid)).thenReturn(false);
+        when(userTypeRepository.findByName("UPDATED_NAME")).thenReturn(Optional.of(foundUserType));
+        when(userTypeRepository.save(any(UserType.class))).thenReturn(userTypeUpdates);
+
+        // Act
+        UserType result = updateUserTypeUseCase.execute(userTypeUuid, userTypeUpdates);
+
+        // Assert
+        assertNotNull(result);
+        verify(userTypeRepository).save(userTypeUpdates);
+    }
 }
